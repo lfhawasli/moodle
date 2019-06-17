@@ -50,21 +50,17 @@ class course_edit_form extends moodleform {
         $this->course  = $course;
         $this->context = $context;
         
-        // START UCLAMOD CCLE-2389 - site indicator info display
-        
+        // START UCLA MOD: CCLE-2389 - site indicator info display.
         if(!empty($course->id) && ucla_map_courseid_to_termsrses($this->course->id)) {
-            // is a registrar site
-//            $mform->addElement('static', 'indicator', 
-//                    get_string('type', 'tool_uclasiteindicator'), 
-//                    get_string('site_registrar', 'tool_uclasiteindicator'));
+            // Is a registrar site, so don't display anything.
         } else if (course_get_format($course)->get_format() == 'ucla') {
-            // user can assign site type if they have the capability at site, 
-            // category, or course level
-            $can_edit_sitetype = false;
+            // User can assign site type if they have the capability at site,
+            // category, or course level.
+            $caneditsitetype = false;
             if (has_capability('tool/uclasiteindicator:edit', $systemcontext) || 
                     has_capability('tool/uclasiteindicator:edit', $categorycontext) ||
                     (!empty($coursecontext) && has_capability('tool/uclasiteindicator:edit', $coursecontext))) {
-                $can_edit_sitetype = true;
+                $caneditsitetype = true;
             }
 
             $indicator = null;
@@ -72,22 +68,22 @@ class course_edit_form extends moodleform {
                 $indicator = siteindicator_site::load($course->id);
             }            
 
-            // do not allow TA site type to be changed via GUI
+            // Do not allow TA site type to be changed via GUI.
             if (!empty($indicator) &&
                     $indicator->property->type == siteindicator_manager::SITE_TYPE_TASITE) {
-                $can_edit_sitetype = false;
+                $caneditsitetype = false;
             }
 
 
-            // only display site type info if there is a type and user can edit
-            if ($can_edit_sitetype || !empty($indicator)) {
+            // Only display site type info if there is a type and user can edit.
+            if ($caneditsitetype || !empty($indicator)) {
                 $mform->addElement('header','uclasiteindicator', get_string('pluginname', 'tool_uclasiteindicator'));
             }
             
             // If user can edit site type, then they can also edit category, so 
             // remind user that if course is in default category that they 
             // should move it.
-            if ($can_edit_sitetype && $category->id == $CFG->defaultrequestcategory) {
+            if ($caneditsitetype && $category->id == $CFG->defaultrequestcategory) {
                 global $OUTPUT;
                 $mform->addElement('html', $OUTPUT->notification(
                                 get_string('defaultcategorywarning', 'tool_uclasiteindicator'), 
@@ -109,8 +105,8 @@ class course_edit_form extends moodleform {
                         '<strong>' . implode('</strong>, <strong>', $rolenames) . '</strong>');
             }
                                 
-            // Change the site type
-            if($can_edit_sitetype) {
+            // Change the site type.
+            if($caneditsitetype) {
                 if (empty($indicator)) {
                     // no indicator found, display ability for user to choose type
                     // if they have the capability to edit
@@ -122,18 +118,18 @@ class course_edit_form extends moodleform {
                 $types = siteindicator_manager::get_types_list();
                 $radioarray = array();
                 foreach($types as $type) {
-                    // don't allow tasite type to be selected
+                    // Don't allow tasite type to be selected.
                     if (siteindicator_manager::SITE_TYPE_TASITE == $type['shortname']) {
                         continue;
                     }
-                    $descstring = '<strong>' . $type['fullname'] . '</strong> - ' . $type['description'];
+                    $descstring = '<p class="mb-0"><strong>' . $type['fullname'] . '</strong> - ' . $type['description'] . '</p>';
                     $attributes = array(
                         'class' => 'indicator-form',
                         'value' => $type['shortname']
                     );
                     $radioarray[] = $mform->createElement('radio', 'indicator_change', '', $descstring, $type['shortname'], $attributes);
                 }
-                $mform->addGroup($radioarray, 'indicator_type_radios', get_string('change', 'tool_uclasiteindicator'), array('<br/>'), false);
+                $mform->addGroup($radioarray, 'indicator_type_radios', get_string('change', 'tool_uclasiteindicator'), '', false);
                 $mform->addGroupRule('indicator_type_radios', get_string('required'), 'required');
                 
                 if (!empty($indicator)) {
@@ -141,7 +137,7 @@ class course_edit_form extends moodleform {
                 }
             }            
         }
-        // END UCLA MOD CCLE-2389
+        // END UCLA MOD: CCLE-2389.
 
         // Form definition with new course defaults.
         $mform->addElement('header','general', get_string('general', 'form'));
@@ -223,11 +219,13 @@ class course_edit_form extends moodleform {
         */
         // END UCLA MOD: CCLE-6987.
 
-        $mform->addElement('date_selector', 'startdate', get_string('startdate'));
+        $mform->addElement('date_time_selector', 'startdate', get_string('startdate'));
         $mform->addHelpButton('startdate', 'startdate');
-        $mform->setDefault('startdate', time() + 3600 * 24);
+        $date = (new DateTime())->setTimestamp(usergetmidnight(time()));
+        $date->modify('+1 day');
+        $mform->setDefault('startdate', $date->getTimestamp());
 
-        $mform->addElement('date_selector', 'enddate', get_string('enddate'), array('optional' => true));
+        $mform->addElement('date_time_selector', 'enddate', get_string('enddate'), array('optional' => true));
         $mform->addHelpButton('enddate', 'enddate');
 
         // START UCLA MOD: CCLE-2940 - TERM-SRS Numbers needed in Course ID Number field
@@ -260,7 +258,7 @@ class course_edit_form extends moodleform {
             }
             $course->idnumber = $idnumber;
         }
-        // END UCLA MOD CCLE-2940
+        // END UCLA MOD: CCLE-2940
 
         // Description.
         $mform->addElement('header', 'descriptionhdr', get_string('description'));
@@ -334,14 +332,17 @@ class course_edit_form extends moodleform {
                 $data = $OUTPUT->edit_form_filepicker($mform, $course->id, $coursecontext->id);
                 $this->set_data($data);
             }
-            // END UCLA MOD CCLE-2315
+            // END UCLA MOD: CCLE-2315
         }
 
         $languages=array();
         $languages[''] = get_string('forceno');
         $languages += get_string_manager()->get_list_of_translations();
-        $mform->addElement('select', 'lang', get_string('forcelanguage'), $languages);
-        $mform->setDefault('lang', $courseconfig->lang);
+        if ((empty($course->id) && guess_if_creator_will_have_course_capability('moodle/course:setforcedlanguage', $categorycontext))
+                || (!empty($course->id) && has_capability('moodle/course:setforcedlanguage', $coursecontext))) {
+            $mform->addElement('select', 'lang', get_string('forcelanguage'), $languages);
+            $mform->setDefault('lang', $courseconfig->lang);
+        }
 
         // Multi-Calendar Support - see MDL-18375.
         $calendartypes = \core_calendar\type_factory::get_list_of_calendar_types();
@@ -535,15 +536,15 @@ class course_edit_form extends moodleform {
             }
         }
 
-        // START UCLA MOD: CCLE-4230 - Instructors can change format from UCLA
+        // START UCLA MOD: CCLE-3278 - Change options on course edit settings page.
         if ($courseid = $mform->getElementValue('id')) {
             $context = context_course::instance($courseid);
 
-            // Lock down ability for non-admins to change course format,
-            // language, and file upload size.
+            // Lock down ability for non-admins to change course format and file
+            // upload size.
             if (!empty($context) &&
                 !has_capability('local/ucla:editadvancedcoursesettings', $context)) {
-                $lockdown = array('format', 'lang', 'maxbytes');
+                $lockdown = array('format', 'maxbytes');
                 foreach ($lockdown as $elementname) {
                     if ($mform->elementExists($elementname)) {
                         $element = $mform->getElement($elementname);
@@ -565,7 +566,7 @@ class course_edit_form extends moodleform {
                 }
             }
         }
-        // END UCLA MOD: CCLE-4230
+        // END UCLA MOD: CCLE-3278.
     }
 
     /**

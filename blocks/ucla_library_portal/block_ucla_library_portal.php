@@ -56,7 +56,7 @@ class block_ucla_library_portal extends block_base {
      * @param array $courseinfo     An array from the ucla_course_menu block
      *                              with a 'course' index with a course object.
      *
-     * @return array               Nodes that will be displayed in the menu.
+     * @return navigation_node      Node that will be displayed in the menu.
      */
     public static function get_navigation_nodes($courseinfo) {
         $course = $courseinfo['course'];

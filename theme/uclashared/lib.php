@@ -73,8 +73,30 @@ function theme_uclashared_get_fontawesome_icon_map() {
          'atto_poodll:video' => 'fa-video-camera',
          'atto_poodll:whiteboard' => 'fa-pencil',
          'atto_poodll:snapshot' => 'fa-camera',
-         'atto_fontfamily:icon' => 'fa-font'
+         'atto_fontfamily:icon' => 'fa-font',
+         'core:i/navigationitem' => 'fa-cog',
      ];
+}
+
+/**
+ * Returns the main SCSS content.
+ *
+ * @param theme_config $theme The theme config object.
+ * @return string
+ */
+function theme_uclashared_get_main_scss_content($theme) {
+    global $CFG;
+
+    // Default from Boost.
+    $scss = file_get_contents($CFG->dirroot . '/theme/boost/scss/preset/default.scss');
+
+    // Pre CSS.
+    $pre = file_get_contents($CFG->dirroot . '/theme/uclashared/scss/pre.scss');
+    // Post CSS.
+    $post = file_get_contents($CFG->dirroot . '/theme/uclashared/scss/post.scss');
+
+    // Combine them together.
+    return $pre . "\n" . $scss . "\n" . $post;
 }
 
 /**

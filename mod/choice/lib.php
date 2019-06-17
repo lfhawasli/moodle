@@ -31,11 +31,11 @@ $CHOICE_COLUMN_HEIGHT = 300;
 global $CHOICE_COLUMN_WIDTH;
 $CHOICE_COLUMN_WIDTH = 300;
 
-// START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous
-define('CHOICE_PUBLISH_ANONYMOUS',        '0');
-define('CHOICE_PUBLISH_ANONYMOUS_TO_ALL', '1');
-define('CHOICE_PUBLISH_NAMES',            '2');
-// END UCLA MOD: CCLE-7191
+define('CHOICE_PUBLISH_ANONYMOUS', '0');
+define('CHOICE_PUBLISH_NAMES',     '1');
+// START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
+define('CHOICE_PUBLISH_ANONYMOUS_TO_STUDENTS', '2');
+// END UCLA MOD: CCLE-7191.
 
 define('CHOICE_SHOWRESULTS_NOT',          '0');
 define('CHOICE_SHOWRESULTS_AFTER_ANSWER', '1');
@@ -50,11 +50,11 @@ define('CHOICE_EVENT_TYPE_CLOSE', 'close');
 
 /** @global array $CHOICE_PUBLISH */
 global $CHOICE_PUBLISH;
-// START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous
 $CHOICE_PUBLISH = array (CHOICE_PUBLISH_ANONYMOUS        => get_string('publishanonymous', 'choice'),
-                         CHOICE_PUBLISH_ANONYMOUS_TO_ALL => get_string('publishanonymoustoall', 'choice'),
+// START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
+                         CHOICE_PUBLISH_ANONYMOUS_TO_STUDENTS => get_string('publishanonymoustostudents', 'choice'),
+// END UCLA MOD: CCLE-7191.
                          CHOICE_PUBLISH_NAMES            => get_string('publishnames', 'choice'));
-// END UCLA MOD: CCLE-7191
 
 /** @global array $CHOICE_SHOWRESULTS */
 global $CHOICE_SHOWRESULTS;
@@ -826,15 +826,6 @@ function choice_get_response_data($choice, $cm, $groupmode, $onlyactive) {
         }
     }
     return $allresponses;
-}
-
-/**
- * Returns all other caps used in module
- *
- * @return array
- */
-function choice_get_extra_capabilities() {
-    return array('moodle/site:accessallgroups');
 }
 
 /**

@@ -1,12 +1,19 @@
-@import "../../uclashared/scss/variables";
-@import "../../boost/scss/bootstrap/variables";
+@import "../../uclashared/scss/pre";
+// Copied from ../../boost/scss/bootstrap/variables" because cannot include
+// this file directly due to dependancies on other Bootstrap files.
+$grid-breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px
+) !default;
 @import "../../boost/scss/bootstrap/mixins/breakpoints";
 
-header.header-custom-logo {
+nav.header-custom-logo {
     // Custom logos have no margins, they should be aligned from top-left corner.
     .header-logo {
         margin: 0;
-        margin-top: -4px;
     }
 
     &.tanms {
@@ -17,7 +24,6 @@ header.header-custom-logo {
         .header-login {
             background-color: $header-color-prod;
             margin-right: 0;
-            padding-left: 1.0em;
         }
 
         // Clip the tanms logo for smaller screens.
@@ -43,17 +49,16 @@ header.header-custom-logo {
         .header-main {
             background-color: #3284bf;
         }
-        .header-logo {
-            img {
-                margin-top: -4px;
-            }
-        }
     }
 
     &.executive_education_program {
-        .header-logo {
-            img {
-                margin-top: -4px;
+        // Need help/User menu gets shifted for this category.
+        .usermenu {
+            margin-top: -0.3rem;
+        }
+        @include media-breakpoint-down(sm) {
+            .btn-help-feedback {
+                margin-top: -0.4rem;
             }
         }
         // Show bottom banner.

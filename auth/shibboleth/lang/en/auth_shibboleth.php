@@ -32,7 +32,7 @@ $string['auth_shibboleth_login'] = 'Shibboleth login';
 $string['auth_shibboleth_login_long'] = 'Login to Moodle via Shibboleth';
 $string['auth_shibboleth_manual_login'] = 'Manual login';
 $string['auth_shibboleth_select_member'] = 'I\'m a member of ...';
-$string['auth_shibboleth_select_organization'] = 'For authentication via Shibboleth, please select your organization from the drop down list:';
+$string['auth_shibboleth_select_organization'] = 'For authentication via Shibboleth, please select your organisation from the drop-down menu:';
 $string['auth_shib_convert_data'] = 'Data modification API';
 $string['auth_shib_convert_data_description'] = 'You can use this API to further modify the data provided by Shibboleth. Read the <a href="../auth/shibboleth/README.txt">README</a> for further instructions.';
 $string['auth_shib_convert_data_warning'] = 'The file does not exist or is not readable by the webserver process!';
@@ -58,4 +58,3 @@ $string['shib_not_all_attributes_error'] = 'Moodle needs certain Shibboleth attr
 $string['shib_not_set_up_error'] = 'Shibboleth authentication doesn\'t seem to be set up correctly because no Shibboleth environment variables are present for this page. Please consult the <a href="README.txt">README</a> for further instructions on how to set up Shibboleth authentication or contact the webmaster of this Moodle installation.';
 $string['pluginname'] = 'Shibboleth';
 $string['privacy:metadata'] = 'The Shibboleth authentication plugin does not store any personal data.';
-

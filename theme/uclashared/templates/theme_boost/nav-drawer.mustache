@@ -1,10 +1,11 @@
 {{!
     @template theme_boost/nav-drawer
 
+    UCLA MOD: Added editing tools in course, else browseby.
 
     Example context (json): {}
 }}
-<div id="nav-drawer" data-region="drawer" class="hidden-print moodle-has-zindex {{^navdraweropen}}closed{{/navdraweropen}}" aria-hidden="{{#navdraweropen}}false{{/navdraweropen}}{{^navdraweropen}}true{{/navdraweropen}}" tabindex="-1">
+<div id="nav-drawer" data-region="drawer" class="d-print-none moodle-has-zindex {{^navdraweropen}}closed{{/navdraweropen}}" aria-hidden="{{#navdraweropen}}false{{/navdraweropen}}{{^navdraweropen}}true{{/navdraweropen}}" tabindex="-1">
     {{#incourse}}
         {{#editingon}}
             {{! Bootstrap is 12 columns so to have 3 columns of even width set
@@ -35,7 +36,7 @@
         <nav class="list-group">
             <div class="list-group-item p-x-1">
                 {{{search}}}
-                <div class="m-t-1"></div>
+                <div class="mt-3"></div>
                 {{{browseby}}}
             </div>
         </nav>

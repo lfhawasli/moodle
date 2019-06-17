@@ -61,10 +61,6 @@ define("LESSON_MAX_EVENT_LENGTH", "432000");
 /** Answer format is HTML */
 define("LESSON_ANSWER_HTML", "HTML");
 
-// Event types.
-define('LESSON_EVENT_TYPE_OPEN', 'open');
-define('LESSON_EVENT_TYPE_CLOSE', 'close');
-
 //////////////////////////////////////////////////////////////////////////////////////
 /// Any other lesson functions go here.  Each of them must have a name that
 /// starts with lesson_
@@ -1730,6 +1726,25 @@ class lesson extends lesson_base {
         foreach ($overrides as $override) {
             $this->delete_override($override->id);
         }
+    }
+
+    /**
+     * Checks user enrollment in the current course.
+     *
+     * @param int $userid
+     * @return null|stdClass user record
+     */
+    public function is_participant($userid) {
+        return is_enrolled($this->get_context(), $userid, 'mod/lesson:view', $this->show_only_active_users());
+    }
+
+    /**
+     * Check is only active users in course should be shown.
+     *
+     * @return bool true if only active users should be shown.
+     */
+    public function show_only_active_users() {
+        return !has_capability('moodle/course:viewsuspendedusers', $this->get_context());
     }
 
     /**
@@ -4185,29 +4200,31 @@ abstract class lesson_page extends lesson_base {
 
                     foreach ($studentanswerresponse as $answer => $response) {
                         // Add a table row containing the answer.
-                        $studentanswer = $this->format_answer($answer, $context, $result->studentanswerformat);
+                        $studentanswer = $this->format_answer($answer, $context, $result->studentanswerformat, $options);
                         $table->data[] = array($studentanswer);
                         // If the response exists, add a table row containing the response. If not, add en empty row.
                         if (!empty(trim($response))) {
                             $studentresponse = isset($result->responseformat) ?
                                 $this->format_response($response, $context, $result->responseformat, $options) : $response;
-                            $table->data[] = array('<em>'.get_string("response", "lesson").
-                                '</em>: <br/>'.$studentresponse);
+                            $studentresponsecontent = html_writer::div('<em>' . get_string("response", "lesson") .
+                                '</em>: <br/>' . $studentresponse, $class);
+                            $table->data[] = array($studentresponsecontent);
                         } else {
                             $table->data[] = array('');
                         }
                     }
                 } else {
                     // Add a table row containing the answer.
-                    $studentanswer = $this->format_answer($result->studentanswer, $context, $result->studentanswerformat);
+                    $studentanswer = $this->format_answer($result->studentanswer, $context, $result->studentanswerformat, $options);
                     $table->data[] = array($studentanswer);
                     // If the response exists, add a table row containing the response. If not, add en empty row.
                     if (!empty(trim($result->response))) {
                         $studentresponse = isset($result->responseformat) ?
                             $this->format_response($result->response, $context, $result->responseformat,
                                 $result->answerid, $options) : $result->response;
-                        $table->data[] = array('<em>'.get_string("response", "lesson").
-                            '</em>: <br/>'.$studentresponse);
+                        $studentresponsecontent = html_writer::div('<em>' . get_string("response", "lesson") .
+                            '</em>: <br/>' . $studentresponse, $class);
+                        $table->data[] = array($studentresponsecontent);
                     } else {
                         $table->data[] = array('');
                     }
@@ -4227,9 +4244,15 @@ abstract class lesson_page extends lesson_base {
      * @param int $answerformat
      * @return string Returns formatted string
      */
-    private function format_answer($answer, $context, $answerformat) {
+    private function format_answer($answer, $context, $answerformat, $options = []) {
 
-        return format_text($answer, $answerformat, array('context' => $context, 'para' => true));
+        if (empty($options)) {
+            $options = [
+                'context' => $context,
+                'para' => true
+            ];
+        }
+        return format_text($answer, $answerformat, $options);
     }
 
     /**

@@ -29,8 +29,7 @@
 #ucla-alert-edit ul li {
     background-image: none;
     list-style-type: none;
-    padding-left: 20px;
-    padding: 5px;
+    padding: 5px 5px 5px 20px;
     margin: 5px;
     cursor: move;
     zoom: 1;
@@ -48,7 +47,7 @@
     border: 1px solid #cdcdcd;
 }
 
-// ALERT EDIT STYLES 
+// ALERT EDIT STYLES
 .alert-edit-header,
 .alert-edit-section {
     border: 1px solid #cdcdcd;
@@ -95,7 +94,7 @@
     color: #9da0a4;
 }
 
-// ITEM EDIT TEXT BOX 
+// ITEM EDIT TEXT BOX
 .alert-edit-text-box {
     border: 1px solid #cdcdcd;
     padding: 5px;
@@ -143,7 +142,7 @@
     width: 100%;
 }
 
-// Block editing button 
+// Block editing button
 .alert-block-edit-on-btn {
     width: 80%;
 }
@@ -155,7 +154,7 @@
     padding-top: 4px;
 }
 
-// Tutorial 
+// Tutorial
 
 .edit-alert-tutorial {
     width: 100%;
@@ -209,7 +208,7 @@
 }
 
 #ucla-alert-edit {
-    .alert-edit-header 
+    .alert-edit-header
     .header-box {
         font-weight: 300;
         min-height: 30px;

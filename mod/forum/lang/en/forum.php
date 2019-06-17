@@ -53,6 +53,7 @@ $string['bynameondate'] = 'by {$a->name} - {$a->date}';
 $string['cannotadd'] = 'Could not add the discussion for this forum';
 $string['cannotadddiscussion'] = 'Adding discussions to this forum requires group membership.';
 $string['cannotadddiscussionall'] = 'You do not have permission to add a new discussion topic for all participants.';
+$string['cannotadddiscussiongroup'] = 'You are not able to create a discussion because you are not a member of any group.';
 $string['cannotaddsubscriber'] = 'Could not add subscriber with id {$a} to this forum!';
 $string['cannotaddteacherforumto'] = 'Could not add converted teacher forum instance to section 0 in the course';
 $string['cannotcreatediscussion'] = 'Could not create new discussion';
@@ -228,7 +229,7 @@ $string['forumauthorhidden'] = 'Author (hidden)';
 $string['forumblockingalmosttoomanyposts'] = 'You are approaching the posting threshold. You have posted {$a->numposts} times in the last {$a->blockperiod} and the limit is {$a->blockafter} posts.';
 $string['forumbodydeleted'] = 'The content of this forum post has been removed and can no longer be accessed.';
 $string['forumbodyhidden'] = 'This post cannot be viewed by you, probably because you have not posted in the discussion, the maximum editing time hasn\'t passed yet, the discussion has not started or the discussion has expired.';
-$string['forum:canposttomygroups'] = 'Can post to all groups you have access to';
+$string['forum:canposttomygroups'] = 'Post to all groups you have access to';
 $string['forum:createattachment'] = 'Create attachments';
 $string['forum:deleteanypost'] = 'Delete any posts (anytime)';
 $string['forum:deleteownpost'] = 'Delete own posts (within deadline)';
@@ -484,7 +485,7 @@ $string['privacy:metadata:preference:maildigest'] = 'The site-wide mail digest p
 $string['privacy:metadata:preference:markasreadonnotification'] = 'Whether to mark forum posts as read when receiving them as messages.';
 $string['privacy:metadata:preference:trackforums'] = 'Whether to enable read tracking.';
 $string['privacy:postwasread'] = 'This post was first read on {$a->firstread} and most recently read on {$a->lastread}';
-$string['privacy:readtrackingdisabled'] = 'You have chosen to not track which posts that you have read within this forum.';
+$string['privacy:readtrackingdisabled'] = 'You have chosen to not track posts you have read within this forum.';
 $string['privacy:request:delete:discussion:name'] = 'Delete at the request of the author';
 $string['privacy:request:delete:post:message'] = 'The content of this post has been deleted at the request of its author.';
 $string['privacy:request:delete:post:subject'] = 'Delete at the request of the author';
@@ -615,7 +616,8 @@ $string['warnformorepost'] = 'Warning! There is more than one discussion in this
 $string['yournewquestion'] = 'Your new question';
 $string['yournewtopic'] = 'Your new discussion topic';
 $string['yourreply'] = 'Your reply';
-
+$string['forumsubjectdeleted'] = 'This forum post has been removed';
+$string['forumbodydeleted'] = 'The content of this forum post has been removed and can no longer be accessed.';
 // START UCLA MOD: CCLE-4882 forum customization.
 $string['alldiscussionposts'] = 'Show all posts on one page';
 $string['showallpostsby'] = 'Show all posts sorted by: ';
@@ -626,13 +628,3 @@ $string['modeprint'] = 'Printer-friendly version';
 $string['modeexport'] = 'Export the entire forum';
 $string['mustprovidediscussionorpostorforum'] = 'You must provide either a forum id, discussion id or post id to export';
 // END UCLA MOD: CCLE-4882 forum customization.
-
-// Deprecated since Moodle 3.1.
-$string['postmailinfo'] = 'This is a copy of a message posted on the {$a} website.
-
-To reply click on this link:';
-$string['emaildigestupdated'] = 'The e-mail digest option was changed to \'{$a->maildigesttitle}\' for the forum \'{$a->forum}\'. {$a->maildigestdescription}';
-$string['emaildigestupdated_default'] = 'Your default profile setting of \'{$a->maildigesttitle}\' was used for the forum \'{$a->forum}\'. {$a->maildigestdescription}.';
-$string['emaildigest_0'] = 'You will receive one e-mail per forum post.';
-$string['emaildigest_1'] = 'You will receive one digest e-mail per day containing the complete contents of each forum post.';
-$string['emaildigest_2'] = 'You will receive one digest e-mail per day containing the subject of each forum post.';

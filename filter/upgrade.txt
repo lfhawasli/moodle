@@ -1,7 +1,7 @@
 This file describes API changes in core filter API and plugins,
 information provided here is intended especially for developers.
 
-=== 3.4.6 ===
+=== 3.5.3 ===
 
 * Although there is no API change that require you to update your filter,
   if you use the filter_phrases() helper method, you may wish to take
@@ -13,7 +13,7 @@ information provided here is intended especially for developers.
 
   To understand how to use this, see the comment on filterobject::__construct and
   look at the filter_glossary changes as an example:
-  https://github.com/timhunt/moodle/commit/86543cb1db35e35c98b6503c4ead3cf0fed4a584
+  https://github.com/timhunt/moodle/commit/44d00da1357e67f6c60ede449adaaa2a8bcd4ae3
 
 === 3.0 ===
 

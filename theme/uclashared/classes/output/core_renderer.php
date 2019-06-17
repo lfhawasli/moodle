@@ -218,11 +218,10 @@ class core_renderer extends \theme_boost\output\core_renderer {
     public function help_feedback_link() {
         global $CFG;
 
-        $helplocale = $this->call_separate_block_function(
+        $helplink = $this->call_separate_block_function(
                 'ucla_help', 'get_action_link'
         );
-
-        if (!$helplocale) {
+        if (!$helplink) {
             return false;
         }
 
@@ -236,6 +235,10 @@ class core_renderer extends \theme_boost\output\core_renderer {
         // Custom-defined items.
         $customitems = \user_convert_text_to_menu_items($CFG->custommenuitems, $this->page);
         foreach ($customitems as $item) {
+            // Use special link for "Submit a help request".
+            if ($item->titleidentifier == 'helprequest,theme_uclashared') {
+                $item->url = new moodle_url($helplink);
+            }
             $opts->navitems[] = $item;
         }
 
@@ -296,46 +299,8 @@ class core_renderer extends \theme_boost\output\core_renderer {
             }
         }
 
-        return html_writer::div($this->render($am), 'btn-header btn-help-feedback');
+        return html_writer::div($this->render($am), 'btn-header btn-help-feedback mr-1');
 
-    }
-
-    /**
-     * Renders the Help & Feedback dropdown menu using Moodle's own config.
-     * The menu items can be modified in Appearance > Themes > Theme settings.
-     *
-     * @see $CFG->custommenuitems
-     * @param custom_menu $menu
-     * @return string HTML output
-     */
-    protected function render_custom_menu(custom_menu $menu) {
-        if (!$menu->has_children()) {
-            return '';
-        }
-
-        $items = array();
-        foreach ($menu->get_children() as $k => $child) {
-
-            // Show an arrow above first item.
-            $arrow = $k === 0 ? html_writer::span('', 'arrow-up') : '';
-            $url = $child->get_url();
-
-            // For help requests, get URL with courseid.
-            // Assume this link is the first item in the menu.
-            if ($k === 0) {
-                $url = $this->call_separate_block_function('ucla_help', 'get_action_link');
-            }
-
-            $items[] = html_writer::tag('li',
-                html_writer::link($url, $arrow . $child->get_text())
-            );
-        }
-
-        $menu = html_writer::tag('ul', implode('', $items),
-            array('class' => 'help-dropdown-menu hidden', 'role' => 'menu')
-        );
-
-        return $menu;
     }
 
     /**
@@ -362,7 +327,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         // Add a class for when $withlinks is false.
-        $usermenuclasses = 'usermenu';
+        $usermenuclasses = 'usermenu ml-auto mr-1 navbar-collapse';
         if (!$withlinks) {
             $usermenuclasses .= ' withoutlinks';
         }
@@ -387,18 +352,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 $returnstr = "<a href=\"$loginurl\"><button class=\"btn btn-header\" id=\"btn-login\">$loginstr</button></a>";
             }
 
-            // If user is on the front page, return button without usermenu classes.
-            if ($onfrontpage) {
-                return $returnstr;
-            } else {
-                return html_writer::div(
-                    html_writer::span(
-                        $returnstr,
-                        'login'
-                    ),
-                    $usermenuclasses
-                );
-            }
+            return $returnstr;
         }
 
         // If logged in as a guest user, show a string to that effect.
@@ -409,18 +363,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 $returnstr = "<a href=\"$loginurl\"><button class=\"btn btn-header\" id=\"btn-login\">$loginstr</button></a>";
             }
 
-            // If user is on the front page, always return the button without usermenu classes.
-            if ($onfrontpage) {
-                return "<a href=\"$loginurl\"><button class=\"btn btn-header\" id=\"btn-login\">$loginstr</button></a>";
-            } else {
-                return html_writer::div(
-                    html_writer::span(
-                        $returnstr,
-                        'login'
-                    ),
-                    $usermenuclasses
-                );
-            }
+            return $returnstr;   
         }
         
         // If logged in and on the front page, hide the login button.
@@ -452,7 +395,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
                         'value'
                     )
                 ),
-                array('class' => 'meta viewingas')
+                array('class' => 'meta viewingas mt-auto')
             );
         }
 
@@ -483,7 +426,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         $returnstr .= html_writer::span(
-            html_writer::span($usertextcontents, 'usertext') .
+            html_writer::span($usertextcontents, 'usertext mr-1 mt-auto') .
             html_writer::span($avatarcontents, $avatarclasses),
             'userbutton'
         );
@@ -606,29 +549,29 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         $html = html_writer::start_tag('header', array('id' => 'page-header', 'class' => 'row'));
-        $html .= html_writer::start_div('col-xs-12 p-a-1');
+        $html .= html_writer::start_div('col-12 pb-2');
         $html .= html_writer::start_div('card');
-        $html .= html_writer::start_div('card-block');
+        $html .= html_writer::start_div('card-body');
         if (empty($PAGE->layout_options['nonavbar'])) {
-            $html .= html_writer::start_div('clearfix w-100 pull-xs-left', array('id' => 'page-navbar'));
+            $html .= html_writer::start_div('clearfix w-100 float-sm-left', array('id' => 'page-navbar'));
             $html .= html_writer::tag('div', $this->navbar(), array('class' => 'breadcrumb-nav'));
             $html .= $this->weeks_display();
             $html .= html_writer::end_div();
         }
 
         $html .= html_writer::tag('div', $this->course_header(), array('id' => 'course-header'));
-        $html .= html_writer::start_div('page-context-header-container pull-xs-left');
+        $html .= html_writer::start_div('page-context-header-container float-sm-left');
         $html .= $this->context_header();
         $html .= html_writer::end_div();
 
         if ($COURSE->id != SITEID) {
             $renderer = $PAGE->get_renderer('format_ucla');
             if (!empty($renderer->print_site_meta_text())) {
-                $html .= html_writer::div($renderer->print_site_meta_text(), 'clearfix pull-xs-left course-details');
+                $html .= html_writer::div($renderer->print_site_meta_text(), 'clearfix float-sm-left course-details');
             }
         }
 
-        $html .= html_writer::start_div('hidden-sm-down pull-xs-right');
+        $html .= html_writer::start_div('d-none d-md-block float-sm-right');
 
         if (has_capability('format/ucla:viewadminpanel', $PAGE->context)) {
             $html .= self::admin_panel();
@@ -638,7 +581,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
              // If the page has editing button, then display it.
             $pageeditingbutton = $this->page_heading_button();
             if (!empty($pageeditingbutton)) {
-                $html .= html_writer::div($pageeditingbutton, 'pull-xs-right header-editing-button');
+                $html .= html_writer::div($pageeditingbutton, 'float-sm-right header-editing-button');
             }
         }
         $html .= html_writer::end_div();
@@ -665,26 +608,26 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
 
         $html = html_writer::start_tag('header', array('id' => 'page-header', 'class' => 'row'));
-        $html .= html_writer::start_div('col-xs-12 p-a-1');
+        $html .= html_writer::start_div('col-12 pb-2');
         $html .= html_writer::start_div('card');
-        $html .= html_writer::start_div('card-block');
-        $html .= html_writer::div($this->context_header_settings_menu(), 'pull-xs-right context-header-settings-menu');
+        $html .= html_writer::start_div('card-body');
+        $html .= html_writer::div($this->context_header_settings_menu(), 'float-sm-right context-header-settings-menu');
         // Adding weeks display to original parent full_header code.
-        $html .= html_writer::start_div('clearfix w-100 pull-xs-left');
+        $html .= html_writer::start_div('clearfix w-100 float-sm-left');
         $html .= $this->weeks_display();
-        $html .= html_writer::start_div('pull-xs-left');
+        $html .= html_writer::start_div('float-sm-left');
         $html .= $this->context_header($headerinfo);
         $html .= html_writer::end_div();
         $html .= html_writer::end_div();
         // End weeks display.
         $pageheadingbutton = $this->page_heading_button();
         if (empty($PAGE->layout_options['nonavbar'])) {
-            $html .= html_writer::start_div('clearfix w-100 pull-xs-left', array('id' => 'page-navbar'));
+            $html .= html_writer::start_div('clearfix w-100 float-sm-left', array('id' => 'page-navbar'));
             $html .= html_writer::tag('div', $this->navbar(), array('class' => 'breadcrumb-nav'));
-            $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button pull-xs-right');
+            $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button float-sm-right');
             $html .= html_writer::end_div();
         } else if ($pageheadingbutton) {
-            $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button nonavbar pull-xs-right');
+            $html .= html_writer::div($pageheadingbutton, 'breadcrumb-button nonavbar float-sm-right');
         }
         $html .= html_writer::tag('div', $this->course_header(), array('id' => 'course-header'));
         $html .= html_writer::end_div();
@@ -709,7 +652,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $params = array('courseid' => $PAGE->course->id, 'section' => course_get_format($PAGE->course)->figure_section());
         $adminlink = new moodle_url('/course/format/ucla/admin_panel.php', $params);
         $html = html_writer::link($adminlink, $adminbutton,
-                array('class' => 'admin-panel-link pull-xs-right'
+                array('class' => 'admin-panel-link float-sm-right'
                 . ($PAGE->url->compare($adminlink) ? ' font-weight-bold' : '')));
 
         return $html;

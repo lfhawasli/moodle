@@ -369,6 +369,8 @@ class core_calendar_external extends external_api {
                             'description' => new external_value(PARAM_RAW, 'Description', VALUE_OPTIONAL, null, NULL_ALLOWED),
                             'format' => new external_format_value('description'),
                             'courseid' => new external_value(PARAM_INT, 'course id'),
+                            'categoryid' => new external_value(PARAM_INT, 'Category id (only for category events).',
+                                VALUE_OPTIONAL),
                             'groupid' => new external_value(PARAM_INT, 'group id'),
                             'userid' => new external_value(PARAM_INT, 'user id'),
                             'repeatid' => new external_value(PARAM_INT, 'repeat id'),
@@ -401,7 +403,9 @@ class core_calendar_external extends external_api {
                 'timesortfrom' => new external_value(PARAM_INT, 'Time sort from', VALUE_DEFAULT, 0),
                 'timesortto' => new external_value(PARAM_INT, 'Time sort to', VALUE_DEFAULT, null),
                 'aftereventid' => new external_value(PARAM_INT, 'The last seen event id', VALUE_DEFAULT, 0),
-                'limitnum' => new external_value(PARAM_INT, 'Limit number', VALUE_DEFAULT, 20)
+                'limitnum' => new external_value(PARAM_INT, 'Limit number', VALUE_DEFAULT, 20),
+                'limittononsuspendedevents' => new external_value(PARAM_BOOL,
+                        'Limit the events to courses the user is not suspended in', VALUE_DEFAULT, false)
             )
         );
     }
@@ -417,7 +421,7 @@ class core_calendar_external extends external_api {
      * @return array
      */
     public static function get_calendar_action_events_by_timesort($timesortfrom = 0, $timesortto = null,
-                                                       $aftereventid = 0, $limitnum = 20) {
+                                                       $aftereventid = 0, $limitnum = 20, $limittononsuspendedevents = false) {
         global $CFG, $PAGE, $USER;
 
         require_once($CFG->dirroot . '/calendar/lib.php');
@@ -430,6 +434,7 @@ class core_calendar_external extends external_api {
                 'timesortto' => $timesortto,
                 'aftereventid' => $aftereventid,
                 'limitnum' => $limitnum,
+                'limittononsuspendedevents' => $limittononsuspendedevents
             ]
         );
         $context = \context_user::instance($USER->id);
@@ -444,7 +449,8 @@ class core_calendar_external extends external_api {
             $params['timesortfrom'],
             $params['timesortto'],
             $params['aftereventid'],
-            $params['limitnum']
+            $params['limitnum'],
+            $params['limittononsuspendedevents']
         );
 
         $exportercache = new events_related_objects_cache($events);
@@ -516,7 +522,7 @@ class core_calendar_external extends external_api {
             $params['aftereventid'] = null;
         }
 
-        $courses = enrol_get_my_courses('*', 'visible DESC,sortorder ASC', 0, [$courseid]);
+        $courses = enrol_get_my_courses('*', null, 0, [$courseid]);
         $courses = array_values($courses);
 
         if (empty($courses)) {
@@ -601,7 +607,7 @@ class core_calendar_external extends external_api {
         }
 
         $renderer = $PAGE->get_renderer('core_calendar');
-        $courses = enrol_get_my_courses('*', 'visible DESC,sortorder ASC', 0, $params['courseids']);
+        $courses = enrol_get_my_courses('*', null, 0, $params['courseids']);
         $courses = array_values($courses);
 
         if (empty($courses)) {
@@ -974,9 +980,10 @@ class core_calendar_external extends external_api {
      * @param   int     $courseid The course to be included
      * @param   int     $categoryid The category to be included
      * @param   bool    $includenavigation Whether to include navigation
+     * @param   bool    $mini Whether to return the mini month view or not
      * @return  array
      */
-    public static function get_calendar_monthly_view($year, $month, $courseid, $categoryid, $includenavigation) {
+    public static function get_calendar_monthly_view($year, $month, $courseid, $categoryid, $includenavigation, $mini) {
         global $CFG, $DB, $USER, $PAGE;
         require_once($CFG->dirroot."/calendar/lib.php");
 
@@ -987,6 +994,7 @@ class core_calendar_external extends external_api {
             'courseid' => $courseid,
             'categoryid' => $categoryid,
             'includenavigation' => $includenavigation,
+            'mini' => $mini,
         ]);
 
         $context = \context_user::instance($USER->id);
@@ -999,7 +1007,8 @@ class core_calendar_external extends external_api {
         $calendar = \calendar_information::create($time, $params['courseid'], $params['categoryid']);
         self::validate_context($calendar->context);
 
-        list($data, $template) = calendar_get_view($calendar, 'month', $params['includenavigation']);
+        $view = $params['mini'] ? 'mini' : 'month';
+        list($data, $template) = calendar_get_view($calendar, $view, $params['includenavigation']);
 
         return $data;
     }
@@ -1021,6 +1030,13 @@ class core_calendar_external extends external_api {
                     'Whether to show course navigation',
                     VALUE_DEFAULT,
                     true,
+                    NULL_ALLOWED
+                ),
+                'mini' => new external_value(
+                    PARAM_BOOL,
+                    'Whether to return the mini month view or not',
+                    VALUE_DEFAULT,
+                    false,
                     NULL_ALLOWED
                 ),
             ]

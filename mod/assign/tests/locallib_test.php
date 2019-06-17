@@ -1679,7 +1679,7 @@ class mod_assign_locallib_testcase extends advanced_testcase {
 
         $events = $sink->get_events();
         $event = reset($events);
-        $this->assertInstanceOf('\core\event\message_sent', $event);
+        $this->assertInstanceOf('\core\event\notification_sent', $event);
         $this->assertEquals($assign->get_course()->id, $event->other['courseid']);
         $sink->close();
     }

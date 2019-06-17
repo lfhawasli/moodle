@@ -794,7 +794,6 @@
 }
 
 #adminsettings .form-overridden {
-    @extend .form-control-feedback;
     @extend .alert-info;
 }
 
@@ -804,4 +803,12 @@
 
 #overriderolestable .overriddenpermission {
     @extend .table-warning;
+}
+
+#page-admin-search {
+    @media (min-width: 576px) {
+        .container {
+            overflow-wrap: break-word;
+        }
+    }
 }

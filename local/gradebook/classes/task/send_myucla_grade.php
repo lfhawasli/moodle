@@ -75,7 +75,8 @@ class send_myucla_grade extends send_myucla_base {
                 'uidStudent'    => $courseinfo->uidstudent,
                 'viewableGrade' => $gradeinfo->finalgrade,
                 'comment'       => $gradeinfo->comment,
-                'excused'       => $gradeinfo->excluded != '0'
+                'excused'       => $gradeinfo->excluded != '0',
+                'isDeleted'     => $gradeinfo->isdeleted
             ),
             'mTransaction' => array(
                 'userUID'               => $transactioninfo->idnumber,
@@ -213,8 +214,9 @@ class send_myucla_grade extends send_myucla_base {
 
         // Set variables to notify deletion.
         if (!empty($gradegrade->deleted)) {
-            $gradeinfo->finalgrade = null;
-            $gradeinfo->comment = get_string('deleted', 'local_gradebook');
+            $gradeinfo->isdeleted = 1;
+        } else {
+            $gradeinfo->isdeleted = 0;
         }
 
         // Now store info on who made changes.

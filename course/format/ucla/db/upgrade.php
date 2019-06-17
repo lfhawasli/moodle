@@ -152,11 +152,15 @@ function xmldb_format_ucla_upgrade($oldversion) {
     }
 
     if ($oldversion < 2018061500) {
-        // Allow only certain roles access to Admin panel. 
+        // Allow only certain roles access to Admin panel.
         $roles = array('manager', 'editinginstructor', 'supervising_instructor', 
                 'ta_instructor', 'ta_admin', 'projectlead', 'projectcontributor', 
                 'instructional_assistant', 'grader', 'editor', 
                 'studentfacilitator', 'coursesitemanager');
+
+        // Make sure 'format/ucla:viewadminpanel' capability exists.
+        update_capabilities('format_ucla');
+
         $context = context_system::instance();
         foreach ($roles as $role) {
             $roleid = $DB->get_field('role', 'id', array('shortname' => $role));

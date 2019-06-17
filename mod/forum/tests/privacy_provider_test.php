@@ -1124,8 +1124,9 @@ class mod_forum_privacy_provider_testcase extends \core_privacy\tests\provider_t
         }
 
         // All tags should have been deleted.
-        foreach (array_keys($postsinforum) as $postid) {
-            $this->assertCount(0, \core_tag_tag::get_item_tags('mod_forum', 'forum_posts', $postid));
+        $posttags = \core_tag_tag::get_items_tags('mod_forum', 'forum_posts', array_keys($postsinforum));
+        foreach ($posttags as $tags) {
+            $this->assertEmpty($tags);
         }
 
         // Check the other forum too. It should remain intact.
@@ -1170,8 +1171,9 @@ class mod_forum_privacy_provider_testcase extends \core_privacy\tests\provider_t
         }
 
         // All tags should remain.
-        foreach (array_keys($postsinforum) as $postid) {
-            $this->assertNotEmpty(\core_tag_tag::get_item_tags('mod_forum', 'forum_posts', $postid));
+        $posttags = \core_tag_tag::get_items_tags('mod_forum', 'forum_posts', array_keys($postsinforum));
+        foreach ($posttags as $tags) {
+            $this->assertNotEmpty($tags);
         }
     }
 

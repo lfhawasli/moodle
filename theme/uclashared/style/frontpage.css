@@ -87,6 +87,9 @@ h1, h2, h3, h4, h5, h6, p {
   float: right;
   margin-top: 30px;
 }
+.header-login .header-btn-group {
+  display: inline-flex;
+}
 .btn-header {
   border-width: 0;
   border-radius: 0px;
@@ -120,8 +123,10 @@ h1, h2, h3, h4, h5, h6, p {
   #header {
     background-color: rgba(44,94,145,0.8);
     height: 70px;
+    width: 100%;
     position: static;
     display: block;
+    width: 990px;
   }
   #login-wrapper {
     float: none;
@@ -136,16 +141,29 @@ h1, h2, h3, h4, h5, h6, p {
     text-align: center;
     width: 100%;
     margin: 11px 0;
+    font-size: 1.5rem;
+  }
+  .header-login {
+    justify-content: flex-end;
+  }
+}
+@media (max-width: 770px) {
+  .header-login .header-btn-group {
+    margin: 0px;
   }
 }
 @media (max-width: 480px) {
   .header-login, .header-login .header-btn-group {
     float: none;
     margin: 0;
+    flex-direction: column;
   }
   .btn-header {
     width: 100%;
     margin-bottom: 10px;
+  }
+  .btn-header .menubar .dropdown {
+    margin: 0 auto;
   }
   .header-logo .icon {
     display: none;
@@ -180,8 +198,9 @@ h1, h2, h3, h4, h5, h6, p {
   background-repeat: no-repeat;
   background-position: left;
   width: 700px;
-  position: static;
+  position: relative;
   float: left;
+  z-index: 2;
 }
 @media (max-width: 992px) {
   #sidebar {
@@ -189,7 +208,7 @@ h1, h2, h3, h4, h5, h6, p {
     background-size: cover;
     background-position: center;
     width: 100%;
-    margin-top: 20px;
+    margin-top: 40px;
   }
   #sidebar .header-logo {
     display: none;
@@ -222,6 +241,22 @@ h1, h2, h3, h4, h5, h6, p {
 }
 
 /* Concerned with the sidebar site directory block */
+/* checkbox and label */
+.form-check-inline .form-check-input {
+  position: absolute;
+  margin-top: .25rem;
+  margin-left: -1.25rem;
+}
+.form-check-label {
+  margin-bottom: 0;
+  margin-top: 4px;
+}
+/*"search:" enough space*/
+.ucla-search fieldset div {
+  display: inline-block;
+  width: 60px;
+}
+/*"search:" enough space*/
 .frontpage-site-directory h5, .sitetopic {
   display: none;
 }
@@ -236,6 +271,8 @@ h1, h2, h3, h4, h5, h6, p {
   margin-top: 30px;
   background-color: rgb(44,94,145);
   color: #fff;
+  padding-right: 0.7rem;
+  padding-left: 0.7rem;
 }
 #frontpage-browseby-btns-wrapper a:hover {
   background-color: rgb(220,220,220);
@@ -306,13 +343,16 @@ h1, h2, h3, h4, h5, h6, p {
 }
 @media (max-width: 992px) {
   #frontpage-browseby-btns-wrapper a, #frontpage-search-wrapper .search-options {
-    font-size: 1.0em;
+    font-size: 0.9em;
   }
 }
 
 /* Concerned with the Greeting section that displays week and quarter */
 #main-area {
   height: 100vh;
+  position: absolute;
+  z-index: 1;
+  left: 0px;
 }
 
 #greeting-wrapper {

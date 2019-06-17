@@ -124,6 +124,7 @@ class course_enrolment_manager {
     private $_plugins = null;
     private $_allplugins = null;
     private $_roles = null;
+    private $_visibleroles = null;
     private $_assignableroles = null;
     private $_assignablerolesothers = null;
     private $_groups = null;
@@ -404,24 +405,34 @@ class course_enrolment_manager {
             $conditions = get_extra_user_fields($this->get_context());
             foreach (get_all_user_name_fields() as $field) {
                 $conditions[] = 'u.'.$field;
+            }            
+            // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
+            //$conditions[] = $DB->sql_fullname('u.firstname', 'u.lastname');
+            // Assume user is searching for lastname first.
+            $conditions[] = $DB->sql_fullname('u.lastname', 'u.firstname');
+            if (strpos($search, ',') !== false) {
+                // Remove comma from search.
+                $separatedwords = preg_split('/(,|\s)+/', $search);
+                $search = implode(' ', $separatedwords);
+            } else {
+                // Did not find a comma, see if there is a space.
+                if (strpos($search, ' ') !== false) {
+                    // There is a space, so user must be searching for firstname
+                    // then lastname, so add that condition as well.
+                    $conditions[] = $DB->sql_fullname('u.firstname', 'u.lastname');
+                }
             }
-            $conditions[] = $DB->sql_fullname('u.firstname', 'u.lastname');
-            // START UCLA MOD: CCLE-7799 - Improve enroll users functionality.
-            /*if ($searchanywhere) {
+            // END UCLA MOD: CCLE-7719.
+            if ($searchanywhere) {
                 $searchparam = '%' . $search . '%';
             } else {
                 $searchparam = $search . '%';
-            }*/
-            $splitsearches = explode(' ', $search);
-            if ($searchanywhere) {
-                $searchparam = '%';
-            } else {
-                $searchparam = '';
             }
-            foreach ($splitsearches as $splitsearch) {
-                $searchparam .= $splitsearch . '%';
-            }
-            // END UCLA MOD: CCLE-7799.
+            // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
+            // Support searching first name or lastname not exact matches.
+            $splitsearches = explode(' ', $searchparam);
+            $searchparam = implode('%', $splitsearches);
+            // END UCLA MOD: CCLE-7719.
             $i = 0;
             foreach ($conditions as $key => $condition) {
                 $conditions[$key] = $DB->sql_like($condition, ":con{$i}00", false);
@@ -435,6 +446,7 @@ class course_enrolment_manager {
         $extrafields = get_extra_user_fields($this->get_context(), array('username', 'lastaccess'));
         $extrafields[] = 'username';
         $extrafields[] = 'lastaccess';
+        $extrafields[] = 'maildisplay';
         $ufields = user_picture::fields('u', $extrafields);
 
         return array($ufields, $params, $wherecondition);
@@ -626,6 +638,18 @@ class course_enrolment_manager {
             $this->_roles = role_fix_names(get_all_roles($this->context), $this->context);
         }
         return $this->_roles;
+    }
+
+    /**
+     * Gets all of the roles this course can contain.
+     *
+     * @return array
+     */
+    public function get_viewable_roles() {
+        if ($this->_visibleroles === null) {
+            $this->_visibleroles = get_viewable_roles($this->context);
+        }
+        return $this->_visibleroles;
     }
 
     /**
@@ -1082,7 +1106,7 @@ class course_enrolment_manager {
         $strunenrol = get_string('unenrol', 'enrol');
         $stredit = get_string('edit');
 
-        $allroles   = $this->get_all_roles();
+        $visibleroles   = $this->get_viewable_roles();
         $assignable = $this->get_assignable_roles();
         $allgroups  = $this->get_all_groups();
         $context    = $this->get_context();
@@ -1104,7 +1128,15 @@ class course_enrolment_manager {
                 if (!is_siteadmin() and !isset($assignable[$rid])) {
                     $unchangeable = true;
                 }
-                $details['roles'][$rid] = array('text'=>$allroles[$rid]->localname, 'unchangeable'=>$unchangeable);
+
+                if (isset($visibleroles[$rid])) {
+                    $label = $visibleroles[$rid];
+                } else {
+                    $label = get_string('novisibleroles', 'role');
+                    $unchangeable = true;
+                }
+
+                $details['roles'][$rid] = array('text' => $label, 'unchangeable' => $unchangeable);
             }
 
             // Users

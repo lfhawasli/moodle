@@ -177,7 +177,7 @@ $CFG->xsendfile = 'X-Sendfile';
 $CFG->disableupdateautodeploy = 1;
 
 // Site administration > Advanced features
-$CFG->usetags = 0;
+$CFG->usetags = 1;
 $CFG->enablenotes = 0;
 $CFG->enablewebservices = 1;
 $CFG->bloglevel = 0; // Disable blog system completely
@@ -204,6 +204,8 @@ $CFG->forced_plugin_settings['tool_dataprivacy']['showdataretentionsummary'] = 0
 
 // Site administration > Courses > Course default settings
 $CFG->forced_plugin_settings['moodlecourse']['format'] = 'ucla';
+$CFG->forced_plugin_settings['moodlecourse']['maxsections'] = 200;
+$CFG->forced_plugin_settings['moodlecourse']['numsections'] = 10;
 $CFG->forced_plugin_settings['moodlecourse']['maxbytes'] = 2147483648;  // 2GB
 // CCLE-2903 - Don't set completion tracking to be course default
 $CFG->forced_plugin_settings['moodlecourse']['enablecompletion'] = 0;
@@ -224,6 +226,7 @@ $CFG->forced_plugin_settings['backup']['backup_import_groups'] = 0;
 $CFG->forced_plugin_settings['restore']['restore_general_users'] = 0;
 
 // Site administration > Grades > General settings
+$CFG->grade_export_exportfeedback = 1;
 $CFG->recovergradesdefault = 1;
 $CFG->unlimitedgrades = 1;
 $CFG->gradepointmax = 300;

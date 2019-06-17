@@ -9,9 +9,8 @@
 //  1. Logo + user buttons
 //  2. System + weeks display
 
-header {
+nav {
 
-    width: inherit;
     margin-bottom: 8px;
     
     .nav-toggle {
@@ -24,6 +23,13 @@ header {
         }
     }
     
+    .fixed-top {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 1030;
+    }
     .header-main {
         background-color: $header-color-prod; //2c5e91
         position: absolute;
@@ -133,9 +139,8 @@ header {
 }
 
 .header-login {
-    float: right;
-    margin-right: 15px;
-    margin-top: -4px;
+    position: relative;
+    display: flex;
     
     .header-btn-group {
         float: right;
@@ -211,6 +216,12 @@ header {
         font-size: 1.1rem;
         margin-left: -20px;
     }
+    @include media-breakpoint-down(sm) {
+        .header-btn-group {
+            display: flex;
+            margin: auto;
+        }
+    }
 }
 
 // Help button
@@ -247,6 +258,31 @@ a.btn-help-feedback {
   right: -35px;
   padding: 8px 25px 35px 0px;
   bottom: -12px;
+}
+
+.usermenu.mr-1, .usermenu.mx-1 {
+    margin-right: .5rem;
+}
+
+.usermenu.navbar-collapse {
+    display: -ms-flexbox;
+    display: inline-grid;
+    -ms-flex-preferred-size: auto;
+    flex-basis: auto;
+}
+
+.usermenu.flex-grow-0 {
+    -ms-flex-positive: 0;
+    flex-grow: 0;
+}
+
+#btn-login {
+    color: black;
+    margin-left: 3px;
+    background-color: $ccle-color-logo;
+}
+#btn-login:hover {
+    background-color: lighten($ccle-color-logo, 10%) !important;
 }
 
 @include media-breakpoint-down(xs) {
@@ -286,16 +322,32 @@ a.btn-help-feedback {
         margin-left: 8px;
         margin-top: .30rem;
     }
+    #btn-login {
+        margin-left: 0px;
+    }
 }
 
-.usermenu .moodle-actionmenu .toggle-display .userbutton
-.usertext{
+.usermenu .moodle-actionmenu .toggle-display .userbutton .usertext {
     font-weight: 300;
     padding-bottom: 3px;
 }
 
+@media (max-width: 940.98px) {
+    .usertext {
+        display: none;
+    }
+}
 .usermenu .moodle-actionmenu:hover .toggle-display .userbutton .usertext {
     color: white;
+}
+
+.usermenu .moodle-actionmenu .userbutton .usertext.mt-auto,
+.usermenu .moodle-actionmenu .userbutton .usertext.my-auto {
+    margin-top: -.15rem!important;
+}
+
+.usermenu .menubar .viewingas.mt-auto, .usermenu .menubar .viewingas.my-auto {
+    margin-top: -.1rem!important;
 }
 
 .usermenu .moodle-actionmenu .toggle-display {
@@ -304,14 +356,7 @@ a.btn-help-feedback {
 
 .usermenu {
     margin-left: 10px;
-    margin-top: .18rem;
-    .login {
-        line-height: 3rem;
-        a, a:hover, a:visited {
-            color: #f5f8f9;
-            text-decoration: underline;
-        }
-    }
+    margin-top: .14rem;
     .jsenabled .moodle-actionmenu[data-enhance] .toggle-display.textmenu .caret {
         margin-top: 10px;
     }
@@ -324,18 +369,21 @@ a.btn-help-feedback {
     a.dropdown-toggle, a.dropdown-toggle:hover {
         color: #f5f8f9;
     }
-    #btn-login {
-        color: black;
-        margin-top: -.7rem;
-        margin-left: 3px;
-        background-color: $ccle-color-logo;
+    
+    img.userpicture {
+        margin-right: .5rem;
+        margin-bottom: .2rem;
+        margin-left: .2rem;
     }
-    #btn-login:hover {
-        background-color: lighten($ccle-color-logo, 10%);
+    .dropdown-menu.mt-auto {
+        margin-top: .1rem!important;
     }
  }
  
 .navbar {
+    
+    display: inherit;
+    
     .popover-region {
         float: left;
         margin-top: 8px;
@@ -357,6 +405,8 @@ a.btn-help-feedback {
 }
 
 // Removes extra spacing at top and bottom of Need help and User menu.
-.dropdown-menu {
+.header-main .dropdown-menu {
     padding: 0px;
+    left: auto;
+    right: 0;
 }

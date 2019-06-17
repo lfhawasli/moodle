@@ -98,7 +98,8 @@ class enrol_manual_enrol_users_form extends moodleform {
             'ajax' => 'enrol_manual/form-potential-user-selector',
             'multiple' => true,
             'courseid' => $course->id,
-            'enrolid' => $instance->id
+            'enrolid' => $instance->id,
+            'userfields' => implode(',', get_extra_user_fields($context))
             // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
             ,'allowcommas' => true
             // END UCLA MOD: CCLE-7719.

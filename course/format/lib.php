@@ -1074,6 +1074,11 @@ abstract class format_base {
         $DB->delete_records('course_sections', array('id' => $section->id));
         rebuild_course_cache($course->id, true);
 
+        // Delete section summary files.
+        $context = \context_course::instance($course->id);
+        $fs = get_file_storage();
+        $fs->delete_area_files($context->id, 'course', 'section', $section->id);
+
         // Descrease 'numsections' if needed.
         if ($decreasenumsections) {
             $this->update_course_format_options(array('numsections' => $course->numsections - 1));
@@ -1272,6 +1277,17 @@ abstract class format_base {
         }
 
         return ['modules' => $modules];
+    }
+
+    /**
+     * Return the plugin config settings for external functions,
+     * in some cases the configs will need formatting or be returned only if the current user has some capabilities enabled.
+     *
+     * @return array the list of configs
+     * @since Moodle 3.5
+     */
+    public function get_config_for_external() {
+        return array();
     }
 }
 

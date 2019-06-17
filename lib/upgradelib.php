@@ -383,8 +383,8 @@ function upgrade_block_savepoint($result, $version, $blockname, $allowabort=true
  * @category upgrade
  * @param bool $result false if upgrade step failed, true if completed
  * @param string or float $version main version
- * @param string $type name of plugin
- * @param string $dir location of plugin
+ * @param string $type The type of the plugin.
+ * @param string $plugin The name of the plugin.
  * @param bool $allowabort allow user to abort script execution here
  * @return void
  */
@@ -430,6 +430,10 @@ function upgrade_stale_php_files_present() {
     global $CFG;
 
     $someexamplesofremovedfiles = array(
+        // Removed in 3.5.
+        '/lib/dml/mssql_native_moodle_database.php',
+        '/lib/dml/mssql_native_moodle_recordset.php',
+        '/lib/dml/mssql_native_moodle_temptables.php',
         // Removed in 3.4.
         '/auth/README.txt',
         '/calendar/set.php',
@@ -1712,6 +1716,9 @@ function install_core($version, $verbose) {
 
     remove_dir($CFG->tempdir.'', true);
     make_temp_directory('', true);
+
+    remove_dir($CFG->backuptempdir.'', true);
+    make_backup_temp_directory('', true);
 
     remove_dir($CFG->dataroot.'/muc', true);
     make_writable_directory($CFG->dataroot.'/muc', true);

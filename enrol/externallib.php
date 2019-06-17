@@ -299,6 +299,8 @@ class core_enrol_external extends external_api {
         // Do basic automatic PARAM checks on incoming data, using params description
         // If any problems are found then exceptions are thrown with helpful error messages
         $params = self::validate_parameters(self::get_users_courses_parameters(), array('userid'=>$userid));
+        $userid = $params['userid'];
+        $sameuser = $USER->id == $userid;
 
         $courses = enrol_get_users_courses($params['userid'], true, 'id, shortname, fullname, idnumber, visible,
                    summary, summaryformat, format, showgrades, lang, enablecompletion, category, startdate, enddate');
@@ -313,7 +315,7 @@ class core_enrol_external extends external_api {
                 continue;
             }
 
-            if ($userid != $USER->id and !course_can_view_participants($context)) {
+            if (!$sameuser and !course_can_view_participants($context)) {
                 // we need capability to view participants
                 continue;
             }
@@ -328,8 +330,11 @@ class core_enrol_external extends external_api {
             $course->shortname = external_format_string($course->shortname, $context->id);
 
             $progress = null;
-            if ($course->enablecompletion) {
-                $progress = \core_completion\progress::get_course_progress_percentage($course);
+            // Return only private information if the user should be able to see it.
+            if ($course->enablecompletion &&
+                    ($sameuser || completion_can_view_data($userid, $course))) {
+
+                $progress = \core_completion\progress::get_course_progress_percentage($course, $userid);
             }
 
             $result[] = array(
@@ -447,9 +452,6 @@ class core_enrol_external extends external_api {
         $manager = new course_enrolment_manager($PAGE, $course);
 
         // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
-        $separatedwords = preg_split('/(,|\s)+/', $params['search']);
-        $reversedwords = array_reverse($separatedwords);
-        $params['search'] = implode(' ', $reversedwords);
         $params['perpage'] *= 2;
         // END UCLA MOD: CCLE-7719.
 

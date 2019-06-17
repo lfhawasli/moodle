@@ -636,6 +636,14 @@ class modify_navigation {
                 $node->icon = $nodeinfo['icon'];
             }
         }
+
+        // Remove folder icons for sections. 
+        $iter = $this->coursenode->children->getIterator(); 
+        foreach ($iter as $key=>$node) {
+            if ($node->icon && $node->icon->pix == 'i/section') {
+                $node->icon = null; 
+            }
+        }
     }
 
     /**
@@ -869,12 +877,18 @@ class modify_navigation {
         $hiddensectiontext = get_string('hiddensectiontext', 'theme_uclashared');
 
         $nodes = $this->navigation->find_all_of_type(\navigation_node::TYPE_SECTION);
+        $siteinfo = get_string('section0name', 'format_ucla');
         foreach ($nodes as $node) {
             if (array_key_exists($node->key, $emptysectionids)) {
                 if ($viewcapability) {
                     $node->text .= $emptysectiontext;
                 } else {
-                    $node->remove();
+                    if ($node->text == $siteinfo && $node->action instanceof \moodle_url &&
+                            $node->action->get_param('section') == '0') {
+                        // Do not remove Site info section.
+                    } else {
+                        $node->remove();
+                    }
                     continue;
                 }
             }

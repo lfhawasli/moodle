@@ -37,6 +37,24 @@ ul {
 	white-space: pre;
 }
 
+/* CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser. */
+.jschooser .choosercontainer #chooseform .instruction .modchooserinstruction {
+    font-style: italic;
+}
+.choosercontainer #chooseform .option .typename .star img,
+.choosercontainer #chooseform .nonoption .typename .star img {
+    float: right;
+    margin-right: -25px;
+    cursor: pointer;
+}
+
+.choosercontainer #chooseform .option .typename .star_empty img,
+.choosercontainer #chooseform .nonoption .typename .star_empty img {
+    float: right;
+    margin-right: -25px;
+    cursor: pointer;
+}
+
 // Make special class to have fixed headers and first column for tables.
 // Taken from https://jsfiddle.net/RMarsh/bzuasLcz/3/
 table.stickyheader {
@@ -77,4 +95,9 @@ table.stickyheader {
     position: relative;
     display: block; // Separates the first column from the tbody.
     background: $gray-lightest;
+}
+
+// Make pagination bar scrollable when too long
+.pagination {
+    overflow: auto;
 }

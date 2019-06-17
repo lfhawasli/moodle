@@ -127,12 +127,13 @@ $allresponses = choice_get_response_data($choice, $cm, $groupmode, $onlyactive);
 
 
 if (has_capability('mod/choice:readresponses', $context)) {
-    // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous
+    // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
+    //choice_show_reportlink($allresponses, $cm);
     $results = prepare_choice_show_results($choice, $course, $cm, $allresponses);
-    if ($results->publish != CHOICE_PUBLISH_ANONYMOUS_TO_ALL) {
+    if ($results->publish != CHOICE_PUBLISH_ANONYMOUS) {
         choice_show_reportlink($allresponses, $cm);
     }
-    // END UCLA MOD: CCLE-7191
+    // END UCLA MOD: CCLE-7191.
 }
 
 echo '<div class="clearer"></div>';
@@ -169,8 +170,42 @@ if ((!empty($choice->timeopen)) && ($choice->timeopen > $timenow)) {
 }
 
 if ( (!$current or $choice->allowupdate) and $choiceopen and is_enrolled($context, NULL, 'mod/choice:choose')) {
-// They haven't made their choice yet or updates allowed and choice is open
 
+    // Show information on how the results will be published to students.
+    $publishinfo = null;
+    switch ($choice->showresults) {
+        case CHOICE_SHOWRESULTS_NOT:
+            $publishinfo = get_string('publishinfonever', 'choice');
+            break;
+
+        case CHOICE_SHOWRESULTS_AFTER_ANSWER:
+            if ($choice->publish == CHOICE_PUBLISH_ANONYMOUS) {
+                $publishinfo = get_string('publishinfoanonafter', 'choice');
+            } else {
+                $publishinfo = get_string('publishinfofullafter', 'choice');
+            }
+            break;
+
+        case CHOICE_SHOWRESULTS_AFTER_CLOSE:
+            if ($choice->publish == CHOICE_PUBLISH_ANONYMOUS) {
+                $publishinfo = get_string('publishinfoanonclose', 'choice');
+            } else {
+                $publishinfo = get_string('publishinfofullclose', 'choice');
+            }
+            break;
+
+        default:
+            // No need to inform the user in the case of CHOICE_SHOWRESULTS_ALWAYS since it's already obvious that the results are
+            // being published.
+            break;
+    }
+
+    // Show info if necessary.
+    if (!empty($publishinfo)) {
+        echo $OUTPUT->notification($publishinfo, 'info');
+    }
+
+    // They haven't made their choice yet or updates allowed and choice is open.
     $options = choice_prepare_options($choice, $USER, $cm, $allresponses);
     $renderer = $PAGE->get_renderer('mod_choice');
     echo $renderer->display_options($options, $cm->id, $choice->display, $choice->allowmultiple);

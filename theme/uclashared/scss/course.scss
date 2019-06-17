@@ -1,8 +1,8 @@
 #coursecat-management #course-category-listings .listing-pagination .yui3-button {
-    background-color: $btn-secondary-bg;
+    background-color: $gray-200;
 
     &.active-page {
-        background-color: inherit;
+        background-color: $gray-700;
     }
 }
 
@@ -10,6 +10,7 @@
     background:   #f9fb7d;
     padding: 25px;
     border-radius: 15px;
+    margin-bottom: auto;
 } 
 
 .coursebox .content .summary {
@@ -34,4 +35,18 @@
     margin: 55px 0 0 -5px;
     text-align: center;
     border-radius: 15px;
+}
+
+#id_uclasiteindicator [data-fieldtype="group"] {
+    flex-flow: column;
+    align-items: flex-start;
+    
+    input[type="radio"] {
+        align-self: baseline;
+        top: 5px;
+    }
+}
+
+#linkcourseadmin {
+    margin-top: 30px;
 }

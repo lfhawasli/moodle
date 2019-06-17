@@ -37,10 +37,7 @@
 
 $string['application/epub_zip'] = 'EPUB ebook';
 $string['application/json'] = '{$a->MIMETYPE2} text';
-// START UCLA MOD: CCLE-7997 - Updated Word file type lang strings.
-// $string['application/msword'] = 'Word document';
-$string['application/msword'] = 'Pre-Word 2007 document';
-// END UCLA MOD: CCLE-7997.
+$string['application/msword'] = 'Word document';
 $string['application/pdf'] = 'PDF document';
 $string['application/vnd.moodle.backup'] = 'Moodle backup';
 $string['application/vnd.ms-excel'] = 'Excel spreadsheet';

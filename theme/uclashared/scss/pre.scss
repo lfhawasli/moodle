@@ -1,0 +1,107 @@
+// Pre SCSS for the theme.
+
+// Fonts.
+$headings-font-weight: 500;
+
+// Colors.
+$blue: #0072b1;   // CCLE Blue.
+
+// Spacing.
+$small-spacer: 0.7rem !default;
+
+// Options
+$enable-rounded: true;
+
+// Body
+$body-bg:    #f4f4f4 !default;
+
+// Blocks.
+$blocks-column-width: 250px !default;
+$blocks-main-region-width: $blocks-column-width + 10px;
+
+// UCLA Variables.
+
+// UCLA colors.
+$ucla-color-blue:   #3284bf !default;
+$ucla-color-gold:   #ffe800 !default;
+$ccle-color-logo:   #ffbc00 !default;
+$ccle-light-blue:   #bfefff !default;
+
+// Colors.
+$btn-color-editing: #f29644;
+$link-color-editing: #ff4500;
+
+// TA site colors.
+$ta-site-color: #fff5cb;
+$ta-site-hover-color: #fffae5;
+
+// Session colors
+$session-fall-background-color: #ec8539 !default;
+$session-fall-color: black;
+
+$session-spring-background-color: #99cb52 !default;
+$session-spring-color: black;
+
+$session-winter-background-color: #11bcfb !default;
+$session-winter-color: black;
+
+$session-summer-background-color: #f4ec35 !default;
+$session-summer-color: black;
+
+// Header variables
+
+/**
+ * Header color for PROD header
+ *
+ * @type Color
+ * @group header
+ */
+$header-color-prod:     #2c5e91 !default;
+
+/**
+ * Header color for TEST header
+ *
+ * @type Color
+ * @group header
+ */
+$header-color-test:     #DA9C31 !default;
+
+/**
+ * Header color for STAGE header
+ *
+ * @type Color
+ * @group header
+ */
+$header-color-stage:    #5749A7 !default;
+
+/**
+ * Header color for development environment header
+ *
+ * @type Color
+ * @group header
+ */
+$header-color-dev:      #8fb33e !default;
+
+/**
+ * System indicator (right below header) background color
+ *
+ * @type Color
+ * @group header
+ */
+$header-color-system-background: #fff !default;
+
+/**
+ * System indicator text color
+ *
+ * @type Color
+ * @group header
+*/
+$header-color-system-text:   $header-color-prod;
+
+/**
+ * Header height.  All elements in the header must have this height or smaller.
+ *
+ * @type Number in px
+ * @group header
+ */
+$header-height: 40px;

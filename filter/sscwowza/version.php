@@ -21,13 +21,13 @@
  *  a media plugin that plays that media inline.
  *
  * @package    filter_sscwowza
- * @copyright  2013 UC Regents
+ * @copyright  2019 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2013012900;       // The current plugin version (Date: YYYYMMDDXX).
+$plugin->version   = 2019052200;       // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2012062500;       // Requires this Moodle version.
 $plugin->cron      = 0;
 $plugin->component = 'filter_sscwowza';    // Full name of the plugin (used for diagnostics).

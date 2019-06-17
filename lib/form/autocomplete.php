@@ -52,6 +52,8 @@ class MoodleQuickForm_autocomplete extends MoodleQuickForm_select {
     protected $showsuggestions = true;
     /** @var string $noselectionstring String that is shown when there are no selections. */
     protected $noselectionstring = '';
+    /** @var callable|null Function to call (with existing value) to render it to HTML */
+    protected $valuehtmlcallback = null;
 
     /**
      * constructor
@@ -101,6 +103,10 @@ class MoodleQuickForm_autocomplete extends MoodleQuickForm_select {
             unset($attributes['allowcommas']);
         }
         // END UCLA MOD: CCLE-7719.
+        if (isset($attributes['valuehtmlcallback'])) {
+            $this->valuehtmlcallback = $attributes['valuehtmlcallback'];
+            unset($attributes['valuehtmlcallback']);
+        }
         parent::__construct($elementName, $elementLabel, $options, $attributes);
 
         $this->_type = 'autocomplete';
@@ -133,7 +139,23 @@ class MoodleQuickForm_autocomplete extends MoodleQuickForm_select {
                 $this->placeholder, $this->casesensitive, $this->showsuggestions, $this->noselectionstring));
         }
 
-        return parent::toHTML();
+        $html = parent::toHTML();
+
+        // Hacky bodge to add in the HTML code to the option tag. There is a nicer
+        // version of this code in the new template version (see export_for_template).
+        if ($this->valuehtmlcallback) {
+            $html = preg_replace_callback('~value="([^"]+)"~', function($matches) {
+                $value = html_entity_decode($matches[1]);
+                $htmlvalue = call_user_func($this->valuehtmlcallback, $value);
+                if ($htmlvalue !== false) {
+                    return $matches[0] . ' data-html="' . s($htmlvalue) . '"';
+                } else {
+                    return $matches[0];
+                }
+            }, $html);
+        }
+
+        return $html;
     }
 
     /**
@@ -188,7 +210,7 @@ class MoodleQuickForm_autocomplete extends MoodleQuickForm_select {
             // Normally this is cleaned as a side effect of it not being a valid option,
             // but in this case we need to detect and skip it manually.
             if ($value === '_qf__force_multiselect_submission' || $value === null) {
-                $value = '';
+                $value = $this->getMultiple() ? [] : '';
             }
             return $this->_prepareValue($value, $assoc);
         } else {
@@ -215,8 +237,6 @@ class MoodleQuickForm_autocomplete extends MoodleQuickForm_select {
     }
 
     public function export_for_template(renderer_base $output) {
-        global $PAGE;
-
         $this->_generateId();
         $context = parent::export_for_template($output);
         $context['tags'] = !empty($this->tags);
@@ -228,6 +248,15 @@ class MoodleQuickForm_autocomplete extends MoodleQuickForm_select {
         // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
         $context['allowcommas'] = isset($this->allowcommas) ? $this->allowcommas : false;
         // END UCLA MOD: CCLE-7719.
+        if ($this->valuehtmlcallback) {
+            foreach ($context['options'] as &$option) {
+                $value = $option['value'];
+                $html = call_user_func($this->valuehtmlcallback, $value);
+                if ($html !== false) {
+                    $option['html'] = $html;
+                }
+            }
+        }
 
         return $context;
     }

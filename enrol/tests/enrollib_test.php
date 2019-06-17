@@ -55,10 +55,24 @@ class core_enrollib_testcase extends advanced_testcase {
 
         $category1 = $this->getDataGenerator()->create_category(array('visible'=>0));
         $category2 = $this->getDataGenerator()->create_category();
-        $course1 = $this->getDataGenerator()->create_course(array('category'=>$category1->id));
-        $course2 = $this->getDataGenerator()->create_course(array('category'=>$category2->id));
-        $course3 = $this->getDataGenerator()->create_course(array('category'=>$category2->id, 'visible'=>0));
-        $course4 = $this->getDataGenerator()->create_course(array('category'=>$category2->id));
+
+        $course1 = $this->getDataGenerator()->create_course(array(
+            'shortname' => 'Z',
+            'category' => $category1->id,
+        ));
+        $course2 = $this->getDataGenerator()->create_course(array(
+            'shortname' => 'X',
+            'category' => $category2->id,
+        ));
+        $course3 = $this->getDataGenerator()->create_course(array(
+            'shortname' => 'Y',
+            'category' => $category2->id,
+            'visible' => 0,
+        ));
+        $course4 = $this->getDataGenerator()->create_course(array(
+            'shortname' => 'W',
+            'category' => $category2->id,
+        ));
 
         $maninstance1 = $DB->get_record('enrol', array('courseid'=>$course1->id, 'enrol'=>'manual'), '*', MUST_EXIST);
         $DB->set_field('enrol', 'status', ENROL_INSTANCE_DISABLED, array('id'=>$maninstance1->id));
@@ -150,6 +164,18 @@ class core_enrollib_testcase extends advanced_testcase {
 
         $courses = enrol_get_all_users_courses($user2->id, false, null, 'id DESC');
         $this->assertEquals(array($course3->id, $course2->id, $course1->id), array_keys($courses));
+
+        // Make sure that implicit sorting defined in navsortmycoursessort is respected.
+
+        $CFG->navsortmycoursessort = 'shortname';
+
+        $courses = enrol_get_all_users_courses($user1->id);
+        $this->assertEquals(array($course2->id, $course3->id, $course1->id), array_keys($courses));
+
+        // But still the explicit sorting takes precedence over the implicit one.
+
+        $courses = enrol_get_all_users_courses($user1->id, false, null, 'shortname DESC');
+        $this->assertEquals(array($course1->id, $course3->id, $course2->id), array_keys($courses));
     }
 
     public function test_enrol_user_sees_own_courses() {
@@ -590,15 +616,15 @@ class core_enrollib_testcase extends advanced_testcase {
         // Create test user and 4 courses, two of which have guest access enabled.
         $user = $this->getDataGenerator()->create_user();
         $course1 = $this->getDataGenerator()->create_course(
-                (object)array('shortname' => 'Z',
+                (object)array('shortname' => 'X',
                 'enrol_guest_status_0' => ENROL_INSTANCE_DISABLED,
                 'enrol_guest_password_0' => ''));
         $course2 = $this->getDataGenerator()->create_course(
-                (object)array('shortname' => 'Y',
+                (object)array('shortname' => 'Z',
                 'enrol_guest_status_0' => ENROL_INSTANCE_ENABLED,
                 'enrol_guest_password_0' => ''));
         $course3 = $this->getDataGenerator()->create_course(
-                (object)array('shortname' => 'X',
+                (object)array('shortname' => 'Y',
                 'enrol_guest_status_0' => ENROL_INSTANCE_ENABLED,
                 'enrol_guest_password_0' => 'frog'));
         $course4 = $this->getDataGenerator()->create_course(
@@ -645,9 +671,18 @@ class core_enrollib_testcase extends advanced_testcase {
         $this->assertObjectHasAttribute('summary', $courses[$course3->id]);
         $this->assertObjectHasAttribute('summaryformat', $courses[$course3->id]);
 
-        // Check sort parameter still works.
-        $courses = enrol_get_my_courses(null, 'shortname', 0, [], true);
+        // By default, courses are ordered by sortorder - which by default is most recent first.
+        $courses = enrol_get_my_courses(null, null, 0, [], true);
         $this->assertEquals([$course3->id, $course2->id, $course1->id], array_keys($courses));
+
+        // Make sure that implicit sorting defined in navsortmycoursessort is respected.
+        $CFG->navsortmycoursessort = 'shortname';
+        $courses = enrol_get_my_courses(null, null, 0, [], true);
+        $this->assertEquals([$course1->id, $course3->id, $course2->id], array_keys($courses));
+
+        // But still the explicit sorting takes precedence over the implicit one.
+        $courses = enrol_get_my_courses(null, 'shortname DESC', 0, [], true);
+        $this->assertEquals([$course2->id, $course3->id, $course1->id], array_keys($courses));
 
         // Check filter parameter still works.
         $courses = enrol_get_my_courses(null, 'id', 0, [$course2->id, $course3->id, $course4->id], true);
@@ -756,5 +791,57 @@ class core_enrollib_testcase extends advanced_testcase {
 
         // There are still only two distinct users.
         $this->assertEquals(2, count_enrolled_users($context));
+    }
+
+    /**
+     * Test enrol_get_course_users_roles function.
+     *
+     * @return void
+     */
+    public function test_enrol_get_course_users_roles() {
+        global $DB;
+
+        $this->resetAfterTest();
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+        $course = $this->getDataGenerator()->create_course();
+        $context = context_course::instance($course->id);
+
+        $roles = array();
+        $roles['student'] = $DB->get_field('role', 'id', array('shortname' => 'student'), MUST_EXIST);
+        $roles['teacher'] = $DB->get_field('role', 'id', array('shortname' => 'teacher'), MUST_EXIST);
+
+        $manual = enrol_get_plugin('manual');
+        $this->assertNotEmpty($manual);
+
+        $enrol = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'manual'), '*', MUST_EXIST);
+
+        // Test without enrolments.
+        $this->assertEmpty(enrol_get_course_users_roles($course->id));
+
+        // Test with 1 user, 1 role.
+        $manual->enrol_user($enrol, $user1->id, $roles['student']);
+        $return = enrol_get_course_users_roles($course->id);
+        $this->assertArrayHasKey($user1->id, $return);
+        $this->assertArrayHasKey($roles['student'], $return[$user1->id]);
+        $this->assertArrayNotHasKey($roles['teacher'], $return[$user1->id]);
+
+        // Test with 1 user, 2 role.
+        $manual->enrol_user($enrol, $user1->id, $roles['teacher']);
+        $return = enrol_get_course_users_roles($course->id);
+        $this->assertArrayHasKey($user1->id, $return);
+        $this->assertArrayHasKey($roles['student'], $return[$user1->id]);
+        $this->assertArrayHasKey($roles['teacher'], $return[$user1->id]);
+
+        // Test with another user, 1 role.
+        $manual->enrol_user($enrol, $user2->id, $roles['student']);
+        $return = enrol_get_course_users_roles($course->id);
+        $this->assertArrayHasKey($user1->id, $return);
+        $this->assertArrayHasKey($roles['student'], $return[$user1->id]);
+        $this->assertArrayHasKey($roles['teacher'], $return[$user1->id]);
+        $this->assertArrayHasKey($user2->id, $return);
+        $this->assertArrayHasKey($roles['student'], $return[$user2->id]);
+        $this->assertArrayNotHasKey($roles['teacher'], $return[$user2->id]);
     }
 }

@@ -21,17 +21,17 @@
  *  a media plugin that plays that media inline.
  *
  * @package    filter_sscwowza
- * @copyright  2013 UC Regents
+ * @copyright  2019 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->libdir . '/filelib.php');
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Filter class file.
  *
  * @package    filter_sscwowza
- * @copyright  2013 UC Regents
+ * @copyright  2019 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class filter_sscwowza extends moodle_text_filter {
@@ -46,22 +46,15 @@ class filter_sscwowza extends moodle_text_filter {
      */
     public function filter($text, array $options = array()) {
         global $CFG;
-        static $eolasfixapplied = false;
 
-        // You should never modify parameters passed to a method or function, it's BAD practice. Create a copy instead.
-        // The reason is that you must always be able to refer to the original parameter that was passed.
-        // For this reason, I changed $text = preg_replace(..,..,$text) into $newtext = preg.... (NICOLAS CONNAULT)
-        // Thanks to Pablo Etcheverry for pointing this out! MDL-10177
-        // We're using the UFO technique for flash to attain XHTML Strict 1.0
-        // See: http://www.bobbyvandersluis.com/ufo/
         if (!is_string($text)) {
             // Non-string data can not be filtered anyway.
             return $text;
         }
-        $newtext = $text; // Fullclone is slow and not needed here.
+        $newtext = $text;
 
         if ($CFG->filter_sscwowza_enable_mp4) {
-            $search = '/\{wowza:(.*?),(.*?),(.*?),(.*?),(.*?)\}/';
+            $search = '/\{wowza:(.*?),(.*?),(.*?)\}/';
             $newtext = preg_replace_callback($search, 'sscwowza_filter_mp4_callback', $newtext);
         }
 
@@ -72,22 +65,27 @@ class filter_sscwowza extends moodle_text_filter {
         }
 
         // Prefix the jwplayer.
-        $jwplayerpath = $CFG->wwwroot . '/filter/sscwowza/jwplayer/';
-        $swfpath = $jwplayerpath . 'SecureToken.swf';
-        $jwjspath = $jwplayerpath . 'jwplayer.js';
-        $swfjspath = $jwplayerpath . 'swfobject.js';
-        $newtext = '<script type="text/javascript" src="' . $jwjspath . '"></script>
-                    <script type="text/javascript" src="' . $swfjspath . '"></script>'
+        $jwplayerpath = 'https://content.jwplatform.com/libraries/q3GUgsN9.js';
+        $newtext = '<script type="text/javascript" src="' . $jwplayerpath . '"></script>'
                 . $newtext;
 
-        // Postfix.
-        if (!$eolasfixapplied) {
-            $newtext .= '<script defer="defer" src="' . $CFG->wwwroot .
-                    '/filter/sscwowza/eolas_fix.js" type="text/javascript">// <![CDATA[ ]]></script>';
-            $eolasfixapplied = true;
-        }
-
         return $newtext;
+    }
+
+    /**
+     * Returns given timecode formatted as time in seconds and HH:MM:SS.
+     *
+     * @param string $timecode  Expecting timecode format like: 00:01:11,736
+     * @return array            Returns array of time in seconds and string.
+     */
+    public static function parse_timecode($timecode) {
+        $parts   = explode(':', $timecode);
+        $hours   = $parts[0];
+        $minutes = $parts[1];
+        $seconds = substr($parts[2], 0, 2);
+        $timecodeinseconds = ($hours * 3600) + ($minutes * 60) + ($seconds);
+        $timecodestandard  = $hours . ':' . $minutes . ':' . $seconds;
+        return array($timecodeinseconds, $timecodestandard);
     }
 
 }
@@ -95,30 +93,27 @@ class filter_sscwowza extends moodle_text_filter {
 /**
  * Replaces WOWZA link with media player.
  *
- * @param array $link   Consisting of type, url, file, width, and height.
+ * @param array $link   Consisting of type, url, and file.
  * @param boolean $autostart    Unused.
  * @return string       HTML fragment to display video player.
  */
 function sscwowza_filter_mp4_callback($link, $autostart = false) {
-    global $CFG, $COURSE, $USER;
+    global $COURSE, $USER;
 
     // Clean url and get variables.
-    $type   = clean_param($link[1], PARAM_NOTAGS);
-    $url    = clean_param($link[2], PARAM_NOTAGS);
-    $file   = clean_param($link[3], PARAM_NOTAGS);
-    $width  = clean_param($link[4], PARAM_NOTAGS);
-    $height = clean_param($link[5], PARAM_NOTAGS);
-
-    // Handle VOD and Live streams.
+    $type = clean_param($link[1], PARAM_NOTAGS);
+    $url  = clean_param($link[2], PARAM_NOTAGS);
+    $file = clean_param($link[3], PARAM_NOTAGS);
     $app = $COURSE->id;
-
+    // Handle VOD and Live streams.
+    $timeline = '';
+    $srtjs = '';
     if (strpos($file, '*') !== false) {
         $files = explode('*', $file);
         $file = $files[0];
         $srt = $files[1];
     } else {
         $srt = '';
-        $timeline = '';
     }
 
     $format = strtolower(substr($file, -3));
@@ -152,146 +147,121 @@ function sscwowza_filter_mp4_callback($link, $autostart = false) {
     }
 
     // Set server variables.
-    $USER->video_allowed = 'true';
-    $USER->video_file = $file;
+    $USER->ssc_video_allowed = 'true';
 
     // Streaming paths.
-    $srtpath = 'http://' . $parseurl['host'] . ':8080/' . $app . '/' . $srt;
-    $html5path = 'http://' . $parseurl['host'] . '/' . $app . '/' . $format . $file . '/playlist.m3u8';
+    $srtpath = 'https://' . $parseurl['host'] . '/' . $app . '/' . $srt;
+    $html5path = 'https://' . $parseurl['host'] . '/' . $app . '/' . $format . $file . '/playlist.m3u8';
+
     $rtmppath = $url . '/' . $app;
-    $jwplayerpath = $CFG->wwwroot . '/filter/sscwowza/jwplayer/';
-    $swfpath = $jwplayerpath . 'SecureToken.swf';
-    $skinpath = $jwplayerpath . 'skins/glow/glow.xml';
 
     // Set playerid, so that we can support multiple video embeds.
-    $fileid = $file . '-' . uniqid();
+    $playerid = uniqid();
 
+    $lines = array();
     if ($srt != '') {
         // Interactive timeline.
         $srtfile = file($srtpath);
-        $lines = array();
-        foreach ($srtfile as $line) {
-            $cleanline = trim($line);
-
-            if (!is_numeric($cleanline)) {
-                array_push($lines, $line);
+        if ($srtfile !== false) {
+            foreach ($srtfile as $line) {
+                $cleanline = trim($line);
+                if (!is_numeric($cleanline)) {
+                    array_push($lines, $cleanline);
+                }
             }
+        } else {
+            // Cannot ready subtitle file, so ignore it.
+            $srt = '';
         }
+    }
 
+    if (!empty($lines)) {
+        // Build arrays for timecodes and text.
         $timecodes = array();
         $text = array();
         $index = 0;
         $paragraph = '';
-
+        $numlines = count($lines) - 1;
         foreach ($lines as $line) {
-            $line = trim($line);
             if (preg_match('/^[0-9]{2}:[0-9]{2}/', $line)) {
+                // Found timecode.
                 array_push($timecodes, $line);
-                $index++;
             } else {
-                if ($index < count($lines) - 1) {
-                    $next = $lines[$index + 1];
+                // Else we found a start of a paragraph.
+                $paragraph = $paragraph . ' ' . $line;
+                
+                // Check if next line is a timecode, meaning paragraph ended.
+                if ($index < $numlines) {
+                    $next = $lines[$index + 1];    
                 } else {
-                    $next = '';
+                    $next = null;
                 }
-                $index++;
-                if (preg_match('/^[0-9]{2}:[0-9]{2}/', $next)) {
-                    $paragraph = $paragraph . ' ' . $line;
-                    array_push($text, trim($paragraph));
+                if (preg_match('/^[0-9]{2}:[0-9]{2}/', $next) || is_null($next)) {
+                    // Next line is timecode or reached end of file.
+                    $paragraph = trim($paragraph . ' ' . $line);
+                    array_push($text, $paragraph);
                     $paragraph = '';
-                } else {
-                    $paragraph = $paragraph . ' ' . $line;
-                    if ($next == '') {
-                        array_push($text, trim($paragraph));
-                    }
                 }
             }
+            $index++;
         }
+
         $starts = array();
         $ends = array();
         $times = array();
         foreach ($timecodes as $timecode) {
+            // Start and end times are delineated by "-->".
+            $timestoparse = explode('-->', $timecode);
+
             // Calculate start times.
-            $parts = preg_split(':', $timecode);
-            $hours = $parts[0];
-            $minutes = $parts[1];
-            $seconds = substr($parts[2], 0, 2);
-            $timecodeinseconds = ((int) $hours * 3600) + ((int) $minutes * 60) + ((int) $seconds);
-            $timecodestandard = $hours . ':' . $minutes . ':' . $seconds;
-            array_push($starts, $timecodeinseconds);
-            array_push($times, $timecodestandard);
+            $result = filter_sscwowza::parse_timecode($timestoparse[0]);
+            array_push($starts, $result[0]);
+            array_push($times, $result[1]);
 
             // Calculate end times.
-            $end = preg_split('-->', $timecode);
-            $parts = preg_split(':', $end[1]);
-            $hours = $parts[0];
-            $minutes = $parts[1];
-            $seconds = substr($parts[2], 0, 2);
-            $timecodeinseconds = ((int) $hours * 3600) + ((int) $minutes * 60) + ((int) $seconds);
-            $timecodestandard = $hours . ':' . $minutes . ':' . $seconds;
-            array_push($ends, $timecodeinseconds);
+            $result = filter_sscwowza::parse_timecode($timestoparse[1]);
+            array_push($ends, $result[0]);
         }
 
         $index = 0;
         $timeline = '<div class="sscwowzafilter-timeline" style="width:' . $width . 'px;">';
         foreach ($text as $line) {
-            $timeline .= '<a onclick="jwplayer().seek(' . $starts[$index] . ')" href="javascript:void(0)" id="t' . $starts[$index] . '">' . $times[$index] . '</a> - ' . $line . '<br/>';
+            if (!empty($line)) {
+                $timeline .= '<a onclick="jwplayer(\'player-' . $playerid . '\').seek(' .
+                        $starts[$index] . ')" href="javascript:void(0)" id="t' .
+                        $starts[$index] . '">' . $times[$index] . '</a> - ' . $line . '<br/>';
+            }
             $index++;
         }
         $timeline .= '</div>';
-    }
 
-    if ($srt != '') {
-        $srtjs = '"captions-2":{
-                                "file":"' . $srtpath . '",
-                                "back": "true"
-				},';
-    } else {
-        $srtjs = "";
+        $srtjs = ",tracks: [{
+                    file: '$srtpath',
+                    kind: 'captions',
+                    'default': true
+                }]";
     }
 
     // Print out the player output.
-    return '
-        <div id="player-' . $fileid . '"></div>
-	<script type="text/javascript">
-	jwplayer("player-' . $fileid . '").setup({
-		"id" : "' . $fileid . '",
-		"skin" : "' . $skinpath . '",
-		"width" : "' . $width . '",
-		"height" : "' . $height . '",
-		"file" : "' . $format . $file . '",
-		"stretching" : "exactfit",
-		"streamer" : "' . $rtmppath . '",
-		"plugins" : {
-                                ' . $srtjs . '
-                                ' . $mbrjs . '
-                                "gapro-2":{}
-                            },
-		"modes" :
-			[
-				{type: "flash",
-					src: "' . $swfpath . '",
-				},
-				{type: "html5",
-					config: {
-						file: "' . $html5path . '",
-						provider: "video"
-					}
-				}
-			]
-		});
-	</script>
-	<script type="text/javascript">
-            var ios = false;
-            if((navigator.userAgent.match(/iPhone/i)) ||
-             (navigator.userAgent.match(/iPod/i)) || (navigator.userAgent.match(/iPad/i))) {
-                    var ios = true;
-            }
-            var version = deconcept.SWFObjectUtil.getPlayerVersion();
-            if (version[\'major\'] < 10 && ios == false ) {
-                    document.write(\'You have an outdated version of Flash. Please Update Your Flash Player: <br/>
-                    <a href="http://www.adobe.com/go/getflashplayer" target="_blank" border="0">
-                    <img src="' . $jwplayerpath . '160x41_Get_Flash_Player.jpg"></a>\');
-            }
-        </script>' . $timeline;
+    return "
+        <div id='player-$playerid'></div>
+        <script type='text/javascript'>
+        jwplayer('player-$playerid').setup({
+            autostart: true,
+            width: '100%',
+            aspectratio: '3:2',
+            plugins: {
+                $mbrjs
+                },
+            playlist: [{
+                sources:
+                    [
+                        {file: '$html5path'},
+                        {file: '$rtmppath'}
+                    ]
+                $srtjs
+                }],
+            primary: 'html5'
+        });
+        </script>" . $timeline;
 }

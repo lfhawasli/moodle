@@ -47,10 +47,8 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
-// START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
-//$plugin->version   = 2017111301;    // The current module version (Date: YYYYMMDDXX).
-$plugin->version   = 2018110200;    // The current module version (Date: YYYYMMDDXX).
-// END UCLA MOD: CCLE-6956.
-$plugin->requires  = 2017110800;    // Requires this Moodle version.
+
+$plugin->version   = 2018051400;    // The current module version (Date: YYYYMMDDXX).
+$plugin->requires  = 2018050800;    // Requires this Moodle version.
 $plugin->component = 'mod_lti';     // Full name of the plugin (used for diagnostics).
 $plugin->cron      = 0;
