@@ -242,19 +242,19 @@ h1, h2, h3, h4, h5, h6, p {
 
 /* Concerned with the sidebar site directory block */
 /* checkbox and label */
-.form-check-inline .form-check-input {
+.ucla-search .form-check-inline .form-check-input {
   position: absolute;
-  margin-top: .25rem;
-  margin-left: -1.25rem;
+  margin-top: .2rem;
 }
-.form-check-label {
+.ucla-search .form-check-label {
   margin-bottom: 0;
-  margin-top: 4px;
+  margin-left: 0.5rem;
+  cursor: pointer;
 }
 /*"search:" enough space*/
 .ucla-search fieldset div {
   display: inline-block;
-  width: 60px;
+  width: 3.25rem;
 }
 /*"search:" enough space*/
 .frontpage-site-directory h5, .sitetopic {
