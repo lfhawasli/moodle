@@ -40,6 +40,13 @@ if ($hassiteconfig) { // speedup for non-admins, add all caps used on this page
 
     $optionalsubsystems->add(new admin_setting_configcheckbox('messagingallowemailoverride', new lang_string('messagingallowemailoverride', 'admin'), new lang_string('configmessagingallowemailoverride','admin'), 0));
 
+    // START UCLA MOD: CCLE-8459 - Messaging does not email students.
+    $optionalsubsystems->add(new admin_setting_configcheckbox('emailbulkmessaging',
+        new lang_string('emailbulkmessaging', 'admin'),
+        new lang_string('configemailbulkmessaging', 'admin'),
+        0));
+    // END UCLA MOD: CCLE-8459.
+
     $optionalsubsystems->add(new admin_setting_configcheckbox('enablestats', new lang_string('enablestats', 'admin'), new lang_string('configenablestats', 'admin'), 0));
 
     $optionalsubsystems->add(new admin_setting_configcheckbox('enablerssfeeds', new lang_string('enablerssfeeds', 'admin'), new lang_string('configenablerssfeeds', 'admin'), 0));

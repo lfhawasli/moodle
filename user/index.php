@@ -320,7 +320,15 @@ if ($bulkoperations) {
         'value' => get_string('deselectall')));
     echo html_writer::end_tag('div');
     $displaylist = array();
-    $displaylist['#messageselect'] = get_string('messageselectadd');
+    // START UCLA MOD: CCLE-8459 - Messaging does not email students.
+    //$displaylist['#messageselect'] = get_string('messageselectadd');
+    if (!empty($CFG->messaging)) {
+        $displaylist['#messageselect'] = get_string('messageselectadd');
+    }
+    if (!empty($CFG->emailbulkmessaging)) {
+        $displaylist['#emailselect'] = get_string('emailselectadd', 'message');
+    }
+    // END UCLA MOD: CCLE-8459.
     if (!empty($CFG->enablenotes) && has_capability('moodle/notes:manage', $context) && $context->id != $frontpagectx->id) {
         $displaylist['#addgroupnote'] = get_string('addnewnote', 'notes');
     }
