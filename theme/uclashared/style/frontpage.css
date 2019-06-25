@@ -278,8 +278,9 @@ h1, h2, h3, h4, h5, h6, p {
   background-color: rgb(220,220,220);
   color: black;
 }
+/* Background color is the same as gray-200 for consistency. */
 #frontpage-search-wrapper .search-options {
-  background-color: rgb(245,245,245);
+  background-color: #e9ecef;
   margin-top: 10px;
   border: 0;
   font-size: 12px;
