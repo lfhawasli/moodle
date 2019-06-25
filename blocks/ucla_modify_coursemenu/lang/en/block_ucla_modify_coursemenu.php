@@ -45,9 +45,8 @@ $string['deletesectioncontents'] = 'At least one of the section(s) you are delet
 $string['tbdel'] = 'To delete:';
 $string['deleteconfirm'] = 'Delete content';
 
-$string['successmodify'] = 'Your change has been applied.';
+$string['successmodify'] = 'Successfully saved changes.';
 $string['failuremodify'] = 'There was an error writing records to the database. Your modifications were not saved.';
-$string['modifymore'] = 'Modify more sections';
 
 // Modify course menu event log handler.
 $string['coursemenu_modified'] = 'Modified site menu';
