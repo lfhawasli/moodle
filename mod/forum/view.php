@@ -125,8 +125,16 @@
     forum_view($forum, $course, $cm, $context);
 
     echo $OUTPUT->header();
-
+    // START UCLA MOD: CCLE-8471 - Warning message for Public missing on Forum (pre-edit)
+    require_once($CFG->dirroot . '/local/publicprivate/lib/module.class.php');
+    $ppmodule = PublicPrivate_Module::build($cm);
+    if (!$ppmodule->is_private()) {
+        $warningpublicforummsg = get_string('warningpublicforum', 'local_ucla');
+        echo $OUTPUT->notification($warningpublicforummsg, 'notifywarning');
+    }
+    // END UCLA MOD: CCLE-8471 - Warning message for Public missing on Forum (pre-edit)
     echo $OUTPUT->heading(format_string($forum->name), 2);
+
     if (!empty($forum->intro) && $forum->type != 'single' && $forum->type != 'teacher') {
 
         // START UCLA MOD: CCLE-4882 forum customization.

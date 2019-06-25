@@ -254,7 +254,14 @@ $PAGE->set_button($searchform);
 $renderer = $PAGE->get_renderer('mod_forum');
 
 echo $OUTPUT->header();
-
+// START UCLA MOD: CCLE-8471 - Warning message for Public missing on Forum (pre-edit)
+require_once($CFG->dirroot . '/local/publicprivate/lib/module.class.php');
+$ppmodule = PublicPrivate_Module::build($cm);
+if (!$ppmodule->is_private()) {
+    $warningpublicforummsg = get_string('warningpublicforum', 'local_ucla');
+    echo $OUTPUT->notification($warningpublicforummsg, 'notifywarning');
+}
+// END UCLA MOD: CCLE-8471 - Warning message for Public missing on Forum (pre-edit)
 echo $OUTPUT->heading(format_string($forum->name), 2);
 echo $OUTPUT->heading(format_string($discussion->name), 3, 'discussionname');
 
