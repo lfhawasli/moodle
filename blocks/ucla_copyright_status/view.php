@@ -73,7 +73,7 @@ echo html_writer::tag('noscript',
         array('id' => 'block-ucla-copyright-status-noscript'));
 
 if (isset($action)) {
-    echo $OUTPUT->notification(get_string('changessaved', 'block_ucla_copyright_status'), 'notifysuccess');
+    \core\notification::success(get_string('changessaved', 'block_ucla_copyright_status'));
 
     $event = \block_ucla_copyright_status\event\copyright_status_updated::create(array(
         'context' => $context

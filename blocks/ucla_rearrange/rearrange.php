@@ -196,53 +196,33 @@ if ($data = $rearrangeform->get_data()) {
 
 $restr = get_string('rearrange_sections', 'block_ucla_rearrange');
 
+if ($data != false) {
+    $event = \block_ucla_rearrange\event\module_rearranged::create(array(
+        'context' => $context
+    ));
+    $event->trigger();
+    
+    redirect(new moodle_url($PAGE->url, array('courseid' => $courseid, 'section' => $sectionredirect)), get_string('rearrange_success', 'block_ucla_rearrange'), null, \core\output\notification::NOTIFY_SUCCESS);
+}
+
 $PAGE->set_title("$course->shortname: $restr");
 $PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading($restr);
 
-if ($data != false) {
-    $message = html_writer::tag('h3', get_string('success', 'block_ucla_rearrange'));
-    $message .= get_string('rearrange_success', 'block_ucla_rearrange');
-
-    // Return to site/section (where the user was).
-    $secturl = new moodle_url('/course/view.php',
-                    array('id' => $courseid, 'section' => $sectionredirect));
-    if ($sectionredirect == UCLA_FORMAT_DISPLAY_ALL) {
-        $secturl->remove_params('section');
-        $secturl->param('show_all', 1);
-    }
-    $returntositebutton = new single_button($secturl,
-            get_string('returntosite', 'block_ucla_rearrange'), 'get');
-
-    // Rearrange more.
-    $rearrangeurl = new moodle_url($PAGE->url,
-            array('courseid' => $courseid, 'section' => $sectionredirect));
-    $rearrangebutton = new single_button($rearrangeurl,
-            get_string('rearrangemore', 'block_ucla_rearrange'), 'get');
-
-    echo $OUTPUT->confirm($message, $returntositebutton, $rearrangebutton, 'success');
-
-    $event = \block_ucla_rearrange\event\module_rearranged::create(array(
-        'context' => $context
-    ));
-    $event->trigger();
-
+/* For section < 0, the secid doesnt matter because we will expand all.
+* However, if will give warning if we use $secid = ($sections[$sectionnum]->id);
+* as there is no secid for section < 0.
+*/
+if ($sectionnum < 0) {
+    $secid = ($sections[0]->id);
 } else {
-    /* For section < 0, the secid doesnt matter because we will expand all.
-     * However, if will give warning if we use $secid = ($sections[$sectionnum]->id);
-     * as there is no secid for section < 0.
-     */
-    if ($sectionnum < 0) {
-        $secid = ($sections[0]->id);
-    } else {
-        $secid = ($sections[$sectionnum]->id);
-    }
-
-    $rearrangeform->display();
-    $PAGE->requires->js_call_amd('block_ucla_rearrange/rearrange', 'init', array($sectionnum, $secid));
+    $secid = ($sections[$sectionnum]->id);
 }
+
+$rearrangeform->display();
+$PAGE->requires->js_call_amd('block_ucla_rearrange/rearrange', 'init', array($sectionnum, $secid));
 
 echo $OUTPUT->footer();
 

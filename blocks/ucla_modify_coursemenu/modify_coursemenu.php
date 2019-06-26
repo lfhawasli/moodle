@@ -49,7 +49,6 @@ require_once($CFG->dirroot . '/local/ucla/lib.php');
 global $CFG, $PAGE, $OUTPUT;
 
 $courseid = required_param('courseid', PARAM_INT);
-$justshowsuccessmessage = optional_param('success', 0, PARAM_INT);
 
 // Carry the previously viewed section over and adjust it if it moves
 // via the course section modifier.
@@ -92,52 +91,10 @@ $params = array('courseid' => $courseid, 'section' => $sectionnum);
 $PAGE->set_url('/blocks/ucla_modify_coursemenu/modify_coursemenu.php',
         $params);
 
-$confirmationurl = new moodle_url($PAGE->url,
-    array(
-            'courseid' => $courseid,
-            'section' => $sectionnum,
-            'success' => true,
-        ));
-
 $restr = get_string('pluginname', 'block_ucla_modify_coursemenu');
 
 $PAGE->set_title("$course->shortname: $restr");
 $PAGE->set_heading($course->fullname);
-
-// If we're just showing the success message, exit immediately afterward.
-if ($justshowsuccessmessage) {
-    echo $OUTPUT->header();
-    echo $OUTPUT->heading($restr, 2, 'headingblock');
-
-    $message = html_writer::tag('h3', get_string('success', 'block_ucla_rearrange'));
-    $message .= get_string('successmodify', 'block_ucla_modify_coursemenu');
-
-    // Return to site/section (where the user was).
-    if ($showall) {
-        $courseviewurl->remove_params('section');
-        $courseviewurl->param('show_all', 1);
-    }
-    $returntositebutton = new single_button($courseviewurl,
-            get_string('returntosite', 'block_ucla_rearrange'),
-            'get');
-
-    // Modify more sections.
-    $modifymoreurl = new moodle_url($PAGE->url, $params);
-    $modifymorebutton = new single_button($modifymoreurl,
-            get_string('modifymore', 'block_ucla_modify_coursemenu'),
-            'get');
-
-    echo $OUTPUT->confirm($message, $returntositebutton, $modifymorebutton, 'success');
-
-    echo $OUTPUT->footer();
-
-    $event = \block_ucla_modify_coursemenu\event\course_menu_modified::create(array(
-        'context' => $context
-    ));
-    $event->trigger();
-
-    die();
-}
 
 // Before loading modinfo, make sure section information is correct.
 local_ucla_course_section_fixer::fix_problems($course);
@@ -177,8 +134,6 @@ $modifycoursemenuform = new ucla_modify_coursemenu_form(
 // This is needed if we're deleting sections.
 $verifyform = new verify_modification_form();
 $verifydata = false;
-
-$redirector = null;
 
 // Used to tell users that they cannot delete.
 $sectionsnotify = array();
@@ -354,57 +309,6 @@ if ($modifycoursemenuform->is_cancelled()) {
     } catch(Exception $e) {
         $transaction->rollback($e);
     }
-
-    // BEGIN UCLA MOD: CCLE-3273-Carry-over-previously-viewed-section.
-    $movetolandingpage = false;
-
-    $pos1 = array_keys($unserialized);
-
-    // Remove sections that were deleted.
-    $rmdelete = preg_grep("/delete-/", $pos1);
-    foreach ($rmdelete as $key => $val) {
-        if ($key == $sectionnum) {
-            $movetolandingpage = true;
-        }
-        unset($pos1[$key]);
-        unset($pos1[$key - 1]);
-    }
-
-    // Remove sections that were hidden.
-    $rmhidden = preg_grep("/hidden-/", $pos1);
-    foreach ($rmhidden as $key => $val) {
-        unset($pos1[$key]);
-    }
-
-    // Array of sections after removing deleted and hidden sections.
-    $pos2 = array_values($pos1);
-
-    if ($movetolandingpage) {
-        // If the section we are on was deleted, then move to the landing page.
-        $newsection = $landingpage;
-    } else {
-        // If we are on 'Site info' then stay on the same section.
-        // Otherwise we are on a section that can be moved; find where it moved.
-        $newsection = $sectionnum == 0 ? $sectionnum : array_search("title-$sectionnum", $pos2) + 1;
-    }
-
-    $confirmationurl = new moodle_url($PAGE->url,
-        array(
-            'courseid' => $courseid,
-            'section' => $newsection,
-            'success' => true,
-        ));
-
-    // Redirect to 'Show all' if we were initially on it or
-    // if the section we were on was deleted and the landing page is 'Show all'.
-    if ($sectionnum == UCLA_FORMAT_DISPLAY_ALL || $newsection == UCLA_FORMAT_DISPLAY_ALL) {
-        $confirmationurl->remove_params('section');
-        $confirmationurl->param('show_all', 1);
-    }
-
-    // END UCLA MOD: CCLE-3273.
-
-    $redirector = $confirmationurl;
 } else if ($verifyform->is_cancelled()) {
     // Fill in data with state that has been changed.
     // TODO: Be more accurate.
@@ -538,16 +442,15 @@ if ($passthrudata || $verifydata) {
     unset($course->sectioncache);
     unset($course->modinfo);
     rebuild_course_cache($course->id);
-
-    $redirector = $confirmationurl;
 }
 
-// Before doing any heavy PAGE-related lifting, see if we should redirect to
-// the success screen.
+// Before doing any heavy PAGE-related lifting, see if we should show
+// the success notif.
 // This will come here when the modifier form is submitted, but a section
 // with content is discovered, BUT the verify form has not been submitted.
 if ($data && empty($sectionsnotify) || $verifydata) {
-    redirect($redirector);
+    // \core\notification::success(get_string('successmodify', 'block_ucla_modify_coursemenu'));
+    redirect(new moodle_url($PAGE->url, array('courseid' => $courseid, 'section' => $sectionnum)), get_string('successmodify', 'block_ucla_modify_coursemenu'), null, \core\output\notification::NOTIFY_SUCCESS);
 }
 
 // CCLE-3685 - If the course contains a syllabus, add it to array of sections.
