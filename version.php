@@ -29,7 +29,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$version  = 2018051706.00;              // 20180517      = branching date YYYYMMDD - do not modify!
+// START UCLA MOD: CCLE-8459 - Messaging does not email students.
+//$version  = 2018051706.00;              // 20180517      = branching date YYYYMMDD - do not modify!
+$version  = 2018051706.01;
+// END UCLA MOD: CCLE-8459.
                                         //         RR    = release increments - 00 in DEV branches.
                                         //           .XX = incremental changes.
 

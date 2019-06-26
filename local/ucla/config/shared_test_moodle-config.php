@@ -215,6 +215,7 @@ $CFG->enablewebservices = 1;
 $CFG->bloglevel = 0; // Disable blog system completely
 // CCLE-5181 Allow users to enter an alternate email
 $CFG->messagingallowemailoverride = 1;
+$CFG->emailbulkmessaging = 1;
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
 $CFG->enableplagiarism = 1;

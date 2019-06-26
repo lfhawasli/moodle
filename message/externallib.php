@@ -188,6 +188,110 @@ class core_message_external extends external_api {
         );
     }
 
+    // START UCLA MOD: CCLE-8459 - Messaging does not email students.
+    /**
+     * Returns description of method parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function send_instant_emails_parameters() {
+        return new external_function_parameters(
+                array(
+                    'messages' => new external_multiple_structure(
+                            new external_single_structure(
+                                array(
+                                    'touserid' => new external_value(PARAM_INT, 'id of the user to send the private email'),
+                                    'text' => new external_value(PARAM_RAW, 'the text of the email'),
+                                )
+                            )
+                    )
+                )
+        );
+    }
+
+    /**
+     * Send private emails from the current user to other users.
+     *
+     * @param array $messages An array of message to send.
+     * @return array
+     */
+    public static function send_instant_emails($messages = array()) {
+        global $CFG, $USER, $DB;
+
+        // Check if emailbulkmessaging is enabled.
+        if (empty($CFG->emailbulkmessaging)) {
+            throw new moodle_exception('emailbulkmessagingdisabled', 'message');
+        }
+
+        $params = self::validate_parameters(self::send_instant_messages_parameters(), array('messages' => $messages));
+
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        // Retrieve all tousers of the messages.
+        $receivers = array();
+        foreach ($params['messages'] as $message) {
+            $receivers[] = $message['touserid'];
+        }
+        list($sqluserids, $sqlparams) = $DB->get_in_or_equal($receivers, SQL_PARAMS_NAMED, 'userid_');
+        $tousers = $DB->get_records_select("user", "id " . $sqluserids . " AND deleted = 0", $sqlparams);
+
+        $resultmessages = array();
+        foreach ($params['messages'] as $message) {
+            $resultmsg = array(); // The info about the success of the operation.
+
+            // We are going to do some checking.
+            // Code should match /messages/index.php checks.
+            $success = true;
+
+            // Check the user exists.
+            if (empty($tousers[$message['touserid']])) {
+                $success = false;
+                $errormessage = get_string('touserdoesntexist', 'message', $message['touserid']);
+            }
+
+            // Now we can send the message (at least try).
+            if ($success) {
+                $success = email_to_user($tousers[$message['touserid']], $USER, '',
+                        $message['text']);
+            }
+
+            // Build the resultmsg.
+            if ($success) {
+                $resultmsg['msgid'] = $success;
+            } else {
+                // WARNINGS: for backward compatibility we return this errormessage.
+                // We should have thrown exceptions as these errors prevent results to be returned.
+                // See http://docs.moodle.org/dev/Errors_handling_in_web_services#When_to_send_a_warning_on_the_server_side .
+                $resultmsg['msgid'] = -1;
+                $resultmsg['errormessage'] = $errormessage;
+            }
+
+            $resultmessages[] = $resultmsg;
+        }
+
+        return $resultmessages;
+    }
+
+    /**
+     * Returns description of method result value
+     *
+     * @return external_description
+     * @since Moodle 3.8
+     */
+    public static function send_instant_emails_returns() {
+        return new external_multiple_structure(
+            new external_single_structure(
+                array(
+                    'msgid' => new external_value(PARAM_INT,
+                            'test this to know if it succeeds:  id of the created message if it succeeded, -1 when failed'),
+                    'errormessage' => new external_value(PARAM_TEXT, 'error message - if it failed', VALUE_OPTIONAL)
+                )
+            )
+        );
+    }
+    // END UCLA MOD: CCLE-8459.
+
     /**
      * Create contacts parameters description.
      *

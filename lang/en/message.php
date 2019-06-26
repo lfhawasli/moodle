@@ -41,6 +41,10 @@ $string['disableall'] = 'Disable notifications';
 $string['disabled'] = 'Messaging is disabled on this site';
 $string['disallowed'] = 'Disallowed';
 $string['editmessages'] = 'Edit messages';
+// START UCLA MOD: CCLE-8459 - Messaging does not email students.
+$string['emailbulkmessagingdisabled'] = 'Bulk user emailing from course participants list is disabled';
+$string['emailselectadd'] = 'Send an email';
+// END UCLA MOD: CCLE-8459.
 $string['emailtagline'] = 'This is a copy of a message sent to you at "{$a->sitename}". Go to {$a->url} to reply.';
 $string['enabled'] = 'Enabled';
 $string['errorcallingprocessor'] = 'Error calling defined output';
@@ -153,6 +157,12 @@ $string['send'] = 'Send';
 $string['sendingvia'] = 'Sending "{$a->provider}" via "{$a->processor}"';
 $string['sendingviawhen'] = 'Sending "{$a->provider}" via "{$a->processor}" when {$a->state}';
 $string['sendmessage'] = 'Send message';
+// START UCLA MOD: CCLE-8459 - Messaging does not email students.
+$string['sendbulkemail'] = 'Send email to {$a} people';
+$string['sendbulkemailsingle'] = 'Send email to 1 person';
+$string['sendbulkemailsent'] = 'Email sent to {$a} people';
+$string['sendbulkemailsentsingle'] = 'Email sent to 1 person';
+// END UCLA MOD: CCLE-8459.
 $string['sendbulkmessage'] = 'Send message to {$a} people';
 $string['sendbulkmessagesingle'] = 'Send message to 1 person';
 $string['sendbulkmessagesent'] = 'Message sent to {$a} people';

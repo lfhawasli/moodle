@@ -216,6 +216,9 @@ $string['configdocroot'] = 'Defines the path to the Moodle Docs for providing co
 $string['configdoctonewwindow'] = 'If you enable this, then links to Moodle Docs will be shown in a new window.';
 $string['configeditordictionary'] = 'This value will be used if aspell doesn\'t have dictionary for users own language.';
 $string['configeditorfontlist'] = 'Select the fonts that should appear in the editor\'s drop-down list.';
+// START UCLA MOD: CCLE-8459 - Messaging does not email students.
+$string['configemailbulkmessaging'] = 'If enabled, teachers will be able to email participants from the course participants page.';
+// END UCLA MOD: CCLE-8459.
 $string['configemailchangeconfirmation'] = 'Require an email confirmation step when users change their email address in their profile.';
 $string['configemailfromvia'] = 'Add via information in the "From" section of outgoing email. This informs the recipient from where this email came from and also helps combat recipients accidentally replying to no-reply email addresses.';
 $string['configenablecalendarexport'] = 'Enable exporting or subscribing to calendars.';
@@ -478,6 +481,9 @@ $string['editorkillword'] = 'Word format filter';
 $string['editorspelling'] = 'Editor spelling';
 $string['editorspellinghelp'] = 'Enable or disable spell-checking. When enabled, <strong>aspell</strong> must be installed on the server.';
 $string['editstrings'] = 'Edit words or phrases';
+// START UCLA MOD: CCLE-8459 - Messaging does not email students.
+$string['emailbulkmessaging'] = 'Enable participant emailing';
+// END UCLA MOD: CCLE-8459.
 $string['emailchangeconfirmation'] = 'Email change confirmation';
 $string['emailfromvia'] = 'Email via information';
 $string['emoticontext'] = 'Text';
