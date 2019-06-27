@@ -3758,6 +3758,38 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
             $commandhtml[] = $command;
         }
     }
+
+    // Output link to post if required
+    if ($link) {
+      if (forum_user_can_post($forum, $discussion, $USER, $cm, $course, $modcontext)) {
+          $langstring = 'discussthistopic';
+      } else {
+          $langstring = 'viewthediscussion';
+      }
+      if ($post->replies == 1) {
+          $replystring = get_string('repliesone', 'forum', $post->replies);
+      } else {
+          $replystring = get_string('repliesmany', 'forum', $post->replies);
+      }
+      if (!empty($discussion->unread) && $discussion->unread !== '-') {
+          $replystring .= ' <span class="sep">/</span> <span class="unread">';
+          $unreadlink = new moodle_url($discussionlink, null, 'unread');
+          if ($discussion->unread == 1) {
+              $replystring .= html_writer::link($unreadlink, get_string('unreadpostsone', 'forum'));
+          } else {
+              $replystring .= html_writer::link($unreadlink, get_string('unreadpostsnumber', 'forum', $discussion->unread));
+          }
+          $replystring .= '</span>';
+      }
+
+      // START UCLA MOD: CCLE-8300 Standard forum displayed in blog-like format, Discuss this topic, Move left
+      // $output .= html_writer::start_tag('div', array('class'=>'link'));
+      // $output .= html_writer::link($discussionlink, get_string($langstring, 'forum'));
+      // $output .= '&nbsp;('.$replystring.')';
+      // $output .= html_writer::end_tag('div'); // link
+      $commandhtml[] .= html_writer::link($discussionlink, get_string($langstring, 'forum')) . ' ('.$replystring.')';
+      // END UCLA MOD: CCLE-8300 Standard forum displayed in blog-like format, Discuss this topic, Move left
+  }
     
     // START UCLA MOD:  CCLE-4882 forum customization
     // $output .= html_writer::tag('div', implode(' | ', $commandhtml), array('class'=>'commands'));
@@ -3765,35 +3797,6 @@ function forum_print_post($post, $discussion, $forum, &$cm, $course, $ownpost=fa
         $output .= html_writer::tag('div', implode(' | ', $commandhtml), array('class'=>'commands'));
     }
     // END UCLA MOD:  CCLE-4882 forum customization
-    
-    // Output link to post if required
-    if ($link) {
-        if (forum_user_can_post($forum, $discussion, $USER, $cm, $course, $modcontext)) {
-            $langstring = 'discussthistopic';
-        } else {
-            $langstring = 'viewthediscussion';
-        }
-        if ($post->replies == 1) {
-            $replystring = get_string('repliesone', 'forum', $post->replies);
-        } else {
-            $replystring = get_string('repliesmany', 'forum', $post->replies);
-        }
-        if (!empty($discussion->unread) && $discussion->unread !== '-') {
-            $replystring .= ' <span class="sep">/</span> <span class="unread">';
-            $unreadlink = new moodle_url($discussionlink, null, 'unread');
-            if ($discussion->unread == 1) {
-                $replystring .= html_writer::link($unreadlink, get_string('unreadpostsone', 'forum'));
-            } else {
-                $replystring .= html_writer::link($unreadlink, get_string('unreadpostsnumber', 'forum', $discussion->unread));
-            }
-            $replystring .= '</span>';
-        }
-
-        $output .= html_writer::start_tag('div', array('class'=>'link'));
-        $output .= html_writer::link($discussionlink, get_string($langstring, 'forum'));
-        $output .= '&nbsp;('.$replystring.')';
-        $output .= html_writer::end_tag('div'); // link
-    }
 
     // Output footer if required
     if ($footer) {
