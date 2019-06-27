@@ -354,10 +354,9 @@ $CFG->forced_plugin_settings['tool_recyclebin']['autohide'] = 0;
 // Site administration > Plugins > Admin tools > Manage senior scholars
 // Christie Fanous (804174318).
 // Chrinstina Domer (904106809).
-// Thomas Garbelotti (304555952).
 // Andy Talajkowski (704631647).
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator']
-        = '904106809;804174318;304555952;704631647';
+        = '904106809;804174318;704631647';
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemail'] = 'srscholars@mednet.ucla.edu';
 
 // Site administration > Plugins > Antivirus plugins > ClamAV antivirus
