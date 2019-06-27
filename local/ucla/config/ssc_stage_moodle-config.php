@@ -252,6 +252,8 @@ $CFG->grade_export_exportfeedback = 1;
 $CFG->recovergradesdefault = 1;
 $CFG->unlimitedgrades = 1;
 $CFG->gradepointmax = 300;
+// CCLE-8470 - Show tabs instead of dropdown for grader report
+$CFG->grade_navmethod = 1;
 
 // Site administration > Grades > Grade category settings
 $CFG->grade_aggregation = 11; // Sets the Aggregation default to Simple weighted mean of grades.
