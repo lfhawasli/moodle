@@ -212,8 +212,10 @@ function core_myprofile_navigation(core_user\output\myprofile\tree $tree, $user,
     }
 
     // START UCLA MOD: CCLE-6759 - Hide User details for non support staff
+    // START UCLA MOD: CCLE-8458 - Students can see their idnumber.
     //  if (isset($identityfields['idnumber']) && $user->idnumber) {
-        if ($showuserdetailstosupport && isset($identityfields['idnumber']) && $user->idnumber) {
+        if (($showuserdetailstosupport || $iscurrentuser || isset($identityfields['idnumber'])) && $user->idnumber) {
+    // END UCLA MOD: CCLE-8458
     // END UCLA MOD: CCLE-6759
             $node = new core_user\output\myprofile\node('contact', 'idnumber', get_string('idnumber'), null, null,
                 $user->idnumber);
