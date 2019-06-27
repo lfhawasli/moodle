@@ -188,6 +188,10 @@ if ($formdata = $mform2->is_cancelled()) {
     // caches
     $ccache         = array(); // course cache - do not fetch all courses here, we  will not probably use them all anyway!
     $cohorts        = array();
+    // START UCLA MOD: CCLE-8280 - Bulk assign roles in a specific course category
+    $categoryrolecache  = uu_allowed_category_roles_cache();// category roles lookup
+    $categorycache  = array(); // category cache - do not fetch all categories here, we will not probably use them all.
+    // END UCLA MOD: CCLE-8280
     $rolecache      = uu_allowed_roles_cache(); // Course roles lookup cache.
     $sysrolecache   = uu_allowed_sysroles_cache(); // System roles lookup cache.
     $manualcache    = array(); // cache of used manual enrol plugins in each course
@@ -942,6 +946,48 @@ if ($formdata = $mform2->is_cancelled()) {
 
                 continue;
             }
+            // START UCLA MOD: CCLE-8280 - Bulk assign roles in a specific course category.
+            // Handle category.
+            if (preg_match('/^category\d+$/', $column)) {
+
+                $j = substr($column, 8);
+                $categoryidnumber = $user->{'category'.$j};
+                if (empty($categoryidnumber)) {
+                    continue;
+                }
+                if (!array_key_exists($categoryidnumber, $categorycache)) {
+                    $category = $DB->get_records('course_categories', array('idnumber' => $categoryidnumber), 'id, idnumber');
+                    if (count($category) != 1) {
+                        $upt->track('enrolments', get_string('unknowncategory', 'error', s($categoryidnumber)), 'error');
+                        continue;
+                    }
+                    $categoryobj = coursecat::get(reset($category)->id);
+                    $context = context_coursecat::instance($categoryobj->id);
+                    $categorycache[$categoryidnumber] = $context;
+                }
+
+                // Check the user's category role.
+                $roleid = false;
+                if (!empty($user->{'role'.$j})) {
+                    $rolename = $user->{'role'.$j};
+                    if (array_key_exists($rolename, $categoryrolecache)) {
+                        $roleid = $categoryrolecache[$rolename]->id;
+                    } else {
+                        $upt->track('enrolments', get_string('unknownrole', 'error', s($rolename)), 'error');
+                        continue;
+                    }
+                    // Assign a role to user with category context.
+                    role_assign($roleid, $user->id, $categorycache[$categoryidnumber]->id);
+                    $a = new stdClass();
+                    $a->category = $categoryobj->name;
+                    $a->categoryrole   = $rolename;
+                    $upt->track('enrolments', get_string('enrolledincategoryrole', 'enrol_manual', $a));
+                } else {
+                    $upt->track('enrolments', get_string('missingcategoryrole', 'error', s($categoryidnumber)), 'error');
+                    continue;
+                }
+            }
+            // END UCLA MOD: CCLE-8280.
             if (!preg_match('/^course\d+$/', $column)) {
                 continue;
             }
