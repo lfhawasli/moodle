@@ -27,8 +27,15 @@ defined('MOODLE_INTERNAL') || die;
 if ($ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configcheckbox('grade_report_user_showrank', get_string('showrank', 'grades'), get_string('showrank_help', 'grades'), 0));
-    $settings->add(new admin_setting_configcheckbox('grade_report_user_showpercentage', get_string('showpercentage', 'grades'), get_string('showpercentage_help', 'grades'), 1));
-    $settings->add(new admin_setting_configcheckbox('grade_report_user_showgrade', get_string('showgrade', 'grades'), get_string('showgrade_help', 'grades'), 1));
+    // START UCLA MOD: CCLE-7688-Course grades settings, Hide of percentage and grade.
+    // $settings->add(new admin_setting_configcheckbox('grade_report_user_showpercentage', get_string('showpercentage', 'grades'), get_string('showpercentage_help', 'grades'), 1));
+    // $settings->add(new admin_setting_configcheckbox('grade_report_user_showgrade', get_string('showgrade', 'grades'), get_string('showgrade_help', 'grades'), 1));
+    $showoptions = array(GRADE_REPORT_SHOW_BOTH => get_string('showboth', 'grades'),
+                         GRADE_REPORT_SHOW_GRADE_ONLY => get_string('showgradeonly', 'grades'),
+                         GRADE_REPORT_SHOW_PERCENTAGE_ONLY => get_string('showpercentageonly', 'grades'),
+                         GRADE_REPORT_HIDE_BOTH => get_string('showneither', 'grades'));
+    $settings->add(new admin_setting_configselect('grade_report_user_showgradeandpercentage', get_string('showgradeandpercentage', 'grades'), get_string('showgradeandpercentage_help', 'grades'), GRADE_REPORT_SHOW_BOTH, $showoptions));
+    // END UCLA MOD: CCLE-7688.
     $settings->add(new admin_setting_configcheckbox('grade_report_user_showfeedback', get_string('showfeedback', 'grades'), get_string('showfeedback_help', 'grades'), 1));
     $settings->add(new admin_setting_configcheckbox('grade_report_user_showrange', get_string('showrange', 'grades'), get_string('showrange_help', 'grades'), 1));
 

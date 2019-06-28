@@ -241,6 +241,13 @@ $string['full'] = 'Full';
 $string['fullmode'] = 'Change to full view';
 $string['generalsettings'] = 'General settings';
 $string['grade'] = 'Grade';
+// START UCLA MOD: CCLE-7688-Course grades settings, Hide of percentage and grade.
+$string['gradeandpercentage'] = 'Grade and percentage';
+$string['showboth'] = 'Show both';
+$string['showgradeonly'] = 'Show grade only';
+$string['showpercentageonly'] = 'Show percentage only';
+$string['showneither'] = 'Hide both';
+// END UCLA MOD: CCLE-7688.
 $string['gradeadministration'] = 'Grade administration';
 $string['gradealreadyupdated'] = '{$a} grades have not been imported because the grades in the import file are older than in the grader report. To proceed with the grade import anyway, use the force import option.';
 $string['gradeanalysis'] = 'Grade analysis';
@@ -721,8 +728,12 @@ $string['showcontributiontocoursetotal'] = 'Show contribution to course total';
 $string['showcontributiontocoursetotal_help'] = 'Whether to show a column of percentages indicating how much each grade item contributes to the user\'s course total percentage (after weighting is applied).';
 $string['showfeedback'] = 'Show feedback';
 $string['showfeedback_help'] = 'Whether to show a column for feedback.';
-$string['showgrade'] = 'Show grades';
-$string['showgrade_help'] = 'Whether to show a column for grades.';
+// START UCLA MOD: CCLE-7688-Course grades settings, Hide of percentage and grade.
+// $string['showgrade'] = 'Show grades';
+// $string['showgrade_help'] = 'Whether to show a column for grades.';
+$string['showgradeandpercentage'] = 'Show grades and percentage';
+$string['showgradeandpercentage_help'] = 'Whether to show grades and percentage.';
+// END UCLA MOD: CCLE-7688.
 $string['showingaggregatesonly'] = 'Showing aggregates only';
 $string['showingfullmode'] = 'Showing full view';
 $string['showinggradesonly'] = 'Showing grades only';
@@ -760,8 +771,10 @@ $string['shownumberofgrades'] = 'Show number of grades in averages';
 $string['shownumberofgrades_help'] = 'If enabled, the number of grades used when calculating the average (mean) is displayed in brackets after each average.';
 $string['showonlyactiveenrol'] = 'Show only active enrolments';
 $string['showonlyactiveenrol_help'] = 'This setting determines, if only active enrolled users will be visible in gradebook report. If enabled suspended users will not be shown in gradebook.';
-$string['showpercentage'] = 'Show percentage';
-$string['showpercentage_help'] = 'Whether to show the percentage value of each grade item.';
+// START UCLA MOD: CCLE-7688-Course grades settings, Hide of percentage and grade.
+// $string['showpercentage'] = 'Show percentage';
+// $string['showpercentage_help'] = 'Whether to show the percentage value of each grade item.';
+// END UCLA MOD: CCLE-7688.
 $string['showquickfeedback'] = 'Show quick feedback';
 $string['showquickfeedback_help'] = 'If enabled, when editing is turned on, a feedback text input box with a dotted border appears for each grade, allowing the feedback for many grades to be edited at the same time. Changes are saved and highlighted when the update button is clicked.
 
