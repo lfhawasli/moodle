@@ -627,11 +627,7 @@ if (!empty($buildnotes)) {
 foreach ($cachedforms as $gn => $group) {
     echo $OUTPUT->box_start('generalbox');
     echo $OUTPUT->heading(get_string($gn, $rucr), 3);
-
-    foreach ($group as $form) {
-         $form->display();
-    }
-
+    
     if ('fetch' == $gn) {
         echo html_writer::link(
             $registrarlink,
@@ -639,6 +635,11 @@ foreach ($cachedforms as $gn => $group) {
             array('target' => '_blank')
         );
     }
+    
+    foreach ($group as $form) {
+         $form->display();
+    }
+
     echo $OUTPUT->box_end();
 }
 
