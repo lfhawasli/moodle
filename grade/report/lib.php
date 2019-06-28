@@ -423,11 +423,18 @@ abstract class grade_report {
      * Returns an arrow icon inside an <a> tag, for the purpose of sorting a column.
      * @param string $direction
      * @param moodle_url $sortlink
+     * @param string $nextdirection
      */
-    protected function get_sort_arrow($direction='move', $sortlink=null) {
+    // START UCLA MOD: CCLE-8497 - Fix and Improve Gradebook Sorting UI.
+    // protected function get_sort_arrow($direction='move', $sortlink=null) {
+    //     global $OUTPUT;
+    //     $pix = array('up' => 't/sort_desc', 'down' => 't/sort_asc', 'move' => 't/sort');
+    //     $matrix = array('up' => 'desc', 'down' => 'asc', 'move' => 'desc');
+    protected function get_sort_arrow($direction='move', $sortlink=null, $nextdirection='desc') {
         global $OUTPUT;
-        $pix = array('up' => 't/sort_desc', 'down' => 't/sort_asc', 'move' => 't/sort');
-        $matrix = array('up' => 'desc', 'down' => 'asc', 'move' => 'desc');
+        $pix = array('up' => 't/sort_asc', 'down' => 't/sort_desc', 'move' => 't/sort');
+        $matrix = array('up' => 'desc', 'down' => 'asc', 'move' => $nextdirection);
+        // END UCLA MOD: CCLE-8479.
         $strsort = $this->get_lang_string('sort' . $matrix[$direction]);
 
         $arrow = $OUTPUT->pix_icon($pix[$direction], $strsort, '', array('class' => 'sorticon'));
