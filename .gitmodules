@@ -180,7 +180,7 @@
 	url = https://github.com/drachels/moodle-mod_hotquestion.git
 [submodule "filter/tabs"]
 	path = filter/tabs
-	url = https://github.com/JosePFs/moodle-filter_tabs.git
+	url = https://github.com/ccle/moodle-filter_tabs.git
 [submodule "local/kaltura/API"]
 	path = local/kaltura/API
 	url = https://github.com/kaltura/KalturaGeneratedAPIClientsPHP.git
