@@ -39,7 +39,7 @@ class ucla_week implements renderable {
 class block_ucla_weeksdisplay_renderer extends plugin_renderer_base {
     
     public function display_wrapper($content, $class) {
-        return html_writer::div($content, 'weeks-display label-' . $class);
+        return html_writer::div($content, 'ml-auto weeks-display label-' . $class);
     }
     
     protected function render_ucla_week(ucla_week $term) {
