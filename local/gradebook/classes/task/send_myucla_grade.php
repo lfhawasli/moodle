@@ -144,7 +144,7 @@ class send_myucla_grade extends send_myucla_base {
 
         // If we get multiple records might be an enrollment problem.
         if (count($enrolledcourses) > 1) {
-            mtrace(sprintf('...WARNING: Multiple records returned for user in course %s|%s',
+            mtrace(sprintf('...INFO: Multiple records returned for user in course %s|%s',
                     $gradeinfo->userid, $params['term'], $srslist));
         }
 
