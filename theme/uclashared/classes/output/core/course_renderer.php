@@ -181,6 +181,7 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
             }
         }
 
+        $output .= html_writer::tag('a', null, array('name' => 'cm-'.$mod->id, 'class' => 'cm-anchor'));
         $output .= html_writer::start_tag('div');
 
         if ($this->page->user_is_editing()) {
