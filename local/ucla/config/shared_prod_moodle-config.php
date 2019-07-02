@@ -419,6 +419,9 @@ $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_notify_emails'] =
 $CFG->block_iclicker_notify_emails = 'ccle-operations@lists.ucla.edu';  // due to bad coding, two variables exist to do the same thing
 $CFG->forced_plugin_settings['block_iclicker']['block_iclicker_enable_shortname'] = 1;
 
+// Site administration > Plugins > Blocks > My sites
+$CFG->forced_plugin_settings['block_ucla_my_sites']['uselocalcourses'] = 0;
+
 // Site administration > Plugins > Blocks > Panopto
 $CFG->forced_plugin_settings['block_panopto']['instance_name'] = 'CCLE-Shared-PROD';
 $CFG->forced_plugin_settings['block_panopto']['server_name1'] = 'dgsom.hosted.panopto.com';

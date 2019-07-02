@@ -328,21 +328,35 @@ function ucla_get_reg_classinfo($term, $srs) {
  * Convenience function to get registrar information for classes.
  *
  * @param int $courseid
+ * @param boolean $joinbrowseby If true, then will join on ucla_browseall_classinfo
+ *                              to get the class link url.
  *
  * @return array            Array of entries from ucla_reg_classinfo table with
  *                         hostcourse value added.
  */
-function ucla_get_course_info($courseid) {
+function ucla_get_course_info($courseid, $joinbrowseby = false) {
     global $DB;
 
-    $sql = 'SELECT inf.*, req.hostcourse
-              FROM {ucla_request_classes} req
-        INNER JOIN {ucla_reg_classinfo} inf
-                ON req.srs = inf.srs
-               AND req.term = inf.term
-             WHERE req.courseid = :courseid
-          ORDER BY inf.subj_area, inf.crsidx, inf.classidx
-    ';
+    if ($joinbrowseby) {
+        $sql = 'SELECT inf.*, req.hostcourse, ubc.url classurl
+                  FROM {ucla_request_classes} req
+                  JOIN {ucla_reg_classinfo} inf
+                    ON req.srs = inf.srs
+                   AND req.term = inf.term
+             LEFT JOIN {ucla_browseall_classinfo} ubc
+                    ON req.srs = ubc.srs
+                   AND req.term = ubc.term
+                 WHERE req.courseid = :courseid
+              ORDER BY inf.subj_area, inf.crsidx, inf.classidx';
+    } else {
+        $sql = 'SELECT inf.*, req.hostcourse
+                  FROM {ucla_request_classes} req
+                  JOIN {ucla_reg_classinfo} inf
+                    ON req.srs = inf.srs
+                   AND req.term = inf.term
+                 WHERE req.courseid = :courseid
+              ORDER BY inf.subj_area, inf.crsidx, inf.classidx';
+    }
     $params =['courseid' => $courseid];
     $reginfos = $DB->get_records_sql($sql, $params);
 
