@@ -184,6 +184,7 @@ $CFG->bloglevel = 0; // Disable blog system completely
 $CFG->enablebadges = 0; // Disable badges
 // CCLE-5181 Allow users to enter an alternate email
 $CFG->messagingallowemailoverride = 1;
+$CFG->emailbulkmessaging = 1;
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
 $CFG->enableplagiarism = 1;
@@ -230,6 +231,8 @@ $CFG->grade_export_exportfeedback = 1;
 $CFG->recovergradesdefault = 1;
 $CFG->unlimitedgrades = 1;
 $CFG->gradepointmax = 300;
+// CCLE-8470 - Show tabs instead of dropdown for grader report
+$CFG->grade_navmethod = 1;
 
 // Site administration > Grades > Grade category settings
 $CFG->grade_aggregation = 11; // Sets the Aggregation default to Simple weighted mean of grades.
@@ -351,10 +354,9 @@ $CFG->forced_plugin_settings['tool_recyclebin']['autohide'] = 0;
 // Site administration > Plugins > Admin tools > Manage senior scholars
 // Christie Fanous (804174318).
 // Chrinstina Domer (904106809).
-// Thomas Garbelotti (304555952).
 // Andy Talajkowski (704631647).
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholaradministrator']
-        = '904106809;804174318;304555952;704631647';
+        = '904106809;804174318;704631647';
 $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemail'] = 'srscholars@mednet.ucla.edu';
 
 // Site administration > Plugins > Antivirus plugins > ClamAV antivirus

@@ -101,7 +101,7 @@ $string['crosslists'] = 'Crosslisted SRSes';
 $string['deletefetch'] = 'Ignore';
 $string['deleteviews'] = 'Remove request';
 
-$string['addmorecrosslist'] = 'Add additional SRS field';
+$string['addmorecrosslist'] = 'Add additional SRS';
 
 $string['clchange_removed'] = 'Removed crosslist: ';
 $string['clchange_added'] = 'Added crosslist: ';

@@ -204,6 +204,8 @@ $CFG->enablecourserequests = 1;
 // Site administration > Grades > General settings
 $CFG->recovergradesdefault = 1;
 $CFG->gradepointmax = 300;
+// CCLE-8470 - Show tabs instead of dropdown for grader report
+$CFG->grade_navmethod = 1;
 
 // Site administration > Language > Language settings
 $CFG->langstringcache = false;

@@ -230,6 +230,11 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
             // Module can put text after the link (e.g. forum unread).
             $output .= $mod->afterlink;
 
+            // CCLE-8417 - Insert hidden tag.
+            if(!$mod->visible) {
+                $output .= html_writer::span(get_string('hiddenwithbrackets'), 'course-resource-hidden');
+            }
+
             // CCLE-5989.
             $output .= $availabilitypopup;
 

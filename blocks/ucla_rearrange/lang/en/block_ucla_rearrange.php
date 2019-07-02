@@ -38,7 +38,7 @@ $string['error_section_previous'] = 'Course has a section without id! Changes ha
 $string['error_module_consistency'] = 'There was a module inconsistency, none of the changes were saved in order to protect your data. Please go back and try again.';
 
 $string['success'] = 'Success!';
-$string['rearrange_success'] = 'Your change has been applied.';
+$string['rearrange_success'] = 'Successfully saved changes.';
 
 $string['returntosite'] = 'Return to site';
 $string['rearrangemore'] = 'Rearrange more materials';

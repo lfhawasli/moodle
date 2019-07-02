@@ -30,6 +30,9 @@ $string['modulename'] = 'Video Resource';
 $string['modulename_help'] = 'The Video Resource enables a teacher to create a resource using a video.';
 $string['pluginadministration'] = 'Video Resource';
 // END UCLA MOD: CCLE-6269
+// START UCLA MOD: CCLE-8475 - Kaltura Video Resource missing from left nav menu Activities/Resources.
+$string['noresource'] = 'No video resource found in the course';
+// END UCLA MOD: CCLE-8475.
 $string['pluginname'] = 'Kaltura Video Resource';
 $string['name'] = 'Name';
 $string['novidsource'] = 'No media content found. You must add media content in order to save a video resource.';

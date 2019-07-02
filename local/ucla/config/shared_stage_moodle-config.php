@@ -203,6 +203,7 @@ $CFG->enablewebservices = 1;
 $CFG->bloglevel = 0; // Disable blog system completely
 // CCLE-5181 Allow users to enter an alternate email
 $CFG->messagingallowemailoverride = 1;
+$CFG->emailbulkmessaging = 1;
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
 $CFG->enableplagiarism = 1;
@@ -250,6 +251,8 @@ $CFG->grade_export_exportfeedback = 1;
 $CFG->recovergradesdefault = 1;
 $CFG->unlimitedgrades = 1;
 $CFG->gradepointmax = 300;
+// CCLE-8470 - Show tabs instead of dropdown for grader report
+$CFG->grade_navmethod = 1;
 
 // Site administration > Grades > Grade category settings
 $CFG->grade_aggregation = 11; // Sets the Aggregation default to Simple weighted mean of grades.
