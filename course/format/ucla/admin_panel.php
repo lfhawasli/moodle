@@ -239,10 +239,22 @@ if ($node) {
     $container = navigation_node::create(get_string('tipbox', 'format_ucla'),
             null, navigation_node::TYPE_CONTAINER, null, 'tipbox');
 
+    $systemname = get_config('theme_uclashared', 'system_name');
+    if (strpos($systemname, 'Social Sciences System') !== false) {
+        $documentationurl = 'https://moodle2help.sscnet.ucla.edu/docs/The_Admin_Panel';
+        $updateurl = 'https://moodle2help.sscnet.ucla.edu/docs/Upgrades';
+    } else {
+        $documentationurl = 'https://docs.ccle.ucla.edu/w/Admin_panel';
+        $updateurl = 'https://docs.ccle.ucla.edu/w/What%27s_New_in_Moodle_3.5';
+    }
+
     foreach ($settings as $name => $type) {
-        $tipbox = navigation_node::create(get_string('tipurl', 'format_ucla'),
-        new moodle_url("https://www.youtube.com/watch?v=WM_1Blkq1hk&"));
-        $container->add_node($tipbox);
+        $tipdocumentation = navigation_node::create(get_string('tipurldocumentation', 'format_ucla'),
+        new moodle_url($documentationurl));
+        $container->add_node($tipdocumentation);
+        $tipwhatsnew = navigation_node::create(get_string('tipurlwhatsnew', 'format_ucla'),
+        new moodle_url($updateurl));
+        $container->add_node($tipwhatsnew);
     }
 
     $rowcontainer->add_node($container);
