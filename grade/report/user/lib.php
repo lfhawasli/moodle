@@ -207,11 +207,33 @@ class grade_report_user extends grade_report {
         parent::__construct($courseid, $gpr, $context);
 
         $this->showrank        = grade_get_setting($this->courseid, 'report_user_showrank', $CFG->grade_report_user_showrank);
-        $this->showpercentage  = grade_get_setting($this->courseid, 'report_user_showpercentage', $CFG->grade_report_user_showpercentage);
+        // START UCLA MOD: CCLE-7688-Course grades settings, Hide of percentage and grade.
+        //$this->showpercentage  = grade_get_setting($this->courseid, 'report_user_showpercentage', $CFG->grade_report_user_showpercentage);
+        // END UCLA MOD: CCLE-7688.
         $this->showhiddenitems = grade_get_setting($this->courseid, 'report_user_showhiddenitems', $CFG->grade_report_user_showhiddenitems);
         $this->showtotalsifcontainhidden = array($this->courseid => grade_get_setting($this->courseid, 'report_user_showtotalsifcontainhidden', $CFG->grade_report_user_showtotalsifcontainhidden));
-
-        $this->showgrade       = grade_get_setting($this->courseid, 'report_user_showgrade',       !empty($CFG->grade_report_user_showgrade));
+        // START UCLA MOD: CCLE-7688-Course grades settings, Hide of percentage and grade.
+        // $this->showgrade = grade_get_setting($this->courseid, 'report_user_showgrade',       !empty($CFG->grade_report_user_showgrade));
+        $showgradeandpercentage = grade_get_setting($this->courseid, 'report_user_showgradeandpercentage', $CFG->grade_report_user_showgradeandpercentage);
+        switch ($showgradeandpercentage) {
+            case GRADE_REPORT_SHOW_BOTH:
+                $this->showgrade = true;
+                $this->showpercentage = true;
+                break;
+            case GRADE_REPORT_SHOW_GRADE_ONLY:
+                $this->showgrade = true;
+                $this->showpercentage = false; 
+                break;
+            case GRADE_REPORT_SHOW_PERCENTAGE_ONLY:
+                $this->showgrade = false;
+                $this->showpercentage = true; 
+                break;
+            case GRADE_REPORT_HIDE_BOTH:
+                $this->showgrade = false;
+                $this->showpercentage = false; 
+                break;
+        }
+        // END UCLA MOD: CCLE-7688.
         $this->showrange       = grade_get_setting($this->courseid, 'report_user_showrange',       !empty($CFG->grade_report_user_showrange));
         $this->showfeedback    = grade_get_setting($this->courseid, 'report_user_showfeedback',    !empty($CFG->grade_report_user_showfeedback));
 
@@ -350,7 +372,7 @@ class grade_report_user extends grade_report {
             $this->tablecolumns[] = 'lettergrade';
             $this->tableheaders[] = $this->get_lang_string('lettergrade', 'grades');
         }
-
+ 
         if ($this->showrank) {
             $this->tablecolumns[] = 'rank';
             $this->tableheaders[] = $this->get_lang_string('rank', 'grades');
@@ -1119,24 +1141,34 @@ function grade_report_user_settings_definition(&$mform) {
 
     $mform->addElement('select', 'report_user_showrank', get_string('showrank', 'grades'), $options);
     $mform->addHelpButton('report_user_showrank', 'showrank', 'grades');
+    // START UCLA MOD: CCLE-7688-Course grades settings, Hide of percentage and grade.
+    // if (empty($CFG->grade_report_user_showpercentage)) {
+    //     $options[-1] = get_string('defaultprev', 'grades', $options[0]);
+    // } else {
+    //     $options[-1] = get_string('defaultprev', 'grades', $options[1]);
+    // }
 
-    if (empty($CFG->grade_report_user_showpercentage)) {
-        $options[-1] = get_string('defaultprev', 'grades', $options[0]);
+    // $mform->addElement('select', 'report_user_showpercentage', get_string('showpercentage', 'grades'), $options);
+    // $mform->addHelpButton('report_user_showpercentage', 'showpercentage', 'grades');
+    // if (empty($CFG->grade_report_user_showgrade)) {
+    //     $options[-1] = get_string('defaultprev', 'grades', $options[0]);
+    // } else {
+    //     $options[-1] = get_string('defaultprev', 'grades', $options[1]);
+    // }
+    // $mform->addElement('select', 'report_user_showgrade', get_string('showgrade', 'grades'), $options);
+    $showoptions = array(-1 => get_string('default', 'grades'),
+    GRADE_REPORT_SHOW_BOTH => get_string('showboth', 'grades'),
+    GRADE_REPORT_SHOW_GRADE_ONLY => get_string('showgradeonly', 'grades'),
+    GRADE_REPORT_SHOW_PERCENTAGE_ONLY => get_string('showpercentageonly', 'grades'),
+    GRADE_REPORT_HIDE_BOTH => get_string('showneither', 'grades'));
+    if (empty($CFG->grade_report_user_showgradeandpercentage)) {
+        $showoptions[-1] = get_string('defaultprev', 'grades', $showoptions[GRADE_REPORT_SHOW_BOTH]);
     } else {
-        $options[-1] = get_string('defaultprev', 'grades', $options[1]);
+        $showoptions[-1] = get_string('defaultprev', 'grades', $showoptions[$CFG->grade_report_user_showgradeandpercentage]);
     }
-
-    $mform->addElement('select', 'report_user_showpercentage', get_string('showpercentage', 'grades'), $options);
-    $mform->addHelpButton('report_user_showpercentage', 'showpercentage', 'grades');
-
-    if (empty($CFG->grade_report_user_showgrade)) {
-        $options[-1] = get_string('defaultprev', 'grades', $options[0]);
-    } else {
-        $options[-1] = get_string('defaultprev', 'grades', $options[1]);
-    }
-
-    $mform->addElement('select', 'report_user_showgrade', get_string('showgrade', 'grades'), $options);
-
+    $mform->addElement('select', 'report_user_showgradeandpercentage', get_string('showgradeandpercentage', 'grades'), $showoptions);
+    $mform->addHelpButton('report_user_showgradeandpercentage', 'showgradeandpercentage', 'grades');
+    // END UCLA MOD: CCLE-7688.
     if (empty($CFG->grade_report_user_showfeedback)) {
         $options[-1] = get_string('defaultprev', 'grades', $options[0]);
     } else {

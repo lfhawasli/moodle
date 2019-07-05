@@ -214,6 +214,27 @@ define('GRADE_REPORT_SHOW_TOTAL_IF_CONTAINS_HIDDEN', 1);
  */
 define('GRADE_REPORT_SHOW_REAL_TOTAL_IF_CONTAINS_HIDDEN', 2);
 
+// START UCLA MOD: CCLE-7688-Course grades settings, Hide of percentage and grade.
+/**
+ * GRADE_REPORT_SHOW_BOTH - Show both the grade and the percentage to users.
+ */
+define("GRADE_REPORT_SHOW_BOTH", 1);
+
+/**
+ * GRADE_REPORT_SHOW_GRADE_ONLY - Show only grade to users.
+ */
+define("GRADE_REPORT_SHOW_GRADE_ONLY", 3);
+
+/**
+ * GRADE_REPORT_SHOW_PERCENTAGE_ONLY - Show only the percentage to users.
+ */
+define("GRADE_REPORT_SHOW_PERCENTAGE_ONLY", 2);
+
+/**
+ * GRADE_REPORT_HIDE_BOTH - Show neither the grade nor the percentage to users.
+ */
+define("GRADE_REPORT_HIDE_BOTH", 0);
+// END UCLA MOD: CCLE-7688.
 /**
  * GRADE_REPORT_PREFERENCE_DEFAULT - Use the setting from site preferences.
  */
