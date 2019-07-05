@@ -27,11 +27,10 @@ defined('MOODLE_INTERNAL') || die;
 if($hassiteconfig && $ADMIN->fulltree) {
 
     $settings->add(new admin_setting_configcheckbox(
-                'block_ucla_course_download/allowstudentaccess',
-                new lang_string('allowstudentaccess','block_ucla_course_download'),
-                new lang_string('allowstudentaccess_desc','block_ucla_course_download'),
-                1
-            ));
+        'block_ucla_course_download/allowstudentaccess',
+        new lang_string('allowstudentaccess','block_ucla_course_download'),
+        new lang_string('allowstudentaccess_desc','block_ucla_course_download'),
+        1));
 
     $days = array(
         1   => new lang_string('numdays', '', 1),
@@ -45,20 +44,17 @@ if($hassiteconfig && $ADMIN->fulltree) {
         30  => new lang_string('numdays', '', 30)
     );
     $settings->add(new admin_setting_configselect(
-                'block_ucla_course_download/ziplifetime',
-                new lang_string('ziplifetime','block_ucla_course_download'),
-                new lang_string('ziplifetime_desc','block_ucla_course_download'),
-                7,
-                $days
-            ));
+        'block_ucla_course_download/ziplifetime',
+        new lang_string('ziplifetime','block_ucla_course_download'),
+        new lang_string('ziplifetime_desc','block_ucla_course_download'),
+        7, $days));
+
     $settings->add(new admin_setting_configtext(
-                'block_ucla_course_download/maxfilesize',
-                new lang_string('maxfilesize','block_ucla_course_download'),
-                new lang_string('maxfilesize_desc','block_ucla_course_download'),
-                250,
-                PARAM_INT,
-                4
-            ));
+        'block_ucla_course_download/maxfilesize',
+        new lang_string('maxfilesize','block_ucla_course_download'),
+        new lang_string('maxfilesize_desc','block_ucla_course_download'),
+        250, PARAM_INT, 4));
+
     $settings->add(new admin_setting_configcheckbox(
         'block_ucla_course_download/coursedownloaddefault',
         get_string('coursedownloaddefault', 'block_ucla_course_download'),
