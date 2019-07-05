@@ -1699,7 +1699,21 @@ class uclacoursecreator {
                 $coursed[] = $this->make_email_course_name($courseinfo);
             }
 
-            $coursetext = implode(' / ', $coursed);
+            $coursedesc = array(); // Going to be an array of string of course descriptions.
+            if (count($coursed) == 1) { // If we have only one course, just concat the course descriptions.
+                $coursedesc[] = implode(' ', $coursed[0]);
+            } else { // If we have multiple courses.
+                foreach ($coursed as $course) {
+                    $coursestring = $course['subjectarea'].' '.$course['coursenum'];
+                    // We only need course area and number, not type and section number.
+                    if (!in_array($coursestring, $coursedesc)) {
+                        // Add this coursestring in the array if it is not added before.
+                        array_push($coursedesc, $coursestring);
+                    }
+                }
+            }
+
+            $coursetext = implode(' / ', $coursedesc);
 
             $coursedept = $rcicourse->subj_area;
             $coursedivision = $rcicourse->division;
@@ -1952,18 +1966,22 @@ class uclacoursecreator {
     }
 
     /**
-     *  A human-readable string that will display the essential course
+     *  An array containing essential course
      *  information in the email that conveys which courses were built
      *  in the current session of course creator.
      *
      * @param object $reginfo
-     * @return string
+     * @return array
      **/
     public function make_email_course_name($reginfo) {
         list($idnumber, $subjarea) = $this->get_subj_area_translation(
                 trim($reginfo->subj_area));
-        return trim($subjarea) . ' ' . trim($reginfo->coursenum) . ' ' .
-                $reginfo->acttype . ' ' . $reginfo->sectnum;
+        return array(
+            'subjectarea' => trim($idnumber),
+            'coursenum' => trim($reginfo->coursenum),
+            'type' => $reginfo->acttype,
+            'sectionnum' => $reginfo->sectnum
+        );
     }
 
     /**
