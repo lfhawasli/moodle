@@ -789,10 +789,16 @@ $string['showverbose'] = 'Show {$a->category} {$a->itemmodule} {$a->itemname}';
 $string['simpleview'] = 'Single view';
 $string['sitewide'] = 'Site-wide';
 $string['sort'] = 'sort';
-$string['sortasc'] = 'Sort in ascending order';
+// START UCLA MOD: CCLE-8497 - Fix and Improve Gradebook Sorting UI.
+// $string['sortasc'] = 'Sort in ascending order';
+$string['sortasc'] = 'Click to sort ascending';
+// END UCLA MOD: CCLE-8497.
 $string['sortbyfirstname'] = 'Sort by first name';
 $string['sortbylastname'] = 'Sort by last name';
-$string['sortdesc'] = 'Sort in descending order';
+// START UCLA MOD: CCLE-8497 - Fix and Improve Gradebook Sorting UI.
+// $string['sortdsc'] = 'Sort in descending order';
+$string['sortdesc'] = 'Click to sort descending';
+// END UCLA MOD: CCLE-8497.
 $string['standarddeviation'] = 'Standard deviation';
 $string['stats'] = 'Statistics';
 $string['statslink'] = 'Stats';
