@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<libraries>
+  <library>
+    <location>classes/rollingcurlx.class.php</location>
+    <name>Rolling Curl X</name>
+    <license>MIT</license>
+    <version>3.0.0</version>
+    <licenseversion></licenseversion>
+  </library>
+</libraries>
