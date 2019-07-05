@@ -164,7 +164,9 @@ if ($mform->is_cancelled()) {
             redirect($fromform->gradingman->get_management_url($url));
         }
     } else {
-        redirect(course_get_url($course, $cw->section, array('sr' => $sectionreturn)));
+        // START UCLA MOD: CCLE-6860 - Append a target (the editted course) to the url.
+        redirect(course_get_url($course, $cw->section, array('sr' => $sectionreturn)).'#cm-'.$fromform->coursemodule);
+        // END UCLA MOD: CCLE-6860.
     }
     exit;
 

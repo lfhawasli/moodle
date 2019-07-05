@@ -46,6 +46,13 @@ abbr[title], abbr[data-original-title] {
     cursor: pointer;
 }
 
+#page-course-view-ucla :target::before {
+    content: "";
+    display: block;
+    height: 50px;
+    margin-top: -50px;
+}
+
 @media (min-width: 280px) {
     .form-users .form-control {
         width: auto;
