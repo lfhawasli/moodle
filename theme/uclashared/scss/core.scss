@@ -34,7 +34,7 @@ ul {
 }
 
 .generaltable .ics-course td {
-	white-space: pre;
+    white-space: pre;
 }
 
 /* CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser. */
@@ -62,7 +62,7 @@ table.stickyheader {
     overflow: hidden;
     border-collapse: collapse;
 }
-table.stickyheader {
+#page-admin-roles-allow table.stickyheader {
     td, th {
         border: 1px solid $gray;
     }
@@ -72,13 +72,13 @@ table.stickyheader {
     display: block; // Separates the header from the body allowing it to be positioned.
     overflow: visible;
 }
-.stickyheader th {
+#page-admin-roles-allow .stickyheader th {
     background-color: $gray-lightest;
     min-width: 120px;
     height: 32px;
 }
 // First cell in the header.
-.stickyheader thead th:nth-child(1) {
+#page-admin-roles-allow .stickyheader thead th:nth-child(1) {
     position: relative;
     background-color: $gray-lightest;
 }
@@ -87,11 +87,11 @@ table.stickyheader {
     display: block; // Separates the tbody from the header.
     overflow: scroll;
 }
-.stickyheader tbody td {
+#page-admin-roles-allow .stickyheader tbody td {
     min-width: 120px;
 }
 // The first cell in each tr.
-.stickyheader tbody tr td:nth-child(1) {
+#page-admin-roles-allow .stickyheader tbody tr td:nth-child(1) {
     position: relative;
     display: block; // Separates the first column from the tbody.
     background: $gray-lightest;

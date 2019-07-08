@@ -8,6 +8,14 @@
  */
 
 $(document).ready(function() {
+    // Stickyheader can be customized to each page, identified by id of body.
+    var body_id = {
+        'page-admin-roles-allow': false,
+        'page-blocks-ucla_modify_coursemenu-modify_coursemenu': false
+    }
+
+    body_id[$('body').attr('id')] = true;
+
     // Detect a scroll event on the tbody.
     // Taken from https://jsfiddle.net/RMarsh/bzuasLcz/3/
     $('.stickyheader tbody').scroll(function() {
@@ -19,10 +27,13 @@ $(document).ready(function() {
 
         // Fix the thead relative to the body scrolling.
         $('.stickyheader thead').css("left", -$(".stickyheader tbody").scrollLeft());
-        // Fix the first cell of the header.
-        $('.stickyheader thead th:nth-child(1)').css("left", $(".stickyheader tbody").scrollLeft());
-        // Fix the first column of tdbody.
-        $('.stickyheader tbody td:nth-child(1)').css("left", $(".stickyheader tbody").scrollLeft());
+        
+        if (body_id['page-admin-roles-allow']) {
+            // Fix the first cell of the header.
+            $('.stickyheader thead th:nth-child(1)').css("left", $(".stickyheader tbody").scrollLeft());
+            // Fix the first column of tdbody.
+            $('.stickyheader tbody td:nth-child(1)').css("left", $(".stickyheader tbody").scrollLeft());
+        }
     });
 
     // Resize table to fit viewport.
@@ -37,12 +48,18 @@ $(document).ready(function() {
         // Leave some space for gutter on right side.
         let tablewidth = viewportwidth - 50;
 
-        $('table.stickyheader').css("width", tablewidth);
-        $('.stickyheader thead').css("width", tablewidth);
-        $('.stickyheader tbody').css("width", tablewidth);
+        if (body_id['page-admin-roles-allow'] || body_id['page-admin-uclacourserequestor']) {
+            $('table.stickyheader').css("width", tablewidth);
+            $('.stickyheader thead').css("width", tablewidth);
+            $('.stickyheader tbody').css("width", tablewidth);
+        }
+        
         $('.stickyheader tbody').css("height", tableheight);
     }
 
     window.addEventListener('load', resizeTable, false);
-    window.addEventListener('resize', resizeTable, false);
+
+    if (body_id['page-admin-roles-allow'] || body_id['page-admin-uclacourserequestor']) {
+        window.addEventListener('resize', resizeTable, false);
+    }
 });

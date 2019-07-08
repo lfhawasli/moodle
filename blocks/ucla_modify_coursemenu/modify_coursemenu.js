@@ -122,14 +122,14 @@ M.block_ucla_modify_coursemenu.generate_row_html = function(sectiondata) {
     // TODO maybe use js dom objects?
     var row_html = '';
     if (canmove) {
-        row_html += '<td class="' + M.block_ucla_modify_coursemenu.drag_handle + '">' + '<img src="' + M.block_ucla_modify_coursemenu.pix.handle + '" class="hidden-handle" />' + '</td>'
+        row_html += '<td class="' + M.block_ucla_modify_coursemenu.drag_handle + ' col-1' + '">' + '<img src="' + M.block_ucla_modify_coursemenu.pix.handle + '" class="hidden-handle" />' + '</td>'
     } else {
-        row_html += '<td></td>';
+        row_html += '<td class="col-1"></td>';
     }
 
-    row_html += '<td class="col-section-num">' + sectionnumdisp + '</td>';
+    row_html += '<td class="col-section-num col-2">' + sectionnumdisp + '</td>';
 
-    row_html += '<td class="col-section-title">';
+    row_html += '<td class="col-section-title col-5">';
     if (sectiondata.no['name'] == undefined) {
         row_html += '<input type="text" name="title-' + sectionident + '" value="' + sectiondata.name + '" />';
     } else {
@@ -137,7 +137,7 @@ M.block_ucla_modify_coursemenu.generate_row_html = function(sectiondata) {
     }
     row_html += '</td>';
 
-    row_html += '<td class="col-section-hide">';
+    row_html += '<td class="col-section-hide col-1">';
     if (sectiondata.no['hide'] == undefined) {
         var is_checked = '';
         if (sectiondata.visible == 0) {
@@ -149,13 +149,13 @@ M.block_ucla_modify_coursemenu.generate_row_html = function(sectiondata) {
     }
     row_html += '</td>';
 
-    row_html += '<td class="col-section-delete">';
+    row_html += '<td class="col-section-delete col-1">';
     if (sectiondata.no['delete'] == undefined) {
         row_html += '<input type="checkbox" class="delete-checkbox" ' + 'id="delete-' + sectionident + '" name="delete-' + sectionident + '" />';
     }
     row_html += '</td>';
 
-    row_html += '<td class="col-section-landing">';
+    row_html += '<td class="col-section-landing col-2">';
     if (sectiondata.no['landingpage'] == undefined) {
         row_html += '<input id="landing-page-' + sectionident + '" type="radio" name="landingpageradios" />';
     }
@@ -180,7 +180,7 @@ M.block_ucla_modify_coursemenu.generate_row_html = function(sectiondata) {
 
     row_html += '</tr>';
 
-    row_html = '<tr class="' + trclasssupp + 'section-row" id="section-' + sectionident + '">' + row_html;
+    row_html = '<tr class="d-flex ' + trclasssupp + 'section-row" id="section-' + sectionident + '">' + row_html;
 
     return row_html;
 }
@@ -339,6 +339,57 @@ M.block_ucla_modify_coursemenu.set_landingpagebydates_visible = function(
     }
 }
 
+M.block_ucla_modify_coursemenu.style_table_header = function() {
+    // Adjust header col widths.
+    $('thead tr').addClass('d-flex');
+    $('thead tr th:nth-child(1)').addClass('col-1');
+    $('thead tr th:nth-child(2)').addClass('col-2');
+    $('thead tr th:nth-child(3)').addClass('col-5');
+    $('thead tr th:nth-child(4)').addClass('col-1');
+    $('thead tr th:nth-child(5)').addClass('col-1');
+    $('thead tr th:nth-child(6)').addClass('col-2');
+
+    responsive_helper();
+
+    // Center the text.
+    $('thead tr th:not(.c2)').css('text-align', 'center');
+    // Set widths of textbox.
+    $('input[type="text"]').css('width', '100%');
+
+    $(window).resize(function() {
+        responsive_helper();
+    });
+
+    function responsive_helper() {
+        // If screen is smaller.
+        if ($('.card-body').width() <= 964) {
+            $('thead tr th:nth-child(3)').addClass('col-3').removeClass('col-5');
+            $('thead tr th:nth-child(5)').addClass('col-2').removeClass('col-1');
+            $('thead tr th:nth-child(6)').addClass('col-3').removeClass('col-2');
+            $('tbody tr td:nth-child(3)').addClass('col-3').removeClass('col-5');
+            $('tbody tr td:nth-child(5)').addClass('col-2').removeClass('col-1');
+            $('tbody tr td:nth-child(6)').addClass('col-3').removeClass('col-2');
+
+            $('th').css('padding-left','0.2rem');
+            $('td').css('padding-left','0.2rem');
+            $('th').css('padding-right','0.2rem');
+            $('td').css('padding-right','0.2rem');
+        } else {
+            $('thead tr th:nth-child(3)').addClass('col-5').removeClass('col-3');
+            $('thead tr th:nth-child(5)').addClass('col-1').removeClass('col-2');
+            $('thead tr th:nth-child(6)').addClass('col-2').removeClass('col-3');
+            $('tbody tr td:nth-child(3)').addClass('col-5').removeClass('col-3');
+            $('tbody tr td:nth-child(5)').addClass('col-1').removeClass('col-2');
+            $('tbody tr td:nth-child(6)').addClass('col-2').removeClass('col-3');
+
+            $('th').css('padding-left','0.75rem');
+            $('td').css('padding-left','0.75rem');
+            $('th').css('padding-right','0.75rem');
+            $('td').css('padding-right','0.75rem');
+        }
+    }
+}
+
 /**
  *  Initialize a bunch of stuff...
  **/
@@ -436,6 +487,9 @@ M.block_ucla_modify_coursemenu.start = function() {
                 );
         }
     }
+
+    // Style the header
+    bumc.style_table_header();
 
     // Initialize logic.
     bumc.make_dnd_table();

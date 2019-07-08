@@ -96,6 +96,7 @@ $restr = get_string('pluginname', 'block_ucla_modify_coursemenu');
 $PAGE->set_title("$course->shortname: $restr");
 $PAGE->set_heading($course->fullname);
 
+$PAGE->requires->js('/local/ucla/js/stickyheader.js');
 // Before loading modinfo, make sure section information is correct.
 local_ucla_course_section_fixer::fix_problems($course);
 
@@ -535,6 +536,7 @@ if ($data && !empty($sectionsnotify) && !$verifydata) {
 } else {
     $tablestructure = new html_table();
     $tablestructure->id = $maintableid;
+    $tablestructure->attributes['class'] = 'generaltable stickyheader';
 
     // Basics.
     $tshead = array('', 'section', 'title', 'hide', 'delete');
@@ -558,6 +560,7 @@ if ($data && !empty($sectionsnotify) && !$verifydata) {
     // Create the table form.
     echo html_writer::start_tag('form', array('id' => 'tableform', 'class' => 'ucla_modify_coursemenu_form mform',
         'autocomplete' => 'off', 'action' => $PAGE->url->out(), 'method' => 'post', 'accept-charset' => 'utf-8'));
+    echo html_writer::start_tag('div', array('class' => 'container-fluid'));
     echo html_writer::table($tablestructure);
     echo html_writer::end_tag('form');
 
