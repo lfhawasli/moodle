@@ -402,13 +402,19 @@ class grade_report_grader extends grade_report {
             if (isset($SESSION->gradeuserreport->sortitemid)) {
                 $this->sortitemid = $SESSION->gradeuserreport->sortitemid;
             } else {
-                $this->sortitemid = 'lastname';
+                // START UCLA MOD: CCLE-8497 - Fix and Improve Gradebook Sorting UI.
+                // $this->sortitemid = 'lastname';
+                $this->sortitemid = $SESSION->gradeuserreport->sortitemid = 'lastname';
+                // END UCLA MOD: CCLE-8497.
             }
 
             if (isset($SESSION->gradeuserreport->sort)) {
                 $this->sortorder = $SESSION->gradeuserreport->sort;
             } else {
-                $this->sortorder = 'ASC';
+                // START UCLA MOD: CCLE-8497 - Fix and Improve Gradebook Sorting UI.
+                // $this->sortorder = 'ASC';
+                $this->sortorder = $SESSION->gradeuserreport->sort = 'ASC';
+                // END UCLA MOD: CCLE-8497.
             }
         }
     }
@@ -470,7 +476,7 @@ class grade_report_grader extends grade_report {
             $params = array_merge($gradebookrolesparams, $this->userwheresql_params, $this->groupwheresql_params, $enrolledparams, $relatedctxparams);
         }
 
-        // START UCLA MOD: CCLE-5732 - Grader report doesn't show full roster in large courses
+        // START UCLA MOD: CCLE-5732 - Grader report doesn't show full roster in large courses.
         //$sql = "SELECT $userfields
         $sql = "SELECT DISTINCT $userfields        
                   FROM {user} u
@@ -487,7 +493,7 @@ class grade_report_grader extends grade_report {
                    $this->userwheresql
                    $this->groupwheresql
               ORDER BY $sort";
-        // END UCLA MOD: CCLE-5732
+        // END UCLA MOD: CCLE-5732.
         $studentsperpage = $this->get_students_per_page();
         $this->users = $DB->get_records_sql($sql, $params, $studentsperpage * $this->page, $studentsperpage);
 
@@ -826,9 +832,9 @@ class grade_report_grader extends grade_report {
         $strexcludedgrades = get_string('excluded', 'grades');
         $strerror = get_string('error');
 
-        // START UCLA MOD:CCLE-8032 - Gradebook, Visual for Hidden items.
+        // START UCLA MOD: CCLE-8032 - Gradebook, Visual for Hidden items.
         $strhiddenwithbrackets = get_string('hiddenwithbrackets');
-        // END UCLA MOD:CCLE-8032.  
+        // END UCLA MOD: CCLE-8032.
 
         $viewfullnames = has_capability('moodle/site:viewfullnames', $this->context);
 
@@ -907,9 +913,9 @@ class grade_report_grader extends grade_report {
 
                     if ($element['object']->is_hidden()) {
                         $itemcell->attributes['class'] .= ' dimmed_text';
-                        // START UCLA MOD:CCLE-8032 - Gradebook, Visual for Hidden items.
+                        // START UCLA MOD: CCLE-8032 - Gradebook, Visual for Hidden items.
                         $headerlink .= ' ' . $strhiddenwithbrackets;
-                        // END UCLA MOD:CCLE-8032. 
+                        // END UCLA MOD: CCLE-8032.
                     }
 
                     $singleview = '';
@@ -1645,7 +1651,7 @@ class grade_report_grader extends grade_report {
 
             $url = new moodle_url($this->gpr->get_return_url(null, array('target' => $element['eid'], 'sesskey' => sesskey())));
 
-            // START UCLA MOD: CCLE-4289 - Show All View Action Icons
+            // START UCLA MOD: CCLE-4289 - Show All View Action Icons.
             /*
             if (in_array($element['object']->id, $this->collapsed['aggregatesonly'])) {
                 $url->param('action', 'switch_plus');
@@ -1703,7 +1709,7 @@ class grade_report_grader extends grade_report {
                     $showing = get_string('showingfullmode', 'grades');
                 }
             }
-            // END UCLA MOD: CCLE-4289
+            // END UCLA MOD: CCLE-4289.
         }
 
         $name = $element['object']->get_name();
@@ -1944,13 +1950,13 @@ class grade_report_grader extends grade_report {
                     static::set_collapsed_preferences($courseid, $collapsed);
                 }
                 
-                // START UCLA MOD: CCLE-4289 - Show All View Action Icons
+                // START UCLA MOD: CCLE-4289 - Show All View Action Icons.
                 $key = array_search($targetid, $collapsed['aggregatesonly']);
                 if ($key !== false) {
                     unset($collapsed['aggregatesonly'][$key]);
                     static::set_collapsed_preferences($courseid, $collapsed);
                 }
-                // END UCLA MOD: CCLE-4289
+                // END UCLA MOD: CCLE-4289.
 
                 break;
             default:
@@ -1991,14 +1997,55 @@ class grade_report_grader extends grade_report {
 
         $arrows['studentname'] = '';
         $requirednames = order_in_string(get_all_user_name_fields(), $nameformat);
+        // START UCLA MOD: CCLE-8497 - Fix and Improve Gradebook Sorting UI.
+        // if (!empty($requirednames)) {
+        //     foreach ($requirednames as $name) {
+        //         $arrows['studentname'] .= html_writer::link(
+        //             new moodle_url($this->baseurl, array('sortitemid' => $name)), $this->get_lang_string($name)
+        //         );
+        //         if ($this->sortitemid == $name) {
+        //             $arrows['studentname'] .= $this->sortorder == 'ASC' ? $iconasc : $icondesc;
+        //         }
+        //         $arrows['studentname'] .= ' / ';
+        //     }
+        //
+        //     $arrows['studentname'] = substr($arrows['studentname'], 0, -3);
+        // }
+        //
+        // foreach ($extrafields as $field) {
+        //   $url = new moodle_url($this->baseurl, array('sortitemid' => $field));
+        //   $arrows[$field] = html_writer::link($url, get_user_field_name($field));
+        //
+        //   if ($field == $this->sortitemid) {
+        //       if ($this->sortorder == 'ASC') {
+        //           $arrows[$field] .= $iconasc;
+        //       } else {
+        //           $arrows[$field] .= $icondesc;
+        //       }
+        //
+        //     }
+        // }
         if (!empty($requirednames)) {
             foreach ($requirednames as $name) {
-                $arrows['studentname'] .= html_writer::link(
-                    new moodle_url($this->baseurl, array('sortitemid' => $name)), $this->get_lang_string($name)
-                );
+                $url = new moodle_url($this->baseurl, array('sortitemid' => $name));
+                $arrows['studentname'] .= '';
+                $headername = $this->get_lang_string($name);
+                $direction = '';
+                $title = '';
                 if ($this->sortitemid == $name) {
-                    $arrows['studentname'] .= $this->sortorder == 'ASC' ? $iconasc : $icondesc;
+                    if ($this->sortorder == 'ASC') {
+                        $title = $strsortdesc;
+                        $direction = 'up';
+                    } else {
+                        $title = $strsortasc;
+                        $direction = 'down';
+                    }
+                } else {
+                    $title = $strsortasc;
+                    $direction = 'move';
                 }
+                $arrows['studentname'] .= html_writer::link($url, $headername, array('title' => $title));
+                $arrows['studentname'] .= $this->get_sort_arrow($direction, $url, 'asc');
                 $arrows['studentname'] .= ' / ';
             }
 
@@ -2006,19 +2053,25 @@ class grade_report_grader extends grade_report {
         }
 
         foreach ($extrafields as $field) {
-            $fieldlink = html_writer::link(new moodle_url($this->baseurl,
-                    array('sortitemid'=>$field)), get_user_field_name($field));
-            $arrows[$field] = $fieldlink;
-
+            $url = new moodle_url($this->baseurl, array('sortitemid' => $field));
+            $direction = '';
+            $title = '';
             if ($field == $this->sortitemid) {
                 if ($this->sortorder == 'ASC') {
-                    $arrows[$field] .= $iconasc;
+                    $title = $strsortdesc;
+                    $direction = 'up';
                 } else {
-                    $arrows[$field] .= $icondesc;
+                    $title = $strsortasc;
+                    $direction = 'down';
                 }
+            } else {
+                $title = $strsortdesc;
+                $direction = 'move';
             }
+            $arrows[$field] = html_writer::link($url, get_user_field_name($field), array('title' => $title));
+            $arrows[$field] .= $this->get_sort_arrow($direction, $url);
         }
-
+        // END UCLA MOD: CCLE-8497.
         return $arrows;
     }
 

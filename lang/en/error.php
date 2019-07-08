@@ -548,6 +548,10 @@ $string['unknowcontext'] = 'This is an unknown context ({$a}) in get_child_conte
 $string['unknowformat'] = 'Format not known ({$a})';
 $string['unknownbackupexporterror'] = 'Unknown error preparing information for import';
 $string['unknownblockregion'] = 'The block region \'{$a}\' is not recognised on this page.';
+// START UCLA MOD: CCLE-8280 - Bulk assign roles in a specific course category.
+$string['unknowncategory'] = 'Unknown category named "{$a}"';
+$string['missingcategoryrole'] = 'Could not assign role to user: missing role for category.';
+// END UCLA MOD: CCLE-8280.
 $string['unknowncontext'] = 'This is an unknown context.';
 $string['unknowncourse'] = 'Unknown course named "{$a}"';
 $string['unknowncourseidnumber'] = 'Unknown course ID "{$a}"';

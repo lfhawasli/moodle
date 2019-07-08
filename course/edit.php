@@ -157,7 +157,7 @@ if ($editform->is_cancelled()) {
         $course = create_course($data, $editoroptions);
 
         // START UCLA MOD CCLE-2389 - update site indicator
-        if ($course->format == ' ucla') {
+        if ($course->format == 'ucla') {
             $data->id = $course->id; // New course was created.
             siteindicator_manager::update_site($data);
         }

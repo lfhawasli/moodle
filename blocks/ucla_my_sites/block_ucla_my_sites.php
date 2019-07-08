@@ -474,6 +474,10 @@ class block_ucla_my_sites extends block_base {
     private function get_sites($courses, $params) {
         global $CFG;
 
+        // See if we need to pull class url from BrowseBy to get link directly
+        // from Registrar or not.
+        $uselocalcourses = get_config('block_ucla_my_sites', 'uselocalcourses');
+
         $classsites = $availableterms = array();
         $collaborationsites = $categoryids = array();
         foreach ($courses as $c) {
@@ -482,13 +486,17 @@ class block_ucla_my_sites extends block_base {
                 continue;
             }
 
-            $reginfo = ucla_get_course_info($c->id);
+            $reginfo = ucla_get_course_info($c->id, !$uselocalcourses);
+            $classurl = null;
             if (!empty($reginfo)) {
                 // Found a class site.
                 $courseterm = false;
                 foreach ($reginfo as $ri) {
                     $c->reg_info[make_idnumber($ri)] = $ri;
                     $courseterm = $ri->term;
+                    if (empty($classurl) && !empty($ri->classurl)) {
+                        $classurl = $ri->classurl;
+                    }
                 }
 
                 $availableterms[$courseterm] = $courseterm;
@@ -498,8 +506,12 @@ class block_ucla_my_sites extends block_base {
                     continue;
                 }
 
-                $c->url = sprintf('%s/course/view.php?id=%d', $CFG->wwwroot,
-                    $c->id);
+                if ($uselocalcourses || empty($classurl)) {
+                    $c->url = sprintf('%s/course/view.php?id=%d', $CFG->wwwroot,
+                        $c->id);
+                } else {
+                    $c->url = $classurl;
+                }
 
                 // We need to toss local information, or at least not
                 // display it twice.

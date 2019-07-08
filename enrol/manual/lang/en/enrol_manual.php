@@ -38,6 +38,9 @@ $string['defaultperiod_help'] = 'Default length of time that the enrolment is va
 $string['deleteselectedusers'] = 'Delete selected user enrolments';
 $string['editselectedusers'] = 'Edit selected user enrolments';
 $string['enrolledincourserole'] = 'Enrolled in "{$a->course}" as "{$a->role}"';
+// START UCLA MOD: CCLE-8280 - Bulk assign roles in a specific course category.
+$string['enrolledincategoryrole'] = 'Enrolled in "{$a->category}" as "{$a->categoryrole}"';
+// END UCLA MOD: CCLE-8280.
 $string['enrolusers'] = 'Enrol users';
 $string['enroluserscohorts'] = 'Enrol selected users and cohorts';
 $string['expiredaction'] = 'Enrolment expiry action';

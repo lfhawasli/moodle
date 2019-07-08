@@ -326,7 +326,7 @@ class format_ucla extends format_topics {
                 'type' => PARAM_BOOL
             ),
             'coursedownload' => array(
-                'default' => true,
+                'default' => get_config('block_ucla_course_download', 'coursedownloaddefault'),
                 'type' => PARAM_BOOL
             ),
         );

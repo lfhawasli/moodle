@@ -28,5 +28,5 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configcheckbox(
         'block_ucla_my_sites/uselocalcourses',
          get_string('uselocalcourses_title', 'block_ucla_my_sites'),
-         get_string('uselocalcourses_desc', 'block_ucla_my_sites'), 0));
+         get_string('uselocalcourses_desc', 'block_ucla_my_sites'), 1));
 }

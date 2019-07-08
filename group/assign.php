@@ -52,12 +52,15 @@ if ($frm = data_submitted() and confirm_sesskey()) {
     require_once($CFG->dirroot.'/local/publicprivate/lib/course.class.php');
     $ppcourse = new PublicPrivate_Course($course);
 
-    // Prevent Course members group from being removed.
-    $ppgroup = $ppcourse->get_group();
-    if (!empty($frm->removeselect) && !empty($ppgroup)) {
-        foreach ($frm->removeselect as $index => $groupid) {
-            if ($ppgroup == $groupid) {
-                unset($frm->removeselect[$index]);
+    // Prevent Course members group from being removed from Private Course Materials grouping.
+    if ($ppcourse->is_grouping($grouping)) {
+        $ppgroup = $ppcourse->get_group();
+        if (!empty($frm->removeselect) && !empty($ppgroup)) {
+            foreach ($frm->removeselect as $index => $groupid) {
+                if ($ppgroup == $groupid) {
+                    unset($frm->removeselect[$index]);
+                    break;
+                }
             }
         }
     }

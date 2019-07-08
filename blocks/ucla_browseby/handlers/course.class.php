@@ -149,6 +149,8 @@ class course_handler extends browseby_handler {
             $t = $subjareapretty;
 
             // Get all courses in this subject area from our browseall tables.
+            // This affects the results found by searching with the
+            // "Subject area" and "Division" tabs.
             $sql = self::BROWSEALL_SQL_HELPER . "
                 FROM {ucla_browseall_classinfo} ubci
                 INNER JOIN {ucla_browseall_instrinfo} ubii
@@ -162,6 +164,7 @@ class course_handler extends browseby_handler {
             " .
             self::BROWSEALL_SYLLABUS_HELPER .
             "   WHERE ubci.subjarea = :subjarea
+                AND ubci.sect_enrl_stat_cd != 'X'
                 $termwhere
             " . self::BROWSEALL_ORDER_HELPER;
 
@@ -204,6 +207,8 @@ class course_handler extends browseby_handler {
 
             // Query that selects courses for selected term only.
             // This will not include people enrolled only locally.
+            // This affects the results found by searching with the
+            // "Instructor" tab.
             $sql = self::BROWSEALL_SQL_HELPER . "
                 FROM {ucla_browseall_classinfo} ubci
                 LEFT JOIN {ucla_browseall_instrinfo} ubii
@@ -218,6 +223,7 @@ class course_handler extends browseby_handler {
             self::BROWSEALL_SYLLABUS_HELPER .
             "   WHERE user.id = :user
                 AND ubii.profcode != '03'
+                AND ubci.sect_enrl_stat_cd != 'X'
                     $termwhere
             " . self::BROWSEALL_ORDER_HELPER;
 
@@ -327,17 +333,9 @@ class course_handler extends browseby_handler {
                     continue;
                 }
 
-                $cancelledmess = '';
-                if (enrolstat_is_cancelled($course->enrolstat)) {
-                    $cancelledmess = html_writer::tag('span',
-                        get_string('cancelled'),
-                        array('class' => 'ucla-cancelled-course')) . ' ';
-                }
-
-                $courseobj->fullname = $cancelledmess .
-                    uclacoursecreator::make_course_title(
-                        $course->course_title, $course->section_title
-                    );
+                $courseobj->fullname = uclacoursecreator::make_course_title(
+                    $course->course_title, $course->section_title
+                );
 
                 // CCLE-3989 - Supervising Instructor Shown On Course List.
                 if (!empty($course->profcode) && $course->profcode != '03') {

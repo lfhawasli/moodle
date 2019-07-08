@@ -278,8 +278,9 @@ h1, h2, h3, h4, h5, h6, p {
   background-color: rgb(220,220,220);
   color: black;
 }
+/* Background color is the same as gray-200 for consistency. */
 #frontpage-search-wrapper .search-options {
-  background-color: rgb(245,245,245);
+  background-color: #e9ecef;
   margin-top: 10px;
   border: 0;
   font-size: 12px;
@@ -321,15 +322,27 @@ h1, h2, h3, h4, h5, h6, p {
   box-shadow: 3px 5px 5px rgba(0,0,0,0.23);
 }
 .frontpage-alert-wrapper .header-title, .frontpage-alert-wrapper .box-section-title {
-  font-size: 20px;
-  font-weight: bolder;
+  font-size: 1.8rem;
+}
+.frontpage-alert-wrapper .box-boundary, .frontpage-alert-wrapper .box-link {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+.frontpage-alert-wrapper .box-list {
+  margin-left: 0.125rem;
+  border-left: 0.125rem solid #ddd;
+  padding-left: 0.125rem;
+  margin-bottom: 0.25rem;
 }
 .frontpage-alert-wrapper .box-title {
-  font-size: 15px;
-  font-weight: bold;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  padding-bottom: 0.125rem;
+  border-bottom: 1px solid #eee;
 }
 .frontpage-alert-wrapper .box-text {
-  font-size: 13px;
+  padding: 0.125rem;
+  margin-bottom: -1rem;
 }
 #site-directory-text {
   text-align: center;

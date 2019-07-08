@@ -196,8 +196,10 @@ function uu_validate_user_upload_columns(csv_import_reader $cir, $stdfields, $pr
         } else if (in_array($lcfield, $profilefields)) {
             // hack: somebody wrote uppercase in csv file, but the system knows only lowercase profile field
             $newfield = $lcfield;
-
-        } else if (preg_match('/^(sysrole|cohort|course|group|type|role|enrolperiod|enrolstatus)\d+$/', $lcfield)) {
+        // START UCLA MOD: CCLE-8280 - Bulk assign roles in a specific course category.
+        //} else if (preg_match('/^(sysrole|cohort|course|group|type|role|enrolperiod|enrolstatus)\d+$/', $lcfield)) {
+        } else if (preg_match('/^(sysrole|category|cohort|course|group|type|role|enrolperiod|enrolstatus)\d+$/', $lcfield)) {
+        // END UCLA MOD: CCLE-8280.
             // special fields for enrolments
             $newfield = $lcfield;
 
@@ -365,6 +367,30 @@ function uu_allowed_roles_cache() {
     }
     return $rolecache;
 }
+
+// START UCLA MOD: CCLE-8280 - Bulk assign roles in a specific course category.
+/**
+ * Returns mapping of all category roles using short role name as index.
+ * @return array
+ */
+function uu_allowed_category_roles_cache() {
+    global $DB;
+    $courcat_id = false;
+    $courcat_id = $DB->get_field('course_categories','id', array(), $strictness = IGNORE_MULTIPLE);
+    $allowedroles = get_assignable_roles(context_coursecat::instance($courcat_id), ROLENAME_SHORT);
+    foreach ($allowedroles as $rid => $rname) {
+        $rolecache[$rid] = new stdClass();
+        $rolecache[$rid]->id   = $rid;
+        $rolecache[$rid]->name = $rname;
+        if (!is_numeric($rname)) { // Only non-numeric shortnames are supported!!
+            $rolecache[$rname] = new stdClass();
+            $rolecache[$rname]->id   = $rid;
+            $rolecache[$rname]->name = $rname;
+        }
+    }
+    return $rolecache;
+}
+// END UCLA MOD: CCLE-8280.
 
 /**
  * Returns mapping of all system roles using short role name as index.
