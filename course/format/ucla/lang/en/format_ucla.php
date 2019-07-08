@@ -64,9 +64,8 @@ $string['classdescription'] = 'Class description';
 
 // CCLE-5098 - Download course content configurable.
 $string['coursedownload'] = 'Enable download course materials';
-$string['coursedownload_help'] = 'Download is enabled by default. '
-        . 'If you do not want the students to be able to download the files in a single zip file, '
-        . 'click "No". This feature is available to students as long as they have access to the course.';
+$string['coursedownload_help'] = 'If you do not want the students to be able '
+        . 'to download the files in a single zip file, click "No".';
 
 // CCLE-5741 - Suppress out of term message for SRS courses.
 $string['enableoutoftermmessage'] = 'Enable out of term message';
