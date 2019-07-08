@@ -2037,7 +2037,7 @@ class restore_course_legacy_files_step extends restore_execution_step {
     }
 }
 
-// BEGIN UCLA MOD: CCLE-3797 - Allow course sections to be hidden upon course restore
+// START UCLA MOD: CCLE-3797 - Allow course sections to be hidden upon course restore
 class restore_course_hide_sections_step extends restore_execution_step {
 
     function define_execution() {
