@@ -103,6 +103,9 @@ class enrol_manual_enrol_users_form extends moodleform {
             // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
             ,'allowcommas' => true
             // END UCLA MOD: CCLE-7719.
+            // START UCLA MOD: CCLE-8500 - Make search results disappear on select.
+            ,'closesuggestionsonselect' => true
+            // END UCLA MOD: CCLE-8500.
         );
         $mform->addElement('autocomplete', 'userlist', get_string('selectusers', 'enrol_manual'), array(), $options);
 
