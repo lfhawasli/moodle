@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: September 12, 2018.
+// Copyright (c) 2011-2019 Respondus, Inc.  All Rights Reserved.
+// Date: February 14, 2019.
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -35,7 +35,8 @@ class quizaccess_lockdownbrowser extends quiz_access_rule_base {
             $result = $this->check_incompatible_rules();
         }
         if ($result === false) {
-            $result = lockdownbrowser_check_for_lock($this->quizobj);
+            $prevent_launch = $this->check_quiz_launch_dependencies();
+            $result = lockdownbrowser_check_for_lock($this->quizobj, $prevent_launch);
         }
         return $result;
     }
@@ -55,6 +56,41 @@ class quizaccess_lockdownbrowser extends quiz_access_rule_base {
         } catch (Exception $ex) {
             // ignore possible exceptions
         }
+    }
+
+    /**
+     * Whether the quiz launch dependencies are valid or not.
+     * @return boolean false if dependencies are valid, true if not
+     */
+    protected function check_quiz_launch_dependencies() {
+        if ($this->check_quiz_timing()) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Whether the quiz timing settings indicate the quiz is available or not.
+     * @return boolean false if quiz is available, true if not
+     */
+    protected function check_quiz_timing() {
+        // these checks are the same as those in quizaccess_openclosedate::prevent_access
+        if ($this->timenow < $this->quiz->timeopen) {
+            return true;
+        }
+        if (!$this->quiz->timeclose) {
+            return false;
+        }
+        if ($this->timenow <= $this->quiz->timeclose) {
+            return false;
+        }
+        if ($this->quiz->overduehandling != 'graceperiod') {
+            return true;
+        }
+        if ($this->timenow <= $this->quiz->timeclose + $this->quiz->graceperiod) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -135,7 +171,7 @@ class quizaccess_lockdownbrowser extends quiz_access_rule_base {
     /**
      * Whether the plugin versions are considered equal or not, for the purpose
      * of dependency checking.
-     * @return string true if versions are considered equal, false if they are not.
+     * @return boolean true if versions are considered equal, false if they are not.
      */
     protected static function compare_plugin_versions($ruleversion, $blockversion) {
         $comparelength = 8; // yyyymmddxx, but only consider first 8 digits

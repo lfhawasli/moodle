@@ -47,10 +47,9 @@ class Blowfish {
   const BLOWFISH_PADDING_RFC  = 21;
   const BLOWFISH_PADDING_ZERO = 22;
 
-  // START UCLA MOD: CCLE-7418 - Update Respondus block to 2018031300.
+  // modified by Respondus
   //function Blowfish($key, $mode, $padding, $iv=NULL) {
   function __construct($key, $mode, $padding, $iv=NULL) {
-  // END UCLA MOD: CCLE-7418.
     $this->mode = $mode;
     $this->padding = $padding;
     $this->N = 16;

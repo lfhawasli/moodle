@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: September 12, 2018.
+// Copyright (c) 2011-2019 Respondus, Inc.  All Rights Reserved.
+// Date: February 14, 2019.
 
 // production flags
 // - should all default to false or 0
@@ -882,10 +882,17 @@ function lockdownbrowser_monitoractionchangesettings($parameters) {
     $exit_password = $parameters["exitPassword"];
     $xdata         = $parameters["xdata"];
 
+    /*** Trac #4594
     if ($enable_monitor) {
         $monitor = $xdata;
     } else {
         $monitor = "";
+    }
+    ***/
+    if ($enable_monitor) {
+        $monitor = "monitorEnabled\$%@%\$true\n " . $xdata;
+    } else {
+        $monitor = "monitorEnabled\$%@%\$false\n " . $xdata;
     }
 
     $course_module = $DB->get_record("course_modules", array("id" => $exam_id));
@@ -1300,9 +1307,26 @@ function lockdownbrowser_monitoractionexamsync($parameters) {
             && !is_null($settings->monitor)
             && strlen($settings->monitor) > 0
         ) {
+            /*** Trac #4594
             $body .= "\t\t<monitorEnabled>true</monitorEnabled>\r\n";
             $body .= "\t\t<extendedData>";
             $body .= lockdownbrowser_utf8encode(htmlspecialchars($settings->monitor));
+            $body .= "</extendedData>\r\n";
+            ***/
+            $parts = explode("\n ", $settings->monitor, 2);
+            $nvpair = explode("\$%@%\$", $parts[0], 2);
+            if ($nvpair[0] == "monitorEnabled") {
+                $enable_monitor = $nvpair[1];
+                $xdata = $parts[1];
+            } else { // assume Monitor is enabled
+                $enable_monitor = "true";
+                $xdata = $settings->monitor;
+            }
+            $body .= "\t\t<monitorEnabled>";
+            $body .= lockdownbrowser_utf8encode(htmlspecialchars($enable_monitor));
+            $body .= "</monitorEnabled>\r\n";
+            $body .= "\t\t<extendedData>";
+            $body .= lockdownbrowser_utf8encode(htmlspecialchars($xdata));
             $body .= "</extendedData>\r\n";
         } else {
             $body .= "\t\t<monitorEnabled>false</monitorEnabled>\r\n";
