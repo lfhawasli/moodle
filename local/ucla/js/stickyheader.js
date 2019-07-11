@@ -11,7 +11,8 @@ $(document).ready(function() {
     // Stickyheader can be customized to each page, identified by id of body.
     var body_id = {
         'page-admin-roles-allow': false,
-        'page-blocks-ucla_modify_coursemenu-modify_coursemenu': false
+        'page-blocks-ucla_modify_coursemenu-modify_coursemenu': false,
+        'page-admin-uclacourserequestor' : false
     }
 
     body_id[$('body').attr('id')] = true;

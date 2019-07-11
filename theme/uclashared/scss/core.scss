@@ -101,3 +101,16 @@ table.stickyheader {
 .pagination {
     overflow: auto;
 }
+
+// Format course request tables.
+#uclacourserequestor_requests.generaltable {
+    th, td {
+        min-width: 230px;
+        text-align: center;
+        vertical-align: middle !important; // Overrides the vertical-align: top in index.php for course requestor.
+    }
+    // Set all header cells to the blue background.
+    .header {
+        background-color: #536895;
+    }
+}
