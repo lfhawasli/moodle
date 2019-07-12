@@ -553,7 +553,7 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $html .= html_writer::start_div('card');
         $html .= html_writer::start_div('card-body');
         if (empty($PAGE->layout_options['nonavbar'])) {
-            $html .= html_writer::start_div('clearfix w-100 float-sm-left', array('id' => 'page-navbar'));
+            $html .= html_writer::start_div('clearfix w-100 float-sm-left d-flex flex-wrap', array('id' => 'page-navbar'));
             $html .= html_writer::tag('div', $this->navbar(), array('class' => 'breadcrumb-nav'));
             $html .= $this->weeks_display();
             $html .= html_writer::end_div();
@@ -613,11 +613,11 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $html .= html_writer::start_div('card-body');
         $html .= html_writer::div($this->context_header_settings_menu(), 'float-sm-right context-header-settings-menu');
         // Adding weeks display to original parent full_header code.
-        $html .= html_writer::start_div('clearfix w-100 float-sm-left');
-        $html .= $this->weeks_display();
+        $html .= html_writer::start_div('clearfix w-100 float-sm-left d-flex flex-wrap-reverse align-items-end');
         $html .= html_writer::start_div('float-sm-left');
         $html .= $this->context_header($headerinfo);
         $html .= html_writer::end_div();
+        $html .= $this->weeks_display();
         $html .= html_writer::end_div();
         // End weeks display.
         $pageheadingbutton = $this->page_heading_button();
