@@ -297,10 +297,18 @@ if ($showcommonelements) {
 if ($showcommonelements) {
     echo html_writer::start_div('search-box');
     echo html_writer::start_tag('form', array('method' => 'post', 'action' => 'view.php'));
+    echo html_writer::start_div('ucla-search search-wrapper qanda-search');
+    echo html_writer::start_tag('button',
+        array('type' => 'submit', 'class' => 'fa fa-search btn', 'name' => 'searchbutton'));
+    echo html_writer::end_tag('button');
     if ($mode == 'search') {
-        echo html_writer::empty_tag('input', array('type' => 'text', 'class' => 'form-control', 'name' => 'hook', 'placeholder' => get_string('searchterms', 'qanda'), 'value' => $hook, 'alt' => $strsearch));
+        echo html_writer::empty_tag('input',
+            array('type' => 'text', 'class' => 'form-control ucla-search-input rounded', 'name' => 'hook',
+                'placeholder' => get_string('searchterms', 'qanda'), 'value' => $hook, 'alt' => $strsearch));
     } else {
-        echo html_writer::empty_tag('input', array('type' => 'text', 'class' => 'form-control', 'name' => 'hook', 'placeholder' => get_string('searchterms', 'qanda'), 'alt' => $strsearch));
+        echo html_writer::empty_tag('input',
+            array('type' => 'text', 'class' => 'form-control ucla-search-input rounded', 'name' => 'hook',
+                'placeholder' => get_string('searchterms', 'qanda'), 'alt' => $strsearch));
     }
     if ($fullsearch || $mode != 'search') {
         $fullsearchchecked = 'checked="checked"';
@@ -311,7 +319,7 @@ if ($showcommonelements) {
     echo '<input type="hidden" name="mode" value="search" />';
     echo '<input type="hidden" name="id" value="' . $cm->id . '" />';
     echo '<label for="fullsearch">' . $strsearchinanswer . '</label>';
-    echo html_writer::empty_tag('input', array('type' => 'submit', 'class' => 'submit', 'name' => 'searchbutton', 'value' => $strsearch));
+    echo html_writer::end_div();
     echo html_writer::end_tag('form');
     echo html_writer::end_div();
     echo '<br />';

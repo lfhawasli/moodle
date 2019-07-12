@@ -524,6 +524,9 @@ $string['rsstypedefault'] = 'RSS feed type';
 $string['search'] = 'Search';
 $string['search:post'] = 'Forum - posts';
 $string['search:activity'] = 'Forum - activity information';
+// START UCLA MOD: CCLE-8504 - Change search fields to look similar.
+$string['searchbarplaceholder'] = 'Search forums...';
+// END UCLA MOD: CCLE-8504.
 $string['searchdatefrom'] = 'Posts must be newer than this';
 $string['searchdateto'] = 'Posts must be older than this';
 $string['searchforumintro'] = 'Please enter search terms into one or more of the following fields:';

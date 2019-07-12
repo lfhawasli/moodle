@@ -473,18 +473,34 @@ function wiki_search_form($cm, $search = '', $subwiki = null) {
     global $CFG, $OUTPUT;
 
     $output = '<div class="wikisearch">';
-    $output .= '<form method="post" action="' . $CFG->wwwroot . '/mod/wiki/search.php" style="display:inline">';
+    // START UCLA MOD: CCLE-8504 - Change search fields to look similar.
+    // $output .= '<form method="post" action="' . $CFG->wwwroot . '/mod/wiki/search.php" style="display:inline">';
+    $output .= '<form method="post" action="' . $CFG->wwwroot . '/mod/wiki/search.php" style="display:inline" class="form-inline">';
+    // END UCLA MOD: CCLE-8504.
     $output .= '<fieldset class="invisiblefieldset">';
     $output .= '<legend class="accesshide">'. get_string('searchwikis', 'wiki') .'</legend>';
     $output .= '<label class="accesshide" for="searchwiki">' . get_string("searchterms", "wiki") . '</label>';
-    $output .= '<input id="searchwiki" name="searchstring" type="text" size="18" value="' . s($search, true) . '" alt="search" />';
+    // START UCLA MOD: CCLE-8504 - Change search fields to look similar.
+    // $output .= '<input id="searchwiki" name="searchstring" type="text" size="18" value="' . s($search, true) . '" alt="search" />';
+    // $output .= '<input name="courseid" type="hidden" value="' . $cm->course . '" />';
+    // $output .= '<input name="cmid" type="hidden" value="' . $cm->id . '" />';
+    // if (!empty($subwiki->id)) {
+    //     $output .= '<input name="subwikiid" type="hidden" value="' . $subwiki->id . '" />';
+    // }
+    // $output .= '<input name="searchwikicontent" type="hidden" value="1" />';
+    // $output .= '<input value="' . get_string('searchwikis', 'wiki') . '" class="btn btn-secondary" type="submit" />';
+    $output .= '<div class="ucla-search search-wrapper">';
+    $output .= '<button class="fa fa-search btn" id="searchforums" type="submit"></button>';
+    $output .= '<input id="searchwiki" name="searchstring" type="text" value="' . s($search, true) . '" alt="search"' .
+        'class="form-control ucla-search-input rounded" placeholder="' . get_string('searchwikis', 'wiki') . '" />';
     $output .= '<input name="courseid" type="hidden" value="' . $cm->course . '" />';
     $output .= '<input name="cmid" type="hidden" value="' . $cm->id . '" />';
     if (!empty($subwiki->id)) {
         $output .= '<input name="subwikiid" type="hidden" value="' . $subwiki->id . '" />';
     }
     $output .= '<input name="searchwikicontent" type="hidden" value="1" />';
-    $output .= '<input value="' . get_string('searchwikis', 'wiki') . '" class="btn btn-secondary" type="submit" />';
+    $output .= '</div>';
+    // END UCLA MOD: CCLE-8504.
     $output .= '</fieldset>';
     $output .= '</form>';
     $output .= '</div>';

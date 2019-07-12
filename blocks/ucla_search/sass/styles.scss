@@ -41,14 +41,24 @@
             color: #666;
         }
     }
-    .search-wrapper {
-      position: relative;
-    }
+
     .fa-search {
-      position: absolute;
-      right: 10px;
-      top: 9px;
+        position: absolute;
+        right: 10px;
+        top: 9px;
     }
+
+    .fa-search.btn {
+        right: 0;
+        top: inherit;
+        background-color: transparent;
+        border: none;
+    }
+}
+
+.search-wrapper {
+    min-width: 200px;
+    position: relative;
 }
 
 // Add spacing before term selector.
@@ -61,8 +71,39 @@
     text-align: center;
 }
 
+#region-main .ucla-search.global-search,
+#region-main .ucla-search.admin-search {
+    margin: 0;
+    max-width: 285px;
+}
+
+.global-search,
+#page-header .ucla-search {
+    .fa-search.btn {
+        right: 0;
+        top: 3px;
+    }
+
+    .ucla-search-input {
+        margin: 0;
+        padding: .5rem .75rem;
+        width: 250px;
+    }
+}
+
 @media (max-width: 480px) {
     #region-main #browsebymain .ucla-search {
-      text-align: left;
-    } 
+        text-align: left;
+    }
+}
+
+@media (max-width: 575px) {
+    #page-header .global-search .ucla-search-input {
+        width: 100%;
+    }
+
+    #page-header .global-search-wrapper {
+        margin-top: .75rem;
+        width: 100%;
+    }
 }

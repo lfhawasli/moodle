@@ -9,7 +9,7 @@
 $string['created'] = 'Created';
 $string['updated'] = 'Updated';
 $string['postby'] = 'Posted by';
-$string['searchterms'] = 'Q&A search terms';
+$string['searchterms'] = 'Search Q&A...';
 
 $string['addcomment'] = 'Add comment';
 $string['addentry'] = 'Ask a question';

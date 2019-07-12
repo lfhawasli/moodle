@@ -12,11 +12,10 @@
             {{/helpicon}}
             </div>
             <label class="sr-only" for="search">{{#str}}search, forum{{/str}}</label>
-            <input id="search" name="search" type="text" class="form-control rounded" value="{{query}}">
-            <div class="input-group-append">
-                <button class="btn btn-secondary rounded" id="searchforums" type="submit">{{#str}}searchforums, mod_forum{{/str}}</button>
+            <div class="ucla-search search-wrapper">
+                <button class="fa fa-search btn" id="searchforums" type="submit"></button>
+                <input id="search" name="search" type="text" class="form-control ucla-search-input rounded" placeholder="{{#str}}searchbarplaceholder, forum{{/str}}" value="{{query}}">
             </div>
         </div>
-
     </form>
 </div>

@@ -331,36 +331,65 @@ class core_renderer extends \theme_boost\output\core_renderer {
                 $id = clean_param($id, PARAM_ALPHANUMEXT);
             }
 
+            // START UCLA MOD: CCLE-8504 - Change search fields to look similar.
             // JS to animate the form.
-            $this->page->requires->js_call_amd('core/search-input', 'init', array($id));
+            // $this->page->requires->js_call_amd('core/search-input', 'init', array($id));
 
-            $searchicon = html_writer::tag('div', $this->pix_icon('a/search', get_string('search', 'search'), 'moodle'),
-                array('role' => 'button', 'tabindex' => 0));
-            $formattrs = array('class' => 'search-input-form', 'action' => $CFG->wwwroot . '/search/index.php');
-            $inputattrs = array('type' => 'text', 'name' => 'q', 'placeholder' => get_string('search', 'search'),
-                'size' => 13, 'tabindex' => -1, 'id' => 'id_q_' . $id, 'class' => 'form-control');
-            // START UCLA MOD: CCLE-8502 - If in course context, then default to 'Search Within' the course.
+            // $searchicon = html_writer::tag('div', $this->pix_icon('a/search', get_string('search', 'search'), 'moodle'),
+            //     array('role' => 'button', 'tabindex' => 0));
+            // $formattrs = array('class' => 'search-input-form', 'action' => $CFG->wwwroot . '/search/index.php');
+            // $inputattrs = array('type' => 'text', 'name' => 'q', 'placeholder' => get_string('search', 'search'),
+            //     'size' => 13, 'tabindex' => -1, 'id' => 'id_q_' . $id, 'class' => 'form-control');
+            // // Set the value of $searchcontext to be passed to search/index.php.
+            // // Default search context for 'Front page' contexts like Subject Area, Division, Collaboration Sites and Instructor should be global.
+            // if ($this->page->course->id != SITEID) {
+            //     $searchcontext = 'course';
+            // } else {
+            //     $searchcontext = 'global';
+            // }
+            // $contents = html_writer::tag('label', get_string('enteryoursearchquery', 'search'),
+            //     array('for' => 'id_q_' . $id, 'class' => 'accesshide')) . html_writer::tag('input', '', $inputattrs);
+            // if ($this->page->context && $this->page->context->contextlevel !== CONTEXT_SYSTEM) {
+            //     $contents .= html_writer::empty_tag('input', ['type' => 'hidden',
+            //             'name' => 'context', 'value' => $this->page->context->id]);
+            // }
+            // $contents .= html_writer::empty_tag('input', ['type' => 'hidden',
+            //         'name' => 'searchcontext', 'value' => $searchcontext]);
+            // $searchinput = html_writer::tag('form', $contents, $formattrs);
+
+            // return html_writer::tag('div', $searchicon . $searchinput, array('class' => 'search-input-wrapper nav-link', 'id' => $id));
+
             // Set the value of $searchcontext to be passed to search/index.php.
             // Default search context for 'Front page' contexts like Subject Area, Division, Collaboration Sites and Instructor should be global.
             if ($this->page->course->id != SITEID) {
                 $searchcontext = 'course';
+                $placeholder = get_string('placeholder_course', 'block_ucla_search');
             } else {
                 $searchcontext = 'global';
+                $placeholder = get_string('placeholder_global', 'block_ucla_search');
             }
-            // END UCLA MOD: CCLE-8502.
-            $contents = html_writer::tag('label', get_string('enteryoursearchquery', 'search'),
-                array('for' => 'id_q_' . $id, 'class' => 'accesshide')) . html_writer::tag('input', '', $inputattrs);
+
+            $formattrs = array('action' => $CFG->wwwroot . '/search/index.php');
+            $buttonattrs = array('class' => 'fa fa-search btn', 'type' => 'submit');
+            $inputattrs = array('type' => 'text', 'name' => 'q', 'placeholder' => $placeholder,
+            'tabindex' => -1, 'id' => 'id_q_' . $id, 'class' => 'form-control ucla-search-input rounded');
+
+            $contents =
+                html_writer::tag('label', get_string('enteryoursearchquery', 'search'),
+                    array('for' => 'id_q_' . $id, 'class' => 'accesshide')) .
+                html_writer::tag('button', '', $buttonattrs) .
+                html_writer::tag('input', '', $inputattrs);
+
             if ($this->page->context && $this->page->context->contextlevel !== CONTEXT_SYSTEM) {
                 $contents .= html_writer::empty_tag('input', ['type' => 'hidden',
                         'name' => 'context', 'value' => $this->page->context->id]);
             }
-            // START UCLA MOD: CCLE-8502 - If in course context, then default to 'Search Within' the course.
             $contents .= html_writer::empty_tag('input', ['type' => 'hidden',
                     'name' => 'searchcontext', 'value' => $searchcontext]);
-            // END UCLA MOD: CCLE-8502.
             $searchinput = html_writer::tag('form', $contents, $formattrs);
 
-            return html_writer::tag('div', $searchicon . $searchinput, array('class' => 'search-input-wrapper nav-link', 'id' => $id));
+            return html_writer::tag('div', $searchinput, array('class' => 'ucla-search search-wrapper global-search', 'id' => $id));
+            // END UCLA MOD: CCLE-8504.
         }
     }
 
@@ -632,6 +661,8 @@ class core_renderer extends \theme_boost\output\core_renderer {
             }
         }
 
+        $html .= html_writer::start_div('d-md-block float-sm-right');
+        // We don't want admin panel and editing buttons to appear on small screens.
         $html .= html_writer::start_div('d-none d-md-block float-sm-right');
 
         if (has_capability('format/ucla:viewadminpanel', $PAGE->context)) {
@@ -648,9 +679,10 @@ class core_renderer extends \theme_boost\output\core_renderer {
         $html .= html_writer::end_div();
 
         if (!empty($PAGE->layout_options['search_box'])) {
-            $html .= html_writer::div($this->search_box(), 'd-inline-block float-sm-right');
+            $html .= html_writer::div($this->search_box(), 'd-inline-block float-sm-right global-search-wrapper');
         }
 
+        $html .= html_writer::end_div();
         $html .= html_writer::end_div();
         $html .= html_writer::end_div();
         $html .= html_writer::end_div();
