@@ -103,6 +103,16 @@ class backup_root_task extends backup_task {
         $activities = new backup_activities_setting('activities', base_setting::IS_BOOLEAN, true);
         $activities->set_ui(new backup_setting_ui_checkbox($activities, get_string('rootsettingactivities', 'backup')));
         $this->add_setting($activities);
+        
+        // START UCLA MOD: CCLE-3797 - Hide all course sections on course restore option.
+        if ($this->plan->get_mode() == backup::MODE_IMPORT) {
+            $hidesectionsetting = new backup_generic_setting('hidesections', base_setting::IS_BOOLEAN, false);
+            $hidesectionsetting->set_ui(
+                    new backup_setting_ui_checkbox($hidesectionsetting, get_string('rootsettinghidesections', 'backup')));
+            $hidesectionsetting->get_ui()->set_label(get_string('rootsettinghidesections', 'backup'));
+            $this->add_setting($hidesectionsetting);
+        }
+        // END UCLA MOD: CCLE-3797.
 
         // Define blocks
         $blocks = new backup_generic_setting('blocks', base_setting::IS_BOOLEAN, true);

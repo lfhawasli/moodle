@@ -288,6 +288,9 @@ $string['rootsettingbadges'] = 'Include badges';
 $string['rootsettingblocks'] = 'Include blocks';
 $string['rootsettingcompetencies'] = 'Include competencies';
 $string['rootsettingfilters'] = 'Include filters';
+// START UCLA MOD: CCLE-3797 - Hide all course sections on course restore option.
+$string['rootsettinghidesections'] = 'Hide all course activities and resources after import/restore';
+// END UCLA MOD: CCLE-3797.
 $string['rootsettingcomments'] = 'Include comments';
 $string['rootsettingcalendarevents'] = 'Include calendar events';
 $string['rootsettinguserscompletion'] = 'Include user completion details';
@@ -306,9 +309,6 @@ $string['sectioninc'] = 'Included in backup (no user information)';
 $string['sectionactivities'] = 'Activities';
 $string['selectacategory'] = 'Select a category';
 $string['selectacourse'] = 'Select a course';
-// BEGIN UCLA MOD: CCLE-3797 - Hide all course sections on course restore option
-$string['hidesections'] = 'Hide all course modules after import/restore';
-// END UCLA MOD: CCLE-3797
 $string['setting_course_fullname'] = 'Course name';
 $string['setting_course_shortname'] = 'Course short name';
 $string['setting_course_startdate'] = 'Course start date';

@@ -157,6 +157,15 @@ class restore_root_task extends restore_task {
         $activities->set_ui(new backup_setting_ui_checkbox($activities, get_string('rootsettingactivities', 'backup')));
         $activities->get_ui()->set_changeable($changeable);
         $this->add_setting($activities);
+        
+        // START UCLA MOD: CCLE-3797 - Hide all course sections on course restore option.
+        $hidesectionsetting = new restore_generic_setting('hidesections', base_setting::IS_BOOLEAN, false);
+        $hidesectionsetting->set_ui(
+                new backup_setting_ui_checkbox($hidesectionsetting, get_string('rootsettinghidesections', 'backup')));
+        $hidesectionsetting->get_ui()->set_label(get_string('rootsettinghidesections', 'backup'));
+        $hidesectionsetting->set_value(false);
+        $this->add_setting($hidesectionsetting);
+        // END UCLA MOD: CCLE-3797.
 
         // Define blocks
         $defaultvalue = false;                      // Safer default
