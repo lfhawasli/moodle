@@ -75,3 +75,22 @@ function print_library_tabs($activetab, $courseid) {
 
     print_tabs(array($tabs), $activetab);
 }
+
+function construct_lti_config() {
+    $toolconfig = new stdClass();
+    // Add config info.
+    $toolconfig->name = get_config('block_ucla_library_reserves', 'lti_tool_name');
+    $toolconfig->toolurl = get_config('block_ucla_library_reserves', 'lti_tool_url');
+    $toolconfig->resourcekey = get_config('block_ucla_library_reserves', 'consumer_key');
+    $toolconfig->password = get_config('block_ucla_library_reserves', 'lti_sharedsecret');
+    // Default info.
+    $toolconfig->instructorchoicesendname = 0; // Do not send name.
+    $toolconfig->instructorchoicesendemailaddr = 0; // Do not send email address.
+    $toolconfig->instructorchoiceacceptgrades = 0; // Do not accept grade from the LTI tool.
+    $toolconfig->instructorcustomparameters = ''; // No custom parameters.
+    $toolconfig->instructorchoiceallowroster = null;
+    $toolconfig->securetoolurl = '';
+    $toolconfig->debuglaunch = 0; // No debuglaunch.
+    $toolconfig->id = 0; // Property $toolconfig->id is an optional param in mod/lti/return.php, default to 0.
+    return $toolconfig;
+}

@@ -33,5 +33,35 @@ require_login($course);
 init_pagex($course, $context, $url, BLOCK_UCLA_LIBRARY_RESERVES_LIB_GUIDE);
 
 echo $OUTPUT->header();
+
 print_library_tabs(get_string('researchguide', 'block_ucla_library_reserves'), $course->id);
+$PAGE->set_pagelayout('incourse');
+
+echo '<iframe id="contentframe" height="600px" width="100%" src="launch.php?id='.$course->id.'"webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+
+    // Output script to make the iframe tag be as large as possible.
+    $resize = '
+        <script type="text/javascript">
+        //<![CDATA[
+            YUI().use("node", "event", function(Y) {
+                var doc = Y.one("body");
+                var frame = Y.one("#contentframe");
+                var padding = 15; //The bottom of the iframe wasn\'t visible on some themes. Probably because of border widths, etc.
+                var lastHeight;
+                var resize = function(e) {
+                    var viewportHeight = doc.get("winHeight");
+                    if(lastHeight !== Math.min(doc.get("docHeight"), viewportHeight)){
+                        frame.setStyle("height", viewportHeight - frame.getY() - padding + "px");
+                        lastHeight = Math.min(doc.get("docHeight"), doc.get("winHeight"));
+                    }
+                };
+
+                resize();
+
+                Y.on("windowresize", resize);
+            });
+        //]]
+        </script>
+';
+echo $resize;
 echo $OUTPUT->footer();

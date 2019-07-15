@@ -21,16 +21,43 @@
  * @copyright  2019 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 defined('MOODLE_INTERNAL') || die;
+require_once($CFG->dirroot.'/mod/lti/edit_form.php');
+require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
 if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext(
-            'block_ucla_library_reserves/source_url',
-            get_string('headerlibraryreservesurl','block_ucla_library_reserves'),
-            get_string('desclibraryreservesurl','block_ucla_library_reserves'),
-            'https://webservices.library.ucla.edu/reserves',
-            PARAM_URL
+        'block_ucla_library_reserves/source_url',
+        get_string('headerlibraryreservesurl', 'block_ucla_library_reserves'),
+        get_string('desclibraryreservesurl', 'block_ucla_library_reserves'),
+        'https://webservices.library.ucla.edu/reserves',
+        PARAM_URL
         ));
-
+    $settings->add(new admin_setting_configtext(
+        'block_ucla_library_reserves/lti_tool_name',
+        get_string('ltinamelibraryreserves', 'block_ucla_library_reserves'),
+        get_string('ltinamelibraryreserveshelp', 'block_ucla_library_reserves'),
+        get_string('ltinamelibraryreservesdefault', 'block_ucla_library_reserves')
+        ));
+    $settings->add(new admin_setting_configtext(
+        'block_ucla_library_reserves/lti_tool_url',
+        get_string('ltiURLlibraryreserves', 'block_ucla_library_reserves'),
+        get_string('ltiURLlibraryreserveshelp', 'block_ucla_library_reserves'),
+        get_string('ltiURLlibraryreservesdefault', 'block_ucla_library_reserves'),
+        PARAM_URL
+        ));
+    $settings->add(new admin_setting_configtext(
+        'block_ucla_library_reserves/consumer_key',
+        get_string('lticonsumerkeylibraryreserves', 'block_ucla_library_reserves'),
+        get_string('lticonsumerkeylibraryreserveshelp', 'block_ucla_library_reserves'),
+        get_string('lticonsumerkeylibraryreservesdefault', 'block_ucla_library_reserves'),
+        PARAM_URL
+        ));
+    $settings->add(new admin_setting_configpasswordunmask(
+        'block_ucla_library_reserves/lti_sharedsecret',
+        get_string("ltisecretlibraryreserves", "block_ucla_library_reserves"),
+        get_string("ltisecretlibraryreserveshelp", "block_ucla_library_reserves"),
+        '',
+        ''
+        ));
 }
