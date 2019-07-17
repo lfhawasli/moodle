@@ -28,6 +28,9 @@ $page = optional_param('page', 0, PARAM_INT);
 $q = optional_param('q', '', PARAM_NOTAGS);
 $title = optional_param('title', '', PARAM_NOTAGS);
 $contextid = optional_param('context', 0, PARAM_INT);
+// START UCLA MOD: CCLE-8502 - If in course context, then default to 'Search Within' the course. 
+$searchcontext = optional_param('searchcontext', 'global', PARAM_NOTAGS);
+// END UCLA MOD: CCLE-8502. 
 // Moving areaids, courseids, timestart, and timeend further down as they might come as an array if they come from the form.
 
 $context = context_system::instance();
@@ -103,6 +106,11 @@ if (!$data && $q) {
     $data->timeend = optional_param('timeend', 0, PARAM_INT);
 
     $data->context = $contextid;
+    // START UCLA MOD: CCLE-8502 - If in course context, then default to 'Search Within' the course.
+    if($searchcontext == 'course') {
+        $data->searchwithin = 'course';
+    }
+    // END UCLA MOD: CCLE-8502.
 
     $mform->set_data($data);
 }

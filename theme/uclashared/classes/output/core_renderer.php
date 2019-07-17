@@ -315,7 +315,52 @@ class core_renderer extends \theme_boost\output\core_renderer {
     public function search_box($id = false) {
         // Do not show search_box for non-logged in users.
         if (isloggedin() && !isguestuser()) {
-            return parent::search_box($id);
+            global $CFG;
+
+            // Accessing $CFG directly as using \core_search::is_global_search_enabled would
+            // result in an extra included file for each site, even the ones where global search
+            // is disabled.
+            if (empty($CFG->enableglobalsearch) || !has_capability('moodle/search:query', \context_system::instance())) {
+                return '';
+            }
+
+            if ($id == false) {
+                $id = uniqid();
+            } else {
+                // Needs to be cleaned, we use it for the input id.
+                $id = clean_param($id, PARAM_ALPHANUMEXT);
+            }
+
+            // JS to animate the form.
+            $this->page->requires->js_call_amd('core/search-input', 'init', array($id));
+
+            $searchicon = html_writer::tag('div', $this->pix_icon('a/search', get_string('search', 'search'), 'moodle'),
+                array('role' => 'button', 'tabindex' => 0));
+            $formattrs = array('class' => 'search-input-form', 'action' => $CFG->wwwroot . '/search/index.php');
+            $inputattrs = array('type' => 'text', 'name' => 'q', 'placeholder' => get_string('search', 'search'),
+                'size' => 13, 'tabindex' => -1, 'id' => 'id_q_' . $id, 'class' => 'form-control');
+            // START UCLA MOD: CCLE-8502 - If in course context, then default to 'Search Within' the course.
+            // Set the value of $searchcontext to be passed to search/index.php.
+            // Default search context for 'Front page' contexts like Subject Area, Division, Collaboration Sites and Instructor should be global.
+            if ($this->page->course->id != SITEID) {
+                $searchcontext = 'course';
+            } else {
+                $searchcontext = 'global';
+            }
+            // END UCLA MOD: CCLE-8502.
+            $contents = html_writer::tag('label', get_string('enteryoursearchquery', 'search'),
+                array('for' => 'id_q_' . $id, 'class' => 'accesshide')) . html_writer::tag('input', '', $inputattrs);
+            if ($this->page->context && $this->page->context->contextlevel !== CONTEXT_SYSTEM) {
+                $contents .= html_writer::empty_tag('input', ['type' => 'hidden',
+                        'name' => 'context', 'value' => $this->page->context->id]);
+            }
+            // START UCLA MOD: CCLE-8502 - If in course context, then default to 'Search Within' the course.
+            $contents .= html_writer::empty_tag('input', ['type' => 'hidden',
+                    'name' => 'searchcontext', 'value' => $searchcontext]);
+            // END UCLA MOD: CCLE-8502.
+            $searchinput = html_writer::tag('form', $contents, $formattrs);
+
+            return html_writer::tag('div', $searchicon . $searchinput, array('class' => 'search-input-wrapper nav-link', 'id' => $id));
         }
     }
 
