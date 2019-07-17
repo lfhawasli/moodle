@@ -58,7 +58,7 @@ class block_ucla_library_reserves extends block_base {
         global $DB, $COURSE;
 
         $nodes = array();
-        
+
         if (!is_collab_site($COURSE)) {
             $nodetitle = get_string('title', 'block_ucla_library_reserves');
             $node = navigation_node::create($nodetitle, new moodle_url('/blocks/ucla_library_reserves/index.php',
