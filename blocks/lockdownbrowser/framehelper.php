@@ -2,8 +2,8 @@
 <html>
 <!--
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: September 12, 2018.
+// Copyright (c) 2011-2019 Respondus, Inc.  All Rights Reserved.
+// Date: February 14, 2019.
 -->
 <head>
 <META http-equiv="Content-Type" content="text/html;charset=UTF-8">

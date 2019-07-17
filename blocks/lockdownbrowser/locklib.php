@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: September 12, 2018.
+// Copyright (c) 2011-2019 Respondus, Inc.  All Rights Reserved.
+// Date: February 14, 2019.
 
 define("LOCKDOWNBROWSER_LOCKLIB_ENABLE_LOG", false); // set true to enable logging to temp file
 define("LOCKDOWNBROWSER_LOCKLIB_LOG", "ldb_locklib.log");
@@ -179,11 +179,12 @@ function lockdownbrowser_browser_sdk2015_detected() {
     return true;
 }
 
-function lockdownbrowser_check_for_lock($quizobj) {
+function lockdownbrowser_check_for_lock($quizobj, $prevent_launch) {
 
     // called from quizaccess_lockdownbrowser::prevent_access();
     // $quizobj is an object of class quiz declared in /mod/quiz/attemptlib.php;
     // not currently using $quizobj here, but it might already contain some of the information we determine below;
+    // $prevent_launch is a boolean override indicating whether quiz launch should be prevented even if access is allowed;
     // returns false if access should be allowed;
     // returns an html string if access should be prevented
     global $CFG, $DB;
@@ -311,7 +312,7 @@ function lockdownbrowser_check_for_lock($quizobj) {
                     if ($_SESSION['lockdownbrowser_sdk2015_session']['active'] === true) {
 
                         if (strcmp($script, "view.php") === 0) {
-                            $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 2); // LDB-exit fragment
+                            $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 2, $prevent_launch); // LDB-exit fragment
                             $ok = false;
                         } else if (strcmp($script, "attempt.php") === 0) {
                             // continue to challenge/response below
@@ -337,15 +338,15 @@ function lockdownbrowser_check_for_lock($quizobj) {
                 } else { // LDB not detected
 
                     if (strcmp($script, "view.php") === 0) {
-                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 1); // LDB-autolaunch fragment
+                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 1, $prevent_launch); // LDB-autolaunch fragment
                     } else if (strcmp($script, "attempt.php") === 0) {
-                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 0); // LDB-required fragment
+                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 0, $prevent_launch); // LDB-required fragment
                     } else if (strcmp($script, "summary.php") === 0) {
-                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 0); // LDB-required fragment
+                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 0, $prevent_launch); // LDB-required fragment
                     } else if (strcmp($script, "startattempt.php") === 0) {
-                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 0); // LDB-required fragment
+                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 0, $prevent_launch); // LDB-required fragment
                     } else { // unexpected script
-                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 0); // LDB-required fragment
+                        $myerror = lockdownbrowser_prevent_access_fragment_for_quiz($quiz, 0, $prevent_launch); // LDB-required fragment
                     }
                     $ok = false;
                 }
@@ -377,12 +378,14 @@ function lockdownbrowser_check_for_lock($quizobj) {
     }
 }
 
-function lockdownbrowser_prevent_access_fragment_for_quiz($quiz, $fragment_type) {
+function lockdownbrowser_prevent_access_fragment_for_quiz($quiz, $fragment_type, $prevent_launch) {
 
     // $fragment_type
     //   0 = LDB-required fragment
     //   1 = LDB-autolaunch fragment
     //   2 = LDB-exit fragment
+    // $prevent_launch
+    //   true = prevent quiz launch
 
     global $CFG;
 
@@ -397,9 +400,20 @@ function lockdownbrowser_prevent_access_fragment_for_quiz($quiz, $fragment_type)
           && !is_null($ldbopt->monitor)
           && strlen($ldbopt->monitor) > 0
           ) {
+            /*** Trac #4594
             $ldb_message = get_string('monitor_required', 'block_lockdownbrowser');
             $ldb_quiz_type = lockdownbrowser_get_ldb_examtype_monitor();
-        } else {
+            ***/
+            $parts = explode("\n ", $ldbopt->monitor, 2);
+            $nvpair = explode("\$%@%\$", $parts[0], 2);
+            if (count($nvpair) == 2 && $nvpair[0] == "monitorEnabled" && $nvpair[1] == "false") {
+                $ldb_message = get_string('ldb_required', 'block_lockdownbrowser');
+                $ldb_quiz_type = lockdownbrowser_get_ldb_examtype_ldbonly();
+            } else { // assume Monitor is enabled
+                $ldb_message = get_string('monitor_required', 'block_lockdownbrowser');
+                $ldb_quiz_type = lockdownbrowser_get_ldb_examtype_monitor();
+            }
+        } else { // assume Monitor is not enabled
             $ldb_message = get_string('ldb_required', 'block_lockdownbrowser');
             $ldb_quiz_type = lockdownbrowser_get_ldb_examtype_ldbonly();
         }
@@ -517,7 +531,7 @@ function lockdownbrowser_prevent_access_fragment_for_quiz($quiz, $fragment_type)
     }
 
     // LDB button
-    if ($fragment_type === 1) { // LDB-autolaunch fragment
+    if (!$prevent_launch && $fragment_type === 1) { // LDB-autolaunch fragment
         $launch_url = lockdownbrowser_autolaunch_url_for_quiz($quiz);
         $script = "<script>";
         if ($is_ipad === true) {
