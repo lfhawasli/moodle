@@ -190,3 +190,6 @@
 [submodule "report/benchmark"]
 	path = report/benchmark
 	url = https://github.com/mikasmart/benchmark
+[submodule "enrol/auto"]
+	path = enrol/auto
+	url = https://github.com/bynare/moodle-enrol_auto
