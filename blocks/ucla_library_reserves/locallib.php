@@ -94,3 +94,15 @@ function construct_lti_config() {
     $toolconfig->id = 0; // Property $toolconfig->id is an optional param in mod/lti/return.php, default to 0.
     return $toolconfig;
 }
+
+/**
+ * Checks if user can access course reserves.
+ *
+ * @param int $courseid
+ * @return bool
+ */
+function can_request_course_reserves(int $courseid) {
+    $caneditcourse = has_capability('format/ucla:viewadminpanel',
+        context_course::instance($courseid, MUST_EXIST));
+    return $caneditcourse;
+}

@@ -35,13 +35,38 @@ init_pagex($course, $context, $url, BLOCK_UCLA_LIBRARY_RESERVES_LIB_RESERVES);
 echo $OUTPUT->header();
 print_library_tabs(get_string('coursereserves', 'block_ucla_library_reserves'), $course->id);
 
-// TODO: Get the links.
-// $reserves = $DB->get_records('ucla_library_reserves', array('courseid' => $course->id));
-// foreach ($reserves as $reserve) {
-//     echo $reserve->url;
-// }
+if (can_request_course_reserves($course->id)) {
+    // TODO: Check for if the reserve exists or not.
+    if (false) {
+        display_course_reserves($course);
+    } else {
+        $nocourseres = html_writer::start_tag('div', array('class' => 'alert alert-danger'));
+        $nocourseres .= html_writer::div(get_string('courseresnotavailable', 'block_ucla_library_reserves'));
+        $nocourseres .= html_writer::end_tag('div');
+        echo $nocourseres;
+    }
+    // Show request link no matter what as long as you have permission to view it.
+    echo html_writer::empty_tag('br');
+    echo html_writer::link('https://www.library.ucla.edu/use/borrow-renew-return/course-reserves/information-instructors',
+        get_string('lcrequest', 'block_ucla_library_reserves'));
+    // Show feedback link.
+    echo html_writer::empty_tag('br');
+    echo html_writer::link('http://ucla.libsurveys.com/rg-feedback',
+            get_string('libraryfeedback', 'block_ucla_library_reserves'));
+} else {
+    echo get_string('nopermissionmsg', 'block_ucla_library_reserves');
+}
 
 echo $OUTPUT->footer();
 
 // Log student view.
-\block_ucla_library_reserves\event\coursereserves_index_viewed::create(array('context' => $context))->trigger();
+\block_ucla_library_reserves\event\coursereserves_index_viewed::create(array('context' => $context))->trigger(); 
+
+// TODO: Function to display the course reserves if there are any.
+function display_course_reserves($course) {
+    // TODO: Get the links.
+    // $reserves = $DB->get_records('ucla_library_reserves', array('courseid' => $course->id));
+    // foreach ($reserves as $reserve) {
+    //    echo $reserve->url;
+    // }
+}

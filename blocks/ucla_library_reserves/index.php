@@ -64,6 +64,13 @@ echo '<iframe id="contentframe" height="600px" width="100%" src="launch.php?id='
         </script>
 ';
 echo $resize;
+
+if (can_request_course_reserves($course->id)) {
+    // Show feedback link.
+    echo html_writer::empty_tag('br');
+    echo html_writer::link('http://ucla.libsurveys.com/rg-feedback',
+            get_string('libraryfeedback', 'block_ucla_library_reserves'));
+}
 echo $OUTPUT->footer();
 
 // Log student view.

@@ -52,3 +52,11 @@ $string['ltisecretlibraryreserves'] = 'Shared secret';
 $string['ltisecretlibraryreserveshelp'] = 'The shared secret can be thought of as a password used to authenticate access to the tool. 
 
 It should be provided along with the consumer key from the tool provider.';
+
+// Library resources feedback.
+$string['libraryfeedback'] = 'Library resources feedback';
+
+// Course reserves request reserves.
+$string['courseresnotavailable'] = "There are no library reserves for this course.";
+$string['lcrequest'] = 'Request library reserves';
+$string['nopermissionmsg'] = 'You do not have permission to access this tab.';
