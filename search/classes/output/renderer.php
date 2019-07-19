@@ -61,10 +61,18 @@ class renderer extends \plugin_renderer_base {
         $perpage = \core_search\manager::DISPLAY_RESULTS_PER_PAGE;
         $content = $this->output->paging_bar($totalcount, $page, $perpage, $url);
 
+        // START UCLA MOD: CCLE-8501 - Search terms are not highlighted.
+        // Get the search query from the url.
+        $query = $url->get_param('q');
+        // END UCLA MOD: CCLE-8501.
+
         // Results.
         $resultshtml = array();
         foreach ($results as $hit) {
-            $resultshtml[] = $this->render_result($hit);
+            // START UCLA MOD: CCLE-8501 - Search terms are not highlighted.
+            // $resultshtml[] = $this->render_result($hit);
+            $resultshtml[] = $this->render_result($hit, $query);
+            // END UCLA MOD: CCLE-8501.
         }
         $content .= \html_writer::tag('div', implode('<hr/>', $resultshtml), array('class' => 'search-results'));
 
@@ -78,9 +86,15 @@ class renderer extends \plugin_renderer_base {
      * Displaying search results.
      *
      * @param \core_search\document Containing a single search response to be displayed.a
+     * // START UCLA MOD: CCLE-8501 - Search terms are not highlighted.
+     * @param string Containing the search query to be highlighted
+     * // END UCLA MOD: CCLE-8501.
      * @return string HTML
      */
-    public function render_result(\core_search\document $doc) {
+    // START UCLA MOD: CCLE-8501 - Search terms are not highlighted.
+    // public function render_result(\core_search\document $doc) {
+    public function render_result(\core_search\document $doc, string $query) {
+    // END UCLA MOD: CCLE-8501.
         $docdata = $doc->export_for_template($this);
 
         // Limit text fields size.
