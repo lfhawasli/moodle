@@ -42,3 +42,6 @@ print_library_tabs(get_string('coursereserves', 'block_ucla_library_reserves'), 
 // }
 
 echo $OUTPUT->footer();
+
+// Log student view.
+\block_ucla_library_reserves\event\coursereserves_index_viewed::create(array('context' => $context))->trigger();

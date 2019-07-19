@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version    = 2017092800;
+defined('MOODLE_INTERNAL') || die;
+
+$plugin->version    = 2019072200;
 $plugin->requires   = 2010112400;
 $plugin->component = 'block_ucla_library_reserves';

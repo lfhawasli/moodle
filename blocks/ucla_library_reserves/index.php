@@ -65,3 +65,6 @@ echo '<iframe id="contentframe" height="600px" width="100%" src="launch.php?id='
 ';
 echo $resize;
 echo $OUTPUT->footer();
+
+// Log student view.
+\block_ucla_library_reserves\event\researchguide_index_viewed::create(array('context' => $context))->trigger();

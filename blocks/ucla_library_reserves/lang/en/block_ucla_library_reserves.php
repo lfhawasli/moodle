@@ -30,6 +30,9 @@ $string['title'] = 'Library reserves';
 
 $string['researchguide'] = 'Research guide';
 $string['coursereserves'] = 'Course reserves';
+// Event names for logging.
+$string['eventresearchguideindexviewed'] = 'Research guide index viewed';
+$string['eventcoursereservesindexviewed'] = 'Course reserves index viewed';
 // Library reserves LTI tool name.
 $string['ltinamelibraryreserves'] = 'Tool name';
 $string['ltinamelibraryreserveshelp'] = 'The tool name is used to identify the tool provider within Moodle. The name entered will be visible to teachers when adding external tools within courses.';
