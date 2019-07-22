@@ -430,7 +430,7 @@ abstract class grade_report {
     //     global $OUTPUT;
     //     $pix = array('up' => 't/sort_desc', 'down' => 't/sort_asc', 'move' => 't/sort');
     //     $matrix = array('up' => 'desc', 'down' => 'asc', 'move' => 'desc');
-    protected function get_sort_arrow($direction='move', $sortlink=null, $nextdirection='desc') {
+    protected function get_sort_arrow($direction='move', $sortlink=null, $nextdirection='asc') {
         global $OUTPUT;
         $pix = array('up' => 't/sort_asc', 'down' => 't/sort_desc', 'move' => 't/sort');
         $matrix = array('up' => 'desc', 'down' => 'asc', 'move' => $nextdirection);

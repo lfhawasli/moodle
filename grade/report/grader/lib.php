@@ -367,19 +367,25 @@ class grade_report_grader extends grade_report {
 
         if ($this->sortitemid) {
             if (!isset($SESSION->gradeuserreport->sort)) {
-                if ($this->sortitemid == 'firstname' || $this->sortitemid == 'lastname') {
-                    $this->sortorder = $SESSION->gradeuserreport->sort = 'ASC';
-                } else {
-                    $this->sortorder = $SESSION->gradeuserreport->sort = 'DESC';
-                }
+                // START UCLA MOD: CCLE-8541 - Grader report: Sorting arrows should first be ascending order.
+                // if ($this->sortitemid == 'firstname' || $this->sortitemid == 'lastname') {
+                //     $this->sortorder = $SESSION->gradeuserreport->sort = 'ASC';
+                // } else {
+                //     $this->sortorder = $SESSION->gradeuserreport->sort = 'DESC';
+                // }
+                $this->sortorder = $SESSION->gradeuserreport->sort = 'ASC';
+                // END UCLA MOD: CCLE-8541.
             } else {
                 // this is the first sort, i.e. by last name
                 if (!isset($SESSION->gradeuserreport->sortitemid)) {
-                    if ($this->sortitemid == 'firstname' || $this->sortitemid == 'lastname') {
-                        $this->sortorder = $SESSION->gradeuserreport->sort = 'ASC';
-                    } else {
-                        $this->sortorder = $SESSION->gradeuserreport->sort = 'DESC';
-                    }
+                    // START UCLA MOD: CCLE-8541 - Grader report: Sorting arrows should first be ascending order.
+                    // if ($this->sortitemid == 'firstname' || $this->sortitemid == 'lastname') {
+                    //     $this->sortorder = $SESSION->gradeuserreport->sort = 'ASC';
+                    // } else {
+                    //     $this->sortorder = $SESSION->gradeuserreport->sort = 'DESC';
+                    // }
+                    $this->sortorder = $SESSION->gradeuserreport->sort = 'ASC';
+                    // END UCLA MOD: CCLE-8541.
                 } else if ($SESSION->gradeuserreport->sortitemid == $this->sortitemid) {
                     // same as last sort
                     if ($SESSION->gradeuserreport->sort == 'ASC') {
@@ -388,11 +394,14 @@ class grade_report_grader extends grade_report {
                         $this->sortorder = $SESSION->gradeuserreport->sort = 'ASC';
                     }
                 } else {
-                    if ($this->sortitemid == 'firstname' || $this->sortitemid == 'lastname') {
-                        $this->sortorder = $SESSION->gradeuserreport->sort = 'ASC';
-                    } else {
-                        $this->sortorder = $SESSION->gradeuserreport->sort = 'DESC';
-                    }
+                    // START UCLA MOD: CCLE-8541 - Grader report: Sorting arrows should first be ascending order.
+                    // if ($this->sortitemid == 'firstname' || $this->sortitemid == 'lastname') {
+                    //     $this->sortorder = $SESSION->gradeuserreport->sort = 'ASC';
+                    // } else {
+                    //     $this->sortorder = $SESSION->gradeuserreport->sort = 'DESC';
+                    // }
+                    $this->sortorder = $SESSION->gradeuserreport->sort = 'ASC';
+                    // END UCLA MOD: CCLE-8541.
                 }
             }
             $SESSION->gradeuserreport->sortitemid = $this->sortitemid;
@@ -2065,7 +2074,10 @@ class grade_report_grader extends grade_report {
                     $direction = 'down';
                 }
             } else {
-                $title = $strsortdesc;
+                // START UCLA MOD: CCLE-8541 - Grader report: Sorting arrows should first be ascending order.
+                // $title = $strsortdesc;
+                $title = $strsortasc;
+                // END UCLA MOD: CCLE-8541.
                 $direction = 'move';
             }
             $arrows[$field] = html_writer::link($url, get_user_field_name($field), array('title' => $title));
