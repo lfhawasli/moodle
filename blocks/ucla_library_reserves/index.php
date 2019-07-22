@@ -25,6 +25,7 @@
 require_once(dirname(__FILE__).'/../../config.php');
 require_once($CFG->dirroot.'/blocks/ucla_library_reserves/locallib.php');
 
+$courseshortname = optional_param('courseshortname', '', PARAM_TEXT);
 $course = get_course(required_param('courseid', PARAM_INT));
 $url = new moodle_url('/blocks/ucla_library_reserves/index.php', array('courseid' => $course->id));
 $context = context_course::instance($course->id, MUST_EXIST);
@@ -37,33 +38,7 @@ echo $OUTPUT->header();
 print_library_tabs(get_string('researchguide', 'block_ucla_library_reserves'), $course->id);
 $PAGE->set_pagelayout('incourse');
 
-echo '<iframe id="contentframe" height="600px" width="100%" src="launch.php?id='.$course->id.'"webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
-
-    // Output script to make the iframe tag be as large as possible.
-    $resize = '
-        <script type="text/javascript">
-        //<![CDATA[
-            YUI().use("node", "event", function(Y) {
-                var doc = Y.one("body");
-                var frame = Y.one("#contentframe");
-                var padding = 15; //The bottom of the iframe wasn\'t visible on some themes. Probably because of border widths, etc.
-                var lastHeight;
-                var resize = function(e) {
-                    var viewportHeight = doc.get("winHeight");
-                    if(lastHeight !== Math.min(doc.get("docHeight"), viewportHeight)){
-                        frame.setStyle("height", viewportHeight - frame.getY() - padding + "px");
-                        lastHeight = Math.min(doc.get("docHeight"), doc.get("winHeight"));
-                    }
-                };
-
-                resize();
-
-                Y.on("windowresize", resize);
-            });
-        //]]
-        </script>
-';
-echo $resize;
+show_research_guide($course->id, $courseshortname);
 
 if (can_request_course_reserves($course->id)) {
     // Show feedback link.
@@ -71,6 +46,7 @@ if (can_request_course_reserves($course->id)) {
     echo html_writer::link('http://ucla.libsurveys.com/rg-feedback',
             get_string('libraryfeedback', 'block_ucla_library_reserves'));
 }
+
 echo $OUTPUT->footer();
 
 // Log student view.

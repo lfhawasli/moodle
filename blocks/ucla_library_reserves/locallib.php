@@ -25,6 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 define('BLOCK_UCLA_LIBRARY_RESERVES_LIB_GUIDE', 1);
 define('BLOCK_UCLA_LIBRARY_RESERVES_LIB_RESERVES', 2);
+require_once($CFG->dirroot.'/local/ucla/lib.php');
+require_once($CFG->dirroot.'/admin/tool/uclacoursecreator/uclacoursecreator.class.php');
 
 function init_pagex($course, $context, $url, $mode = null, $title = null) {
     global $PAGE;
@@ -105,4 +107,110 @@ function can_request_course_reserves(int $courseid) {
     $caneditcourse = has_capability('format/ucla:viewadminpanel',
         context_course::instance($courseid, MUST_EXIST));
     return $caneditcourse;
+}
+/**
+ * Print the tabs under "reserach guide" tab for crosslisted courses.
+ * @param array   $courseinfo An array of stdClass object containing course info such as subject area/course number.
+ * @param int $courseid The course id of the given course context.
+ * @param string $activetab The string serves as id of the crossslisted course tab being clicked on.
+ */
+function print_research_tabs($courseinfo, $courseid, $activetab) {
+    $tabs = array();
+    foreach ($courseinfo as $course) {
+        $coursenamedisplay = $course->subj_area.' '.$course->coursenum;
+        $courseshortname = uclacoursecreator::make_course_shortname($course);
+        if ($course->hostcourse == 1 && $activetab == '') {
+            $activetab = $courseshortname;
+        }
+        // Here, $courseshortname serves as the id of a tab.
+        $tabs[] = new tabobject($courseshortname,
+        new moodle_url('/blocks/ucla_library_reserves/index.php',
+        array('courseid' => $courseid, 'courseshortname' => $courseshortname)),
+        $coursenamedisplay);
+    }
+    print_tabs(array($tabs), $activetab);
+}
+
+/**
+ * Display some information about research guide and crosslisted course between "Research guide" tab and crosslisted tabs.
+ * @param bool   $iscrosslisted A boolean . If the current course is a crosslisted course.
+ */
+function info_display($iscrosslisted) {
+    $infodisplay = html_writer::start_tag('div', array('class' => 'alert alert-info'));
+    $infodisplay .= html_writer::div(get_string('researchguidegeneral', 'block_ucla_library_reserves'));
+    if ($iscrosslisted) {
+        $infodisplay .= html_writer::tag('hr', '');
+        $infodisplay .= html_writer::div(get_string('reserachguidecrosslistedcourse', 'block_ucla_library_reserves'));
+    }
+    $infodisplay .= html_writer::end_tag('div');
+    echo $infodisplay;
+}
+
+/**
+ * From the given coursesectioninfo array, remove courses with the same subject area/course number.
+ * @param array   $coursesectioninfo An array of stdClass object containing all course sections getting from a particular course id.
+ * @return bool An array of stdClass object containing course info with nonduplicated subject area/course number.
+ */
+function get_unique_course($coursesectioninfo) {
+    $coursenamecache = array();
+    foreach ($coursesectioninfo as $course) {
+        $coursename = $course->subj_area.' '.$course->coursenum;
+        if (in_array($coursename, $coursenamecache)) {
+            unset($coursesectioninfo[array_search($course, $coursesectioninfo)]);
+        } else {
+            array_push($coursenamecache, $coursename);
+        }
+    }
+    return $coursesectioninfo;
+}
+
+/**
+ * Show the research guide under library reserves section.
+ * @param int   $courseid An integer representing the course id of the current course.
+ * @param string $activetab The string serves as id of the crossslisted course tab being clicked on..
+ */
+function show_research_guide($courseid, $activetab) {
+    global $OUTPUT;
+    $coursesectioninfo = ucla_get_course_info($courseid);
+    $courseinfo = get_unique_course($coursesectioninfo);
+    $crosslistedtab = (count($courseinfo) > 1);
+    info_display($crosslistedtab);
+    if ($crosslistedtab) {
+        print_research_tabs($courseinfo, $courseid, $activetab);
+    }
+    get_iframe($courseid, $activetab);
+}
+
+/**
+ * Generate an iframe that displays the page sent by library reserve LTI tool.
+ * @param int   $id An integer representing the course id of the current course.
+ * @param string $sn The string representing the course shortname of the tab being clicked on. Same as tab id since we use short name as tab id. sn for shortname.
+ */
+function get_iframe($id, $sn='') {
+    echo '<iframe id="contentframe" height="600px" width="100%" src="launch.php?shortname='.$sn.'&id='.$id.'"webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+    // Output script to make the iframe tag be as large as possible.
+    $resize = '
+        <script type="text/javascript">
+        //<![CDATA[
+            YUI().use("node", "event", function(Y) {
+                var doc = Y.one("body");
+                var frame = Y.one("#contentframe");
+                var padding = 15; //The bottom of the iframe wasn\'t visible on some themes. Probably because of border widths, etc.
+                var lastHeight;
+                var resize = function(e) {
+                    var viewportHeight = doc.get("winHeight");
+                    if(lastHeight !== Math.min(doc.get("docHeight"), viewportHeight)){
+                        frame.setStyle("height", viewportHeight - frame.getY() - padding + "px");
+                        lastHeight = Math.min(doc.get("docHeight"), doc.get("winHeight"));
+                    }
+                };
+
+                resize();
+
+                Y.on("windowresize", resize);
+            });
+        //]]
+        </script>
+';
+    echo $resize;
 }

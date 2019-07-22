@@ -27,11 +27,15 @@ require_once($CFG->dirroot.'/mod/lti/locallib.php');
 require_once($CFG->dirroot.'/blocks/ucla_library_reserves/locallib.php');
 
 $id = required_param('id', PARAM_INT); // Course ID.
+$shortname = optional_param('shortname', '', PARAM_TEXT);
 $placement = 'activity';
 $lti = construct_lti_config();
 $lti->course = $id;
 $course = get_course($id);
 require_login($course);
+if ($shortname != '') {
+    $course->shortname = $shortname;
+}
 $PAGE->set_course($course);
 lti_launch_tool($lti, $placement);
 
