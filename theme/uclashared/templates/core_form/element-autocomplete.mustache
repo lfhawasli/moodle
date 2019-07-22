@@ -1,5 +1,6 @@
 {{!
     UCLA MOD: CCLE-7719 - Overriding boost templates to add allowcommas config.
+    UCLA MOD: CCLE-8500 - Overriding boost templates to add closeSuggestionsOnSelect config.
 }}
 
 {{< core_form/element-template }}
@@ -44,7 +45,7 @@ require(['core/form-autocomplete'], function(module) {
                    {{! START UCLA MOD: CCLE-7719 - Fix manual enrollment search.}}
                    {{!{{#quote}\}{{element.noselectionstring}\}{{/quote}\},}}
                    {{#quote}}{{element.noselectionstring}}{{/quote}},
-                   null,
+                   {{element.closesuggestionsonselect}},
                    {{element.allowcommas}});
                    {{! END UCLA MOD: CCLE-7719.}}
 });

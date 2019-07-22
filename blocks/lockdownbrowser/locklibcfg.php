@@ -1,7 +1,7 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
-// Copyright (c) 2011-2018 Respondus, Inc.  All Rights Reserved.
-// Date: September 12, 2018.
+// Copyright (c) 2011-2019 Respondus, Inc.  All Rights Reserved.
+// Date: February 14, 2019.
 
 // ----- never edit these
 // START UCLA MOD: CCLE-4027 - Install and evaluate Respondus
@@ -11,9 +11,8 @@ define('LDB_SERVERSECRET', '');
 // END UCLA MOD: CCLE-4027
 define('LDB_SERVERID', '228644488');
 define('LDB_SERVERTYPE', '0');
-define('LDB_DOWNLOAD', 'https://www.respondus.com/lockdown/download.php?id=228644488');
+define('LDB_DOWNLOAD', 'https://download.respondus.com/lockdown/download.php?id=228644488');
 // to remove link: define('LDB_DOWNLOAD', '');
-
 
 // ----- edit these only if your server is nonstandard
 // editing these will break the plugin!

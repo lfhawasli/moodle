@@ -103,6 +103,12 @@ class MoodleQuickForm_autocomplete extends MoodleQuickForm_select {
             unset($attributes['allowcommas']);
         }
         // END UCLA MOD: CCLE-7719.
+        // START UCLA MOD: CCLE-8500 - Make search results disappear on select.
+        if (isset($attributes['closesuggestionsonselect'])) {
+            $this->closesuggestionsonselect = $attributes['closesuggestionsonselect'];
+            unset($attributes['closesuggestionsonselect']);
+        }
+        // END UCLA MOD: CCLE-8500.
         if (isset($attributes['valuehtmlcallback'])) {
             $this->valuehtmlcallback = $attributes['valuehtmlcallback'];
             unset($attributes['valuehtmlcallback']);
@@ -248,6 +254,9 @@ class MoodleQuickForm_autocomplete extends MoodleQuickForm_select {
         // START UCLA MOD: CCLE-7719 - Fix manual enrollment search.
         $context['allowcommas'] = isset($this->allowcommas) ? $this->allowcommas : false;
         // END UCLA MOD: CCLE-7719.
+        // START UCLA MOD: CCLE-8500 - Make search results disappear on select.
+        $context['closesuggestionsonselect'] = isset($this->closesuggestionsonselect) ? $this->closesuggestionsonselect : false;
+        // END UCLA MOD: CCLE-8500.
         if ($this->valuehtmlcallback) {
             foreach ($context['options'] as &$option) {
                 $value = $option['value'];

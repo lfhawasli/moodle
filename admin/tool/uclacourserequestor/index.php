@@ -593,6 +593,11 @@ if ($processrequests) {
     $requeststable->head = $possfields;
     $requeststable->data = $tabledata;
 
+    // START UCLA MOD: CCLE-8021 - Freeze header in UCLA course requester.
+    $requeststable->attributes['class'] = 'generaltable stickyheader';
+    $PAGE->requires->js('/local/ucla/js/stickyheader.js');
+    // END UCLA MOD: CCLE-8021.
+
     // For errors and class types.
     $requeststable->rowclasses = $rowclasses;
 }
