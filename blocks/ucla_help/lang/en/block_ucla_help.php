@@ -31,6 +31,7 @@ $string['name_field'] = 'Name';
 $string['email_field'] = 'Email';
 $string['course_field'] = 'Course';
 $string['description_field'] = 'Details';
+$string['type_field'] = 'Type';
 
 $string['submit_button'] = 'Submit';
 
@@ -41,11 +42,15 @@ $string['error_empty_description'] = 'A description is required to send a report
 $string['helpbox_header'] = 'Help/Feedback';
 $string['helpbox_text_default'] = 'Please use the settings option of the help block to set what displays in the Help Box';
 
-$string['helpform_header'] = 'Report a problem';
-$string['helpform_text'] = 'Use the form below to report a problem or error.';
+$string['helpform_header'] = 'Report a problem/feedback';
+$string['helpform_text'] = 'Use the form below to report a problem, error, feedback, or suggestions.';
 $string['helpform_alternative'] = 'CCLE uses your official email address. {$a->students} can change it at MyUCLA and {$a->facultystaff} can change it through their directory coordinator.';
 
 $string['helpform_upload'] = 'Upload a file';
+
+// Report type.
+$string['type_bug'] = 'Problem/error';
+$string['type_feature'] = 'Feedback/suggestion';
 
 // Used by message being sent.
 $string['message_header'] = 'CCLE Help: {$a}';
@@ -95,7 +100,8 @@ $string['error_emptysystemcontext'] = 'Please enter a value for the "System" sup
 $string['error_sending_message'] = 'Sorry, there was a problem with sending your report. Please try again later.';
 
 // Success messages.
-$string['success_sending_message'] = 'Thank you for contacting us. Your issue has been forwarded to your local support.';
+$string['success_message_localsupport'] = 'Thank you for contacting us. Your issue has been forwarded to your local support.';
+$string['success_message_cclehome'] = 'Thank you for contacting us. Your issue has been forwarded to CCLE support.';
 
 // Side block strings.
 $string['hidehelp'] = 'Hide help/legend';

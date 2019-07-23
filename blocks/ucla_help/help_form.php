@@ -92,6 +92,12 @@ class help_form extends moodleform {
             $mform->hardFreeze('ucla_help_course');
         }
 
+        $radioreporttype=array();
+        $radioreporttype[] = $mform->createElement('radio', 'ucla_help_reporttype', '', get_string('type_bug', 'block_ucla_help'), 0, '');
+        $radioreporttype[] = $mform->createElement('radio', 'ucla_help_reporttype', '', get_string('type_feature', 'block_ucla_help'), 1, '');
+        $mform->addGroup($radioreporttype, 'ucla_help_radioreporttype', get_string('type_field', 'block_ucla_help'), array(' '), false);
+        $mform->setDefault('ucla_help_reporttype', 0);
+
         $mform->addElement('textarea', 'ucla_help_description',
                 get_string("description_field", "block_ucla_help"),
                 'wrap="virtual" rows="6"');
