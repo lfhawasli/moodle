@@ -562,6 +562,7 @@ if ($data && !empty($sectionsnotify) && !$verifydata) {
         'autocomplete' => 'off', 'action' => $PAGE->url->out(), 'method' => 'post', 'accept-charset' => 'utf-8'));
     echo html_writer::start_tag('div', array('class' => 'container-fluid'));
     echo html_writer::table($tablestructure);
+    echo html_writer::end_tag('div');
     echo html_writer::end_tag('form');
 
     $modifycoursemenuform->display();
