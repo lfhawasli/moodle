@@ -363,6 +363,9 @@ $CFG->forced_plugin_settings['tool_uclaseniorscholar']['seniorscholarsupportemai
 $CFG->forced_plugin_settings['antivirus_clamav']['pathtoclam'] = '/usr/bin/clamscan';
 $CFG->forced_plugin_settings['antivirus_clamav']['clamfailureonupload'] = 'donothing';
 
+// Site administration > Plugins > Enrollments > Auto enrollment
+$CFG->forced_plugin_settings['enrol_auto']['defaultenrol'] = 0;
+
 // Site administration > Plugins > Enrollments > UCLA registrar
 $CFG->forced_plugin_settings['local_ucla']['overrideenroldatabase'] = 1;
 

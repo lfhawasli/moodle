@@ -401,6 +401,9 @@ $CFG->forced_plugin_settings['tool_recyclebin']['coursebinexpiry'] = 1209600;
 $CFG->forced_plugin_settings['tool_recyclebin']['categorybinexpiry'] = 1209600;
 $CFG->forced_plugin_settings['tool_recyclebin']['autohide'] = 0;
 
+// Site administration > Plugins > Enrollments > Auto enrollment
+$CFG->forced_plugin_settings['enrol_auto']['defaultenrol'] = 0;
+
 // Site administration > Plugins > Enrollments > UCLA registrar
 $CFG->forced_plugin_settings['local_ucla']['overrideenroldatabase'] = 1;
 
