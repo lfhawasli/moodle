@@ -178,16 +178,16 @@ function show_research_guide($courseid, $activetab) {
     if ($crosslistedtab) {
         print_research_tabs($courseinfo, $courseid, $activetab);
     }
-    get_iframe($courseid, $activetab);
+    get_iframe('launch.php?shortname='.$activetab.'&id='.$courseid);
 }
 
 /**
- * Generate an iframe that displays the page sent by library reserve LTI tool.
- * @param int   $id An integer representing the course id of the current course.
- * @param string $sn The string representing the course shortname of the tab being clicked on. Same as tab id since we use short name as tab id. sn for shortname.
+ * Generate an iframe that displays the sent URL.
+ *
+ * @param string $url The URL to be displayed.
  */
-function get_iframe($id, $sn='') {
-    echo '<iframe id="contentframe" height="600px" width="100%" src="launch.php?shortname='.$sn.'&id='.$id.'"webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+function get_iframe($url) {
+    echo '<iframe id="contentframe" height="600px" width="100%" src="'.$url.'"webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
     // Output script to make the iframe tag be as large as possible.
     $resize = '
         <script type="text/javascript">

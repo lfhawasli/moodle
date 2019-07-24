@@ -35,10 +35,22 @@ init_pagex($course, $context, $url, BLOCK_UCLA_LIBRARY_RESERVES_LIB_RESERVES);
 echo $OUTPUT->header();
 print_library_tabs(get_string('coursereserves', 'block_ucla_library_reserves'), $course->id);
 
+$hostcourseurl = $DB->get_record_sql("
+        SELECT url
+          FROM {ucla_library_reserves} reserves
+          JOIN {ucla_request_classes} classes ON reserves.srs = classes.srs
+               AND reserves.quarter = classes.term
+         WHERE classes.hostcourse = 1
+               AND classes.courseid = :id", array('id' => $course->id), IGNORE_MULTIPLE);
+
 if (can_request_course_reserves($course->id)) {
-    // TODO: Check for if the reserve exists or not.
-    if (false) {
-        display_course_reserves($course);
+    if ($hostcourseurl) {
+        $hostcourseurl = $hostcourseurl->url;
+        // If link is not https, convert it to https.
+        if (!(strpos($hostcourseurl, 'https') !== false)) {
+            $hostcourseurl = preg_replace('|http://|i', 'https://', $hostcourseurl, 1);
+        }
+        get_iframe($hostcourseurl);
     } else {
         $nocourseres = html_writer::start_tag('div', array('class' => 'alert alert-danger'));
         $nocourseres .= html_writer::div(get_string('courseresnotavailable', 'block_ucla_library_reserves'));
@@ -66,13 +78,4 @@ if (can_request_course_reserves($course->id)) {
 echo $OUTPUT->footer();
 
 // Log student view.
-\block_ucla_library_reserves\event\coursereserves_index_viewed::create(array('context' => $context))->trigger(); 
-
-// TODO: Function to display the course reserves if there are any.
-function display_course_reserves($course) {
-    // TODO: Get the links.
-    // $reserves = $DB->get_records('ucla_library_reserves', array('courseid' => $course->id));
-    // foreach ($reserves as $reserve) {
-    //    echo $reserve->url;
-    // }
-}
+\block_ucla_library_reserves\event\coursereserves_index_viewed::create(array('context' => $context))->trigger();
