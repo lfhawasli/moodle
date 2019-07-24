@@ -641,6 +641,9 @@ function lti_check_updates_since(cm_info $cm, $from, $filter = array()) {
 function mod_lti_get_fontawesome_icon_map() {
     return [
         'mod_lti:warning' => 'fa-exclamation text-warning',
+        // START UCLA MOD: CCLE-6955 - LTI Apps in Course Menu Links.
+        'mod_lti:i/indent' => 'fa-level-up fa-rotate-90',
+        // END UCLA MOD: CCLE-6955.
     ];
 }
 
@@ -737,19 +740,30 @@ function mod_lti_extend_navigation_course(navigation_node $parentnode, stdClass 
     $appsnode->make_inactive();
     $appsnode = new flat_navigation_node($appsnode, 0);
     $appsnode->set_showdivider(true);
-    $appsnode = $coursenode->add_node($appsnode);
+
+    // Add 'Course apps' to node following "Add section" (if editing is on) or
+    // "Show all" (if no editing is enabled).
+    $nodekeys = $coursenode->get_children_key_list();
+    $keytofind = $PAGE->user_is_editing() ? 'addsection' : 'showall';
+    $index = array_keys($nodekeys, $keytofind);
+    $index = reset($index); // Function array_keys returns an array.
+    $beforekey = $nodekeys[$index + 1]; // Get the key right after.
+    $appsnode = $coursenode->add_node($appsnode, $beforekey);
 
     foreach ($coursemenulinks as $type) {
-        $node = $coursenode->add(
+        $node = navigation_node::create(
             $type->name,
             new moodle_url('/mod/lti/view.php', [
                 'course' => $course->id,
                 'ltitypeid' => $type->id,
             ]),
-            navigation_node::TYPE_RESOURCE
+            navigation_node::TYPE_RESOURCE,
+            null,
+            $type->id,
+            new pix_icon('i/indent', '', 'mod_lti')
         );
         $node->set_parent($appsnode);
-        $node->make_active();
+        $coursenode->add_node($node, $beforekey);
     }
 }
 // END UCLA MOD: CCLE-6955.
