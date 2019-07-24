@@ -511,6 +511,15 @@ M.block_ucla_modify_coursemenu.start = function() {
 
     bumc.set_landingpageradio_default();
 
+    $("#id_submitbutton1").click(function (e) {
+        e.preventDefault();
+        $("#id_submitbutton").click();
+    });
+    $("#id_cancelbutton1").click(function (e) {
+        e.preventDefault();
+        $("#id_cancel").click();
+    })
+
     // Form submission, transfer fake form data onto MForm fields.
     $("#id_submitbutton").click(function (e) {
         var mbumc = M.block_ucla_modify_coursemenu;

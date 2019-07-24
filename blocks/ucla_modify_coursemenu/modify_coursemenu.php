@@ -43,6 +43,7 @@ $thispath = '/blocks/ucla_modify_coursemenu';
 require_once($CFG->dirroot . $thispath . '/block_ucla_modify_coursemenu.php');
 require_once($CFG->dirroot . $thispath . '/modify_coursemenu_form.php');
 require_once($CFG->dirroot . $thispath . '/verify_modification_form.php');
+require_once($CFG->dirroot . $thispath . '/submit_form_top.php');
 
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
@@ -556,6 +557,16 @@ if ($data && !empty($sectionsnotify) && !$verifydata) {
     }
 
     $tablestructure->head = $tsheadstrs;
+
+    $submitformtop = new submit_form_top(
+        null,
+        null,
+        'post',
+        '',
+        array('class' => 'ucla_modify_coursemenu_form', 'id' => 'submit_form_top')
+    );
+
+    $submitformtop->display();
 
     // Create the table form.
     echo html_writer::start_tag('form', array('id' => 'tableform', 'class' => 'ucla_modify_coursemenu_form mform',
