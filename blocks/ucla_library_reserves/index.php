@@ -44,7 +44,8 @@ if (can_request_course_reserves($course->id)) {
     // Show feedback link.
     echo html_writer::empty_tag('br');
     echo html_writer::link('http://ucla.libsurveys.com/rg-feedback',
-            get_string('libraryfeedback', 'block_ucla_library_reserves'));
+        get_string('libraryfeedback', 'block_ucla_library_reserves'),
+        array('class'=> 'btn btn-secondary', 'role' => 'button'));
 }
 
 echo $OUTPUT->footer();

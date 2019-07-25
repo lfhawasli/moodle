@@ -48,13 +48,19 @@ if (can_request_course_reserves($course->id)) {
     // Show request link no matter what as long as you have permission to view it.
     echo html_writer::empty_tag('br');
     echo html_writer::link('https://www.library.ucla.edu/use/borrow-renew-return/course-reserves/information-instructors',
-        get_string('lcrequest', 'block_ucla_library_reserves'));
+        get_string('lcrequest', 'block_ucla_library_reserves'),
+        array('class'=> 'btn btn-primary', 'role' => 'button'));
     // Show feedback link.
+    echo html_writer::empty_tag('br'); // First <br> is of size 0x0 because of the above button.
     echo html_writer::empty_tag('br');
     echo html_writer::link('http://ucla.libsurveys.com/rg-feedback',
-            get_string('libraryfeedback', 'block_ucla_library_reserves'));
+        get_string('libraryfeedback', 'block_ucla_library_reserves'),
+        array('class'=> 'btn btn-secondary', 'role' => 'button'));
 } else {
-    echo get_string('nopermissionmsg', 'block_ucla_library_reserves');
+    $nopermission = html_writer::start_tag('div', array('class' => 'alert alert-danger'));
+    $nopermission .= html_writer::div(get_string('nopermissionmsg', 'block_ucla_library_reserves'));
+    $nopermission .= html_writer::end_tag('div');
+    echo $nopermission;
 }
 
 echo $OUTPUT->footer();
