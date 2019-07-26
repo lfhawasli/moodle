@@ -95,12 +95,15 @@ class update_librarymusicreserves extends \core\task\scheduled_task {
                         if (isset($existingmedia[$key])) {
                             // Entry exists, so update.
                             $entry->id = $existingmedia[$key];
+                            $entry->timemodified = time();
                             $DB->update_record('ucla_library_music_reserves', $entry);
                             unset($existingmedia[$key]);
                             ++$numupdated;
                         } else {
                             // Does not exist, so add.
                             try {
+                                $entry->timecreated = time();
+                                $entry->timemodified = time();
                                 $DB->insert_record('ucla_library_music_reserves', $entry);
                                 ++$numinserted;
                             } catch (\Exception $ex) {
@@ -136,12 +139,15 @@ class update_librarymusicreserves extends \core\task\scheduled_task {
                         if (isset($existingmedia[$key])) {
                             // Entry exists, so update.
                             $entry->id = $existingmedia[$key];
+                            $entry->timemodified = time();
                             $DB->update_record('ucla_library_music_reserves', $entry);
                             unset($existingmedia[$key]);
                             ++$numupdated;
                         } else {
                             // Does not exist, so add.
                             try {
+                                $entry->timecreated = time();
+                                $entry->timemodified = time();
                                 $DB->insert_record('ucla_library_music_reserves', $entry);
                                 ++$numinserted;
                             } catch (\Exception $ex) {

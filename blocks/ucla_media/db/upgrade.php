@@ -366,5 +366,29 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2019080900, 'ucla_media');
     }
 
+    if ($oldversion < 2019081600) {
+        // Define table ucla_music_reserves to add fields to.
+        $table = new xmldb_table('ucla_library_music_reserves');
+
+        // Adding field timecreated to table ucla_library_music_reserves.
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, time(), 'tracknumber');
+        
+        // Conditionally launch add field timecreated.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Adding field timemodified to table ucla_library_music_reserves.
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, time(), 'timecreated');
+        
+        // Conditionally launch add field timemodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // ucla_media savepoint reached.
+        upgrade_block_savepoint(true, 2019081600, 'ucla_media');
+    }
+
     return true;
 }
