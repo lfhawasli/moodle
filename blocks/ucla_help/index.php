@@ -154,8 +154,11 @@ if ($fromform = $mform->get_data()) {
     // Get message body.
     $body = create_help_message($fromform);
 
+    // Get report type.
+    $isfeaturereport = $fromform->ucla_help_reporttype;
+
     // Get support contact(s).
-    $supportcontacts = get_support_contact($context);
+    $supportcontacts = get_support_contact($context, $isfeaturereport);
 
     // Get uploaded attachment if there is one.
     if (isloggedin() && !isguestuser() && get_config('block_ucla_help', 'enablefileuploads')) {
@@ -179,14 +182,18 @@ if ($fromform = $mform->get_data()) {
     $result = true;
     foreach ($supportcontacts as $supportcontact) {
         if (!message_support_contact($supportcontact, $fromaddress,
-                $fromform->ucla_help_name, $header, $body, $attachmentfile, $attachmentname)) {
+                $fromform->ucla_help_name, $header, $body, $isfeaturereport, $attachmentfile, $attachmentname)) {
             $result = false;
             break;
         }
     }
 
     if (!empty($result)) {
-        echo $OUTPUT->notification(get_string('success_sending_message', 'block_ucla_help'), 'notifysuccess');
+        if ($isfeaturereport) {
+            echo $OUTPUT->notification(get_string('success_message_cclehome', 'block_ucla_help'), 'notifysuccess');
+        } else {
+            echo $OUTPUT->notification(get_string('success_message_localsupport', 'block_ucla_help'), 'notifysuccess');
+        }
     } else {
         echo $OUTPUT->notification(get_string('error_sending_message', 'block_ucla_help'), 'notifyproblem');
         // TODO: log error Send fails.
