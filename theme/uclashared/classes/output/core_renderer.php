@@ -602,6 +602,10 @@ class core_renderer extends \theme_boost\output\core_renderer {
         }
         $html .= html_writer::end_div();
 
+        if (!empty($PAGE->layout_options['search_box'])) {
+            $html .= html_writer::div($this->search_box(), 'd-inline-block float-sm-right');
+        }
+
         $html .= html_writer::end_div();
         $html .= html_writer::end_div();
         $html .= html_writer::end_div();
