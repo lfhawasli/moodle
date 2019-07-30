@@ -105,7 +105,6 @@ table.stickyheader {
 // Format course request tables.
 #uclacourserequestor_requests.generaltable {
     th, td {
-        min-width: 230px;
         text-align: center;
         vertical-align: middle !important; // Overrides the vertical-align: top in index.php for course requestor.
     }
