@@ -467,14 +467,16 @@ class ucla_syllabus_manager {
      * Returns an appropriately public or private syllabus.
      *
      * @param int $entryid
+     * @param int $strictness Strictness to pass to get_field
      * @return mixed, a public/private syllabus, or null
+     * @throws dml_exception A DML specific exception is thrown for errors getting the DB record.
      */
-    public static function instance($entryid) {
+    public static function instance($entryid, $strictness=IGNORE_MISSING) {
         global $DB;
 
         // First find access_type so we know which.
         $accesstype = $DB->get_field('ucla_syllabus', 'access_type',
-                array('id' => $entryid));
+                array('id' => $entryid), $strictness);
 
         // Cast it to the appropiate object type.
         switch ($accesstype) {
