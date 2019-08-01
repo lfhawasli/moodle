@@ -10,8 +10,7 @@
 $(document).ready(function() {
     // Stickyheader can be customized to each page, identified by id of body.
     var body_id = {
-        'page-admin-roles-allow': false,
-        'page-blocks-ucla_modify_coursemenu-modify_coursemenu': false
+        'page-admin-roles-allow': false
     }
 
     body_id[$('body').attr('id')] = true;
@@ -48,7 +47,7 @@ $(document).ready(function() {
         // Leave some space for gutter on right side.
         let tablewidth = viewportwidth - 50;
 
-        if (body_id['page-admin-roles-allow'] || body_id['page-admin-uclacourserequestor']) {
+        if (body_id['page-admin-roles-allow']) {
             $('table.stickyheader').css("width", tablewidth);
             $('.stickyheader thead').css("width", tablewidth);
             $('.stickyheader tbody').css("width", tablewidth);
@@ -59,7 +58,7 @@ $(document).ready(function() {
 
     window.addEventListener('load', resizeTable, false);
 
-    if (body_id['page-admin-roles-allow'] || body_id['page-admin-uclacourserequestor']) {
+    if (body_id['page-admin-roles-allow']) {
         window.addEventListener('resize', resizeTable, false);
     }
 });

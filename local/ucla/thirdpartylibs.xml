@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <libraries>
     <library>
-        <location>admin/tool/uclacourserequestor/js/jquery.stickytableheaders.min.js</location>
+        <location>local/ucla/js/jquery.stickytableheaders.min.js</location>
         <name>StickyTableHeaders</name>
         <version>0.1.24</version>
         <license>MIT</license>

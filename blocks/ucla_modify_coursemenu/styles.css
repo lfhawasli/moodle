@@ -9,13 +9,19 @@
 
 #sections-table thead .header {
     filter: progid:DXImageTransform.Microsoft.gradient(GradientType=0, startColorstr=#ffb300, endColorstr=#fddf96); /* for IE */
-    background-image: -webkit-linear-gradient(top, rgba(254, 187, 54, 0.7), rgba(253, 223, 150, 0.7)); /* for webkit browsers */
-    background-image: -moz-linear-gradient(top, rgba(254, 187, 54, 0.7), rgba(253, 223, 150, 0.7)); /* for firefox 3.6+ */
-    background-image: -o-linear-gradient(top, rgba(254, 187, 54, 0.7), rgba(253, 223, 150, 0.7)); /* for opera */
+    background-image: -webkit-linear-gradient(top, rgba(254, 187, 54, 1), rgba(253, 223, 150, 1)); /* for webkit browsers */
+    background-image: -moz-linear-gradient(top, rgba(254, 187, 54, 1), rgba(253, 223, 150, 1)); /* for firefox 3.6+ */
+    background-image: -o-linear-gradient(top, rgba(254, 187, 54, 1), rgba(253, 223, 150, 1)); /* for opera */
     font-size: larger;
     border: 0;
     padding-top: 3px;
     padding-bottom: 3px;
+    text-align: center;
+}
+
+/* All cells are center-aligned except for the Title column. */
+#sections-table .c2 {
+    text-align: left !important;
 }
 
 #sections-table .section-row {

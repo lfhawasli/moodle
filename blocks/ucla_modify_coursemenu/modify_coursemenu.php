@@ -49,6 +49,7 @@ require_once($CFG->dirroot . '/local/ucla/lib.php');
 
 global $CFG, $PAGE, $OUTPUT;
 
+
 $courseid = required_param('courseid', PARAM_INT);
 
 // Carry the previously viewed section over and adjust it if it moves
@@ -97,7 +98,6 @@ $restr = get_string('pluginname', 'block_ucla_modify_coursemenu');
 $PAGE->set_title("$course->shortname: $restr");
 $PAGE->set_heading($course->fullname);
 
-$PAGE->requires->js('/local/ucla/js/stickyheader.js');
 // Before loading modinfo, make sure section information is correct.
 local_ucla_course_section_fixer::fix_problems($course);
 
@@ -497,6 +497,8 @@ $PAGE->requires->string_for_js('landingpagebydatessequential', 'block_ucla_modif
 $PAGE->requires->string_for_js('landingpagebydatesstartoverlap', 'block_ucla_modify_coursemenu');
 $PAGE->requires->string_for_js('landingpagebydatesrangeoverlap', 'block_ucla_modify_coursemenu');
 
+$PAGE->requires->js('/local/ucla/js/jquery.stickytableheaders.min.js');
+
 // Load other things here for consistency.
 $maintableid = block_ucla_modify_coursemenu::MAINTABLE_DOMNODE;
 block_ucla_modify_coursemenu::many_js_init_code_helpers(array(
@@ -537,7 +539,6 @@ if ($data && !empty($sectionsnotify) && !$verifydata) {
 } else {
     $tablestructure = new html_table();
     $tablestructure->id = $maintableid;
-    $tablestructure->attributes['class'] = 'generaltable stickyheader';
 
     // Basics.
     $tshead = array('', 'section', 'title', 'hide', 'delete');
@@ -571,7 +572,6 @@ if ($data && !empty($sectionsnotify) && !$verifydata) {
     // Create the table form.
     echo html_writer::start_tag('form', array('id' => 'tableform', 'class' => 'ucla_modify_coursemenu_form mform',
         'autocomplete' => 'off', 'action' => $PAGE->url->out(), 'method' => 'post', 'accept-charset' => 'utf-8'));
-    echo html_writer::start_tag('div', array('class' => 'container-fluid'));
     echo html_writer::table($tablestructure);
     echo html_writer::end_tag('div');
     echo html_writer::end_tag('form');
@@ -580,6 +580,8 @@ if ($data && !empty($sectionsnotify) && !$verifydata) {
 }
 
 echo $OUTPUT->footer();
+echo html_writer::nonempty_tag('script', '$("table").stickyTableHeaders();');
+echo html_writer::nonempty_tag('script', '$("table").stickyTableHeaders({fixedOffset: 40});');
 
 /**
  * This function is a part of the "Landing Page by Dates" option. It
