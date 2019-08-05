@@ -438,13 +438,14 @@ function create_help_message(&$fromform) {
  * @param string $fromname          Optional. Requestor name.
  * @param string $subject           Email subject
  * @param string $body              Email body
+ * @param boolean $isfeaturereport  Is report type a feature request.
  * @param string $attachmentfile    Path to file
  * @param string $attachmentname    Name of attachment
  *
  * @return boolean                  Returns false on error, otherwise true.
  */
 function message_support_contact($supportcontact, $from=null, $fromname=null,
-                                 $subject, $body, $attachmentfile=null, $attachmentname=null) {
+                                 $subject, $body, $isfeaturereport, $attachmentfile=null, $attachmentname=null) {
     global $CFG, $DB, $USER;
 
     $result = false;
@@ -498,6 +499,11 @@ function message_support_contact($supportcontact, $from=null, $fromname=null,
         $result = email_to_user($touser, $fromuser, $subject, $body, '',
                         $attachmentfile, $attachmentname);
     } else if (!empty($supportcontact)) {
+        $labels = array();
+        if ($isfeaturereport) {
+            $labels[] = 'feature-request';
+        }
+
         // Send message via JIRA.
         $params = array(
             'fields' => array(
@@ -506,7 +512,8 @@ function message_support_contact($supportcontact, $from=null, $fromname=null,
                 'summary' => $subject,
                 'assignee' => array('name' => $supportcontact),
                 'reporter' => array('name' => $supportcontact),
-                'description' => $body
+                'description' => $body,
+                'labels' => $labels
             )
         );
 
@@ -532,14 +539,15 @@ function message_support_contact($supportcontact, $from=null, $fromname=null,
  *
  * @see support_contacts_manager
  *
- * @param object $curcontext    Current context object
+ * @param object $curcontext          Current context object
+ * @param boolean $isfeaturereport    Is report type a feature request.
  *
  * @return array                Returns an array of support contacts matching
  *                              most specific context first until it reaches the
  *                              "System" context. Can be a mix of email or JIRA
  *                              users.
  */
-function get_support_contact($curcontext) {
+function get_support_contact($curcontext, $isfeaturereport) {
     $retval = null;
 
     // Get support contacts.
@@ -561,7 +569,7 @@ function get_support_contact($curcontext) {
         }
     }
 
-    if (empty($retval)) {
+    if (empty($retval) || $isfeaturereport) {
         // There should be a "System" contact.
         $retval = $supportcontacts['System'];
     }
