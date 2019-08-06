@@ -26,7 +26,7 @@ $string['desclibraryreservesurl'] = 'Base URL for library reserves web service';
 $string['headerlibraryreservesurl'] = 'Source URL';
 $string['pluginname'] = 'UCLA library reserves';
 $string['taskupdate'] = 'Updates library reserves';
-$string['title'] = 'Library reserves';
+$string['title'] = 'Library resources';
 
 $string['researchguide'] = 'Research guide';
 $string['coursereserves'] = 'Course reserves';
