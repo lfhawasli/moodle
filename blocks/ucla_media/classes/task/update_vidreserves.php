@@ -167,6 +167,7 @@ class update_vidreserves extends \core\task\scheduled_task {
 
                     // Update record.
                     $rowdata['id'] = $id;
+                    $rowdata['timemodified'] = time();
                     $DB->update_record('ucla_video_reserves', $rowdata);
 
                     // Unset it. We will be deleting any remaining videos later.
@@ -176,6 +177,8 @@ class update_vidreserves extends \core\task\scheduled_task {
                     echo '.';   // Give process bar.
                 } else {
                     // Video doesn't exist, so add it.
+                    $rowdata['timecreated'] = time();
+                    $rowdata['timemodified'] = time();
                     $DB->insert_record('ucla_video_reserves', $rowdata);
                     $insertcount++;
                     echo '+';   // Give process bar.

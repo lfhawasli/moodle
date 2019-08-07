@@ -343,5 +343,28 @@ function xmldb_block_ucla_media_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2018081500, 'ucla_media');
     }
 
+    if ($oldversion < 2019080900) {
+
+        // Define field timecreated to be added to ucla_video_reserves.
+        $table = new xmldb_table('ucla_video_reserves');
+        $field = new xmldb_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, time(), 'width');
+
+        // Conditionally launch add field timecreated.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field timemodified to be added to ucla_video_reserves.
+        $field = new xmldb_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, time(), 'timecreated');
+
+        // Conditionally launch add field timemodified.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Ucla_media savepoint reached.
+        upgrade_block_savepoint(true, 2019080900, 'ucla_media');
+    }
+
     return true;
 }
