@@ -199,10 +199,9 @@ function get_iframe($url) {
                 var padding = 15; //The bottom of the iframe wasn\'t visible on some themes. Probably because of border widths, etc.
                 var lastHeight;
                 var resize = function(e) {
-                    var viewportHeight = doc.get("winHeight");
-                    if(lastHeight !== Math.min(doc.get("docHeight"), viewportHeight)){
-                        frame.setStyle("height", viewportHeight - frame.getY() - padding + "px");
-                        lastHeight = Math.min(doc.get("docHeight"), doc.get("winHeight"));
+                    if(lastHeight !== doc.get("docHeight")*3/4){
+                        frame.setStyle("height", doc.get("docHeight")*3/4- frame.getY() - padding + "px");
+                        lastHeight = doc.get("docHeight")*3/4;
                     }
                 };
 
