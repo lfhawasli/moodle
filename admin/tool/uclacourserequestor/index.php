@@ -777,7 +777,6 @@ echo $OUTPUT->footer();
 echo html_writer::nonempty_tag('script', '$("table").stickyTableHeaders();');
 // Prevent header from scrolling under CCLE banner.
 echo html_writer::nonempty_tag('script', '$("table").stickyTableHeaders({fixedOffset: 40});');
-echo html_writer::nonempty_tag('script', '$("table").stickyTableHeaders({cacheHeaderHeight: true});');
 // END UCLA MOD: CCLE-8585.
 
 // Script functions.
