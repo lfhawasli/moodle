@@ -71,7 +71,7 @@ $placement = null;
 if ($id) {
     $cm = get_coursemodule_from_id('lti', $id, 0, false, MUST_EXIST);
     $lti = $DB->get_record('lti', array('id' => $cm->instance), '*', MUST_EXIST);
-    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $course = get_course($cm->course);
     $context = context_module::instance($cm->id);
     $launchparam = 'id=' . $ltitypeid;
     $pageparams = array('id' => $id);
@@ -80,7 +80,8 @@ if ($id) {
     $lti->typeid = $ltitypeid;
     $lti->instructorcustomparameters = null;
     $lti->debuglaunch = false;
-    $course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+    $lti->course = $courseid;
+    $course = get_course($courseid);
     $context = context_course::instance($courseid);
     $pageparams = array('ltitypeid' => $ltitypeid, 'courseid' => $courseid,);
     $launchparam = 'ltitypeid=' . $ltitypeid . '&courseid=' . $courseid;
