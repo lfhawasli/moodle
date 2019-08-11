@@ -63,6 +63,13 @@ if ($hassiteconfig) {
         get_string('limitcrosslistemailname', 'local_ucla'),
         get_string('limitcrosslistemaildesc', 'local_ucla'),
         2, PARAM_INT));
+    
+    // CCLE-8619 - Purge student data from collab site
+    $settings->add(new admin_setting_configtext(
+        'local_ucla/purgefromcourses',
+        get_string('purgefromcoursesname', 'local_ucla'),
+        get_string('purgefromcoursesdesc', 'local_ucla'),
+        'japanese-diagnostic-test', PARAM_RAW));
 
     $ADMIN->add('localucla', $settings);
 
