@@ -64,18 +64,18 @@ function init_pagex($course, $context, $url, $mode = null, $title = null) {
     }
 }
 
-function print_library_tabs($activetab, $courseid) {
+function print_library_tabs($activetab, $courseid, $print_reserves = true) {
     $tabs = [];
     $tabs[] = new tabobject(get_string('researchguide', 'block_ucla_library_reserves'),
         new moodle_url('/blocks/ucla_library_reserves/index.php',
             array('courseid' => $courseid)),
             get_string('researchguide', 'block_ucla_library_reserves'));
-
-    $tabs[] = new tabobject(get_string('coursereserves', 'block_ucla_library_reserves'),
-    new moodle_url('/blocks/ucla_library_reserves/course_reserves.php',
-        array('courseid' => $courseid)),
-        get_string('coursereserves', 'block_ucla_library_reserves'));
-
+    if ($print_reserves) {
+        $tabs[] = new tabobject(get_string('coursereserves', 'block_ucla_library_reserves'),
+        new moodle_url('/blocks/ucla_library_reserves/course_reserves.php',
+            array('courseid' => $courseid)),
+            get_string('coursereserves', 'block_ucla_library_reserves'));
+    }
     print_tabs(array($tabs), $activetab);
 }
 
@@ -213,4 +213,33 @@ function get_iframe($url) {
         </script>
 ';
     echo $resize;
+}
+
+/**
+ * Find the hostcourse URL if it exists.
+ *
+ * @param int   $courseid An integer representing the course id of the current course.
+ * @return string Returns null if no URL exists.
+ */
+function get_hostcourseurl($courseid) {
+    global $DB;
+    $cache = cache::make('block_ucla_library_reserves', 'hostcourseurl');
+    $courseurl = $cache->get($courseid);
+    if ($courseurl === false) {
+        $courseurl = $DB->get_record_sql("
+            SELECT url
+              FROM {ucla_library_reserves} reserves
+              JOIN {ucla_request_classes} classes ON reserves.srs = classes.srs
+                   AND reserves.quarter = classes.term
+             WHERE classes.hostcourse = 1
+                   AND classes.courseid = :id", array('id' => $courseid), IGNORE_MULTIPLE);
+        if ($courseurl) $courseurl = $courseurl->url;
+        // If link is not https, convert it to https.
+        if (!(strpos($courseurl, 'https') !== false)) {
+            $courseurl = preg_replace('|http://|i', 'https://', $courseurl, 1);
+        }
+        if (!$courseurl) $courseurl = null;
+        $cache->set($courseid, $courseurl);
+    }
+    return $courseurl;
 }

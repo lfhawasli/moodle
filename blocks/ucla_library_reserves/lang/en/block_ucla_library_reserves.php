@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$string['cachedef_hostcourseurl'] = 'Request cache that stores the url for the iframe in course reserves.';
+
 $string['desclibraryreservesurl'] = 'Base URL for library reserves web service';
 $string['headerlibraryreservesurl'] = 'Source URL';
 $string['pluginname'] = 'UCLA library reserves';

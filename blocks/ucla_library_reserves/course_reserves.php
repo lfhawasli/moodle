@@ -33,22 +33,9 @@ init_pagex($course, $context, $url, BLOCK_UCLA_LIBRARY_RESERVES_LIB_RESERVES);
 
 echo $OUTPUT->header();
 print_library_tabs(get_string('coursereserves', 'block_ucla_library_reserves'), $course->id);
-
-$hostcourseurl = $DB->get_record_sql("
-        SELECT url
-          FROM {ucla_library_reserves} reserves
-          JOIN {ucla_request_classes} classes ON reserves.srs = classes.srs
-               AND reserves.quarter = classes.term
-         WHERE classes.hostcourse = 1
-               AND classes.courseid = :id", array('id' => $course->id), IGNORE_MULTIPLE);
-
+$hostcourseurl = get_hostcourseurl($course->id);
 if (can_request_course_reserves($course->id)) {
     if ($hostcourseurl) {
-        $hostcourseurl = $hostcourseurl->url;
-        // If link is not https, convert it to https.
-        if (!(strpos($hostcourseurl, 'https') !== false)) {
-            $hostcourseurl = preg_replace('|http://|i', 'https://', $hostcourseurl, 1);
-        }
         get_iframe($hostcourseurl);
     } else {
         $nocourseres = html_writer::start_tag('div', array('class' => 'alert alert-danger'));
@@ -68,10 +55,14 @@ if (can_request_course_reserves($course->id)) {
         get_string('libraryfeedback', 'block_ucla_library_reserves'),
         array('class'=> 'btn btn-secondary', 'role' => 'button'));
 } else {
-    $nopermission = html_writer::start_tag('div', array('class' => 'alert alert-danger'));
-    $nopermission .= html_writer::div(get_string('nopermissionmsg', 'block_ucla_library_reserves'));
-    $nopermission .= html_writer::end_tag('div');
-    echo $nopermission;
+    if ($hostcourseurl) {
+        get_iframe($hostcourseurl);
+    } else {
+        $nopermission = html_writer::start_tag('div', array('class' => 'alert alert-danger'));
+        $nopermission .= html_writer::div(get_string('nopermissionmsg', 'block_ucla_library_reserves'));
+        $nopermission .= html_writer::end_tag('div');
+        echo $nopermission;
+    }
 }
 
 echo $OUTPUT->footer();

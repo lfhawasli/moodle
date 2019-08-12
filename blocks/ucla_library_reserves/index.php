@@ -34,7 +34,15 @@ init_pagex($course, $context, $url, BLOCK_UCLA_LIBRARY_RESERVES_LIB_GUIDE);
 
 echo $OUTPUT->header();
 
-print_library_tabs(get_string('researchguide', 'block_ucla_library_reserves'), $course->id);
+$cache = cache::make('block_ucla_library_reserves', 'hostcourseurl');
+$hostcourseurl = get_hostcourseurl($course->id);
+// Don't print the reserves tab if you're a student and there are no reserves.
+if (!can_request_course_reserves($course->id) && !$hostcourseurl) {
+    print_library_tabs(get_string('researchguide', 'block_ucla_library_reserves'), $course->id, false);
+} else {
+    print_library_tabs(get_string('researchguide', 'block_ucla_library_reserves'), $course->id);
+}
+
 $PAGE->set_pagelayout('incourse');
 
 show_research_guide($course->id, $courseshortname);

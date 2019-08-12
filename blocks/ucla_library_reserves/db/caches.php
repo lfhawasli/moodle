@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA Library Reserves block for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,17 +13,18 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * Version file.
+ * Cache for course reserves URL.
  *
- * @package    block_ucla_library_reserves
- * @copyright  2016 UC Regents
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    ucla_library_reserves
+ * @category   cache
+ * @copyright  2019 UC Regents
  */
 
-defined('MOODLE_INTERNAL') || die;
-
-$plugin->version    = 2019081200;
-$plugin->requires   = 2010112400;
-$plugin->component = 'block_ucla_library_reserves';
+defined('MOODLE_INTERNAL') || die();
+$definitions = array(
+    // Store reserves url to avoid repetitive DB queries within one request.
+    'hostcourseurl' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+    )
+);

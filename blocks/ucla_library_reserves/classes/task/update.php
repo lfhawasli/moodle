@@ -101,6 +101,9 @@ class update extends \core\task\scheduled_task {
             return false;
         }
 
+        // Purge the cached hostcourse urls.
+        cache_helper::purge_by_definition('block_ucla_library_reserves', 'hostcourseurl');
+
         // Wrap everything in a transaction, because we don't want to have an empty.
         // Table while data is being updated.
         $numinserted = 0;
