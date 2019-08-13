@@ -98,11 +98,15 @@
 }
 
 @media (max-width: 575px) {
-    #page-header .global-search .ucla-search-input {
+    #page-header .ucla-search {
         width: 100%;
     }
 
-    #page-header .global-search-wrapper {
+    #page-header .ucla-search .ucla-search-input {
+        width: 100%;
+    }
+
+    #page-header .header-search-wrapper {
         margin-top: .75rem;
         width: 100%;
     }

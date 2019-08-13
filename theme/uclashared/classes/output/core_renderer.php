@@ -669,17 +669,26 @@ class core_renderer extends \theme_boost\output\core_renderer {
             $html .= self::admin_panel();
         }
 
+        $displaysearchfield = false;
         if (empty($PAGE->layout_options['nonavbar'])) {
              // If the page has editing button, then display it.
-            $pageeditingbutton = $this->page_heading_button();
-            if (!empty($pageeditingbutton)) {
-                $html .= html_writer::div($pageeditingbutton, 'float-sm-right header-editing-button');
+            $pageheadingbutton = $this->page_heading_button();
+            if (!empty($pageheadingbutton)) {
+                // Check whether html string contains ucla-search class to determine if heading button is a search field.
+                $displaysearchfield = (strpos($pageheadingbutton, 'ucla-search') !== false);
+                if (!$displaysearchfield) {
+                    $html .= html_writer::div($pageheadingbutton, 'float-sm-right header-editing-button');
+                }
             }
         }
         $html .= html_writer::end_div();
 
+        if ($displaysearchfield) {
+            $html .= html_writer::div($pageheadingbutton, 'd-inline-block float-sm-right header-search-wrapper');
+        }
+
         if (!empty($PAGE->layout_options['search_box'])) {
-            $html .= html_writer::div($this->search_box(), 'd-inline-block float-sm-right global-search-wrapper');
+            $html .= html_writer::div($this->search_box(), 'd-inline-block float-sm-right header-search-wrapper');
         }
 
         $html .= html_writer::end_div();
