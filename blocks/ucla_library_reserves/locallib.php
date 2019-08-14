@@ -37,6 +37,7 @@ function init_pagex($course, $context, $url, $mode = null, $title = null) {
     $PAGE->set_title($course->shortname . ': ' . get_string('pluginname', 'block_ucla_library_reserves'));
     $PAGE->set_heading($course->fullname);
     $PAGE->set_url($url);
+    require_login($course);
 
     // Reset breadcrumbs and make it start with course and Library reserves.
     $PAGE->navbar->ignore_active();

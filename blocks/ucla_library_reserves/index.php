@@ -29,7 +29,6 @@ $courseshortname = optional_param('courseshortname', '', PARAM_TEXT);
 $course = get_course(required_param('courseid', PARAM_INT));
 $url = new moodle_url('/blocks/ucla_library_reserves/index.php', array('courseid' => $course->id));
 $context = context_course::instance($course->id, MUST_EXIST);
-require_login($course);
 
 init_pagex($course, $context, $url, BLOCK_UCLA_LIBRARY_RESERVES_LIB_GUIDE);
 
