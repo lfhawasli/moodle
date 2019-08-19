@@ -35,5 +35,14 @@ $tasks = array(
         'day' => '*',
         'dayofweek' => '*',
         'month' => '*'
+    ),
+    array(
+        'classname' => 'local_ucla\task\purge_users_quiz_attempts_task',
+        'blocking' => 0,
+        'minute' => '0',
+        'hour' => '0', // Midnight.
+        'day' => '1,15', // 1st and 15th of every month
+        'dayofweek' => '*',
+        'month' => '*'
     )
 );

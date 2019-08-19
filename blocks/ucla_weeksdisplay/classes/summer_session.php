@@ -158,4 +158,31 @@ class block_ucla_weeksdisplay_summer_session extends block_ucla_weeksdisplay_ses
         set_config('current_week_summera', $currentweek['A'], 'local_ucla');
         set_config('current_week_summerc', $currentweek['C'], 'local_ucla');
     }
+
+    /**
+     * Override base class method to use term_end instead of session_end,
+     * because summer courses have overlaping session (A & B) that session_end
+     * would cause the summer term to end too early.
+     */
+    public function save_configs() {
+
+        // Save the week.
+        $this->save_current_week();
+
+        // Check if we need to update term.
+        if ($this->term_ended() && $this->current_week() !== self::WEEK_ERR) {
+            // We want to wait one week after a session has ended before
+            // switching current term to allow users to access their courses.
+            $termnend = new DateTime($this->session->term_end);
+            $termnend->modify('+1 week');
+
+            if ($this->today > $termnend) {
+                // Roll over the term.
+                $this->save_next_term();
+
+                // Update active terms.
+                $this->save_active_terms();
+            }
+        }
+    }
 }

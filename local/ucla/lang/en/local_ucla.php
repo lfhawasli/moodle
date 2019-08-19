@@ -369,3 +369,8 @@ $string['esberror'] = 'ESB error ({$a->lasthttpcode}): {$a->lastmessage}. Query 
 
 // CCLE-8045 - Add tooltip for low discriminative efficiency into quiz statistics 
 $string['lowefficiencytooltip'] = 'This is a question that may need review because the results are outside the range of expected distribution.';
+
+// CCLE-8619 - Purge student data from collab site after unenrollment
+$string['purgeusersquizattempts'] = 'Cron task to purge users\' quiz attempts from list of courses in admin settings';
+$string['purgefromcoursesname'] = 'Purge from courses';
+$string['purgefromcoursesdesc'] = 'Purge users\' quiz attempts from this comma seperated list of course shortnames.';
