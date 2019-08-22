@@ -580,8 +580,8 @@ if ($data && !empty($sectionsnotify) && !$verifydata) {
 }
 
 echo $OUTPUT->footer();
-echo html_writer::nonempty_tag('script', '$("table").stickyTableHeaders();');
-echo html_writer::nonempty_tag('script', '$("table").stickyTableHeaders({fixedOffset: 40});');
+echo html_writer::nonempty_tag('script', '$("table#sections-table").stickyTableHeaders();');
+echo html_writer::nonempty_tag('script', '$("table#sections-table").stickyTableHeaders({fixedOffset: 40});');
 
 /**
  * This function is a part of the "Landing Page by Dates" option. It
