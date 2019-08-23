@@ -30,7 +30,7 @@ $thisdir = '/' . $CFG->admin . '/tool/uclacourserequestor/';
 require_once($CFG->dirroot . $thisdir . 'lib.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 // START UCLA MOD: CCLE-8585 - Course Requester requires too much horizontal scrolling.
-$PAGE->requires->js('/admin/tool/uclacourserequestor/js/jquery.stickytableheaders.min.js', false);
+$PAGE->requires->js('/local/ucla/js/jquery.stickytableheaders.min.js', false);
 // END UCLA MOD: CCLE-8585.
 global $DB, $ME, $USER;
 
@@ -774,9 +774,9 @@ if (!empty($requeststable->data)) {
 echo html_writer::end_tag('div');
 echo $OUTPUT->footer();
 // START UCLA MOD: CCLE-8585 - Course Requester requires too much horizontal scrolling.
-echo html_writer::nonempty_tag('script', '$("table").stickyTableHeaders();');
+echo html_writer::nonempty_tag('script', '$("table#uclacourserequestor_requests").stickyTableHeaders();');
 // Prevent header from scrolling under CCLE banner.
-echo html_writer::nonempty_tag('script', '$("table").stickyTableHeaders({fixedOffset: 40});');
+echo html_writer::nonempty_tag('script', '$("table#uclacourserequestor_requests").stickyTableHeaders({fixedOffset: 40});');
 // END UCLA MOD: CCLE-8585.
 
 // Script functions.
