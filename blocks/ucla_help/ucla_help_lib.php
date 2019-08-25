@@ -541,13 +541,14 @@ function message_support_contact($supportcontact, $from=null, $fromname=null,
  *
  * @param object $curcontext          Current context object
  * @param boolean $isfeaturereport    Is report type a feature request.
+ *                                    Default is false.
  *
  * @return array                Returns an array of support contacts matching
  *                              most specific context first until it reaches the
  *                              "System" context. Can be a mix of email or JIRA
  *                              users.
  */
-function get_support_contact($curcontext, $isfeaturereport) {
+function get_support_contact($curcontext, $isfeaturereport = false) {
     $retval = null;
 
     // Get support contacts.
