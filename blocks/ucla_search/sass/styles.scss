@@ -87,9 +87,16 @@
 
     .ucla-search-input {
         margin: 0;
-        padding: .5rem .75rem;
         width: 250px;
     }
+}
+
+.form-control.ucla-search-input {
+    padding: .5rem 2.375rem .5rem .75rem;
+}
+
+.frontpage-site-directory .form-control.ucla-search-input {
+    padding: .5rem 2.5rem .5rem .75rem;
 }
 
 @media (max-width: 480px) {
