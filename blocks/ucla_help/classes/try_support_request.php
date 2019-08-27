@@ -61,8 +61,11 @@ class block_ucla_help_try_support_request extends \core\task\adhoc_task {
         // If there is an attachment, then attach it to the newly created issue.
         if ($cd->attachmentfile != null) {
             $url = $jiraendpoint . "/$issueid/attachments";
-            $headers = array('Content-Type: multipart/form-data', 'X-Atlassian-Token: no-check');
-            $data = array('file' => "@{$cd->attachmentfile};filename={$cd->attachmentname}");
+            $headers = array('Content-Type: multipart/form-data', 'X-Atlassian-Token: nocheck');
+            $data = array(                 
+                'file'=> curl_file_create($cd->attachmentfile),                 
+                'filename'=> $cd->attachmentname             
+            );
             $jiraresult = send_jira_request($url, true, $headers, $data);
             if ($jiraresult === false) {
                 // If attachment fails, comment a note on the JIRA ticket for reference.
