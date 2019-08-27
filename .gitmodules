@@ -196,3 +196,6 @@
 [submodule "question/type/conceptmap"]
 	path = question/type/conceptmap
 	url = https://github.com/villalon/qtype_conceptmap.git
+[submodule "local/visibility"]
+	path = local/visibility
+	url = https://github.com/ucla/moodle-local_visibility.git
