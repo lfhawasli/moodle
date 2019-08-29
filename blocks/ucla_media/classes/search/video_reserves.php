@@ -145,7 +145,7 @@ class video_reserves extends \core_search\base {
     public function check_access($id) {
         global $DB;
 
-        $sql = "SELECT x.id as contextid
+        $sql = "SELECT x.id as contextid, vr.start_date, vr.stop_date
                   FROM {ucla_video_reserves} vr
                   JOIN {course} c ON c.id = vr.courseid
                   JOIN {context} x ON x.instanceid = c.id AND x.contextlevel = ?
@@ -158,6 +158,9 @@ class video_reserves extends \core_search\base {
             return \core_search\manager::ACCESS_DELETED;
         }
         if (!is_enrolled($context) && !has_capability('moodle/course:view', $context)) {
+            return \core_search\manager::ACCESS_DENIED;
+        }
+        if ($instance->start_date > time() || $instance->stop_date < time()) {
             return \core_search\manager::ACCESS_DENIED;
         }
         return \core_search\manager::ACCESS_GRANTED;
