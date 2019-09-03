@@ -38,11 +38,21 @@ class admin_settings_search_form extends moodleform {
         $mform = $this->_form;
 
         //$mform->addElement('header', 'settingsheader', get_string('search', 'admin'));
-        $elements = [];
-        $elements[] = $mform->createElement('text', 'query', get_string('query', 'admin'));
-        $elements[] = $mform->createElement('submit', 'search', get_string('search'));
-        $mform->addGroup($elements);
-        $mform->setType('query', PARAM_RAW);
-        $mform->setDefault('query', optional_param('query', '', PARAM_RAW));
+        // START UCLA MOD: CCLE-8504 - Change search fields to look similar.
+        // $elements = [];
+        // $elements[] = $mform->createElement('text', 'query', get_string('query', 'admin'));
+        // $elements[] = $mform->createElement('submit', 'search', get_string('search'));
+        // $mform->addGroup($elements);
+        // $mform->setType('query', PARAM_RAW);
+        // $mform->setDefault('query', optional_param('query', '', PARAM_RAW));
+        $searchbar = html_writer::start_div('ucla-search search-wrapper admin-search').
+            html_writer::tag('button', null,
+                array('type' => 'submit', 'name' => 'search', 'id' => 'id_search', 'class' => 'fa fa-search btn')).
+            html_writer::empty_tag('input',
+                array('type' => 'text', 'name' => 'query', 'id' => 'id_query', 'value' => optional_param('query', '', PARAM_RAW),
+                    'class' => 'form-control ucla-search-input rounded', 'placeholder' => get_string('searchbarplaceholder', 'admin'))).
+            html_writer::end_div();
+        $mform->addElement('html', $searchbar);
+        // END UCLA MOD: CCLE-8504.
     }
 }

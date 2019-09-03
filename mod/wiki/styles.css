@@ -359,3 +359,9 @@ a.wiki_edit_section {
 #page-mod-wiki-prettyview .displayprinticon {
     text-align: right;
 }
+
+/* START UCLA MOD: CCLE-8630 - Make forum and wiki search fields appear on small screens. */
+.wikisearch fieldset {
+    width: 100%;
+}
+/* END UCLA MOD: CCLE-8630. */

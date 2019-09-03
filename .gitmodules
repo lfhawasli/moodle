@@ -193,3 +193,6 @@
 [submodule "enrol/auto"]
 	path = enrol/auto
 	url = https://github.com/bynare/moodle-enrol_auto
+[submodule "question/type/conceptmap"]
+	path = question/type/conceptmap
+	url = https://github.com/villalon/qtype_conceptmap.git

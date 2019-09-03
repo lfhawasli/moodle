@@ -115,8 +115,6 @@ $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://docs
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_api'] = 'https://docs.ccle.ucla.edu/api.php';
 $block_ucla_help_support_contacts['System'] = 'support';  // Default.
 $CFG->forced_plugin_settings['block_ucla_help']['maxfilesize'] = 10485760;
-// CCLE-5879 Enable/disable the file attachement uploads for help ticket.
-$CFG->forced_plugin_settings['block_ucla_help']['enablefileuploads'] = false;
 
 // CCLE-2301 - COURSE MENU BLOCK
 $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
@@ -187,6 +185,7 @@ $CFG->emailbulkmessaging = 1;
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
 $CFG->enableplagiarism = 1;
+$CFG->enableglobalsearch = 1;
 // CCLE-7144 - Enable stealth activities
 $CFG->allowstealth = 1;
 

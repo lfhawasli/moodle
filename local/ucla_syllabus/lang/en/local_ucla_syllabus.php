@@ -207,3 +207,6 @@ $string['errornosyllabi'] = 'No syllabi to download.';
 $string['errordownload'] = 'Error downloading syllabi.';
 $string['errornocourses'] = 'No courses exist in the selected term.';
 $string['progressbar'] = 'Preparing syllabus archive...';
+
+// String for search
+$string['search:syllabus'] = 'Syllabi';

@@ -493,3 +493,7 @@
 .path-mod-qanda div.qanda-entry div.qanda-entry-table table.qanda-post {
     width: 95%;
 }
+
+#region-main .ucla-search.qanda-search {
+    margin: 0;
+}

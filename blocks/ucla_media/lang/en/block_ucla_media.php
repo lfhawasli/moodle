@@ -119,3 +119,7 @@ $string['mlrequest'] = 'Request Digital audio reserves';
 
 // Strings for Kaltura media gallery
 $string['kalvidres_tab'] = 'Media gallery';
+
+// Strings for global search.
+$string['search:library_music_reserves'] = 'Digital audio reserves - media resource information';
+$string['search:video_reserves'] = 'Video reserves - media resource information';
