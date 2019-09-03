@@ -10,6 +10,7 @@ h1, h2, h3, h4, h5, h6, p {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: right;
+  min-height: 100vh;
 }
 @media (max-width: 992px) {
   .bg-img {
