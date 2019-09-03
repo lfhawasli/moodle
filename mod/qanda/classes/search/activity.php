@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA Media block for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,15 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version number.
+ * Q&A activities search area.
  *
- * @package    block_ucla_media
- * @copyright  2016 UC Regents
+ * @package    mod_qanda
+ * @copyright  2019 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace mod_qanda\search;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version    = 2019081600;
-$plugin->requires   = 2010112400;
-$plugin->component = 'block_ucla_media';
+/**
+ * Q&A activities search area.
+ *
+ * @package    mod_qanda
+ * @copyright  2019 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class activity extends \core_search\base_activity {
+
+    /**
+     * Returns true if this area uses file indexing.
+     *
+     * @return bool
+     */
+    public function uses_file_indexing() {
+        return true;
+    }
+}

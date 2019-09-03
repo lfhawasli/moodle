@@ -247,7 +247,10 @@ $string['search:collaborative_page'] = 'Wiki - collaborative pages';
 $string['searchcontent'] = 'Search in page content';
 $string['searchresult'] = 'Search results:';
 $string['searchterms'] = 'Search terms';
-$string['searchwikis'] = 'Search wikis';
+// START UCLA MOD: CCLE-8504 - Change search fields to look similar.
+// $string['searchwikis'] = 'Search wikis';
+$string['searchwikis'] = 'Search wikis...';
+// END UCLA MOD: CCLE-8504.
 $string['special'] = 'Special';
 $string['tableofcontents'] = 'Table of contents';
 $string['tagarea_wiki_pages'] = 'Wiki pages';

@@ -209,6 +209,7 @@ $CFG->emailbulkmessaging = 1;
 // CCLE-1266 - Enable RSS Feeds for Forum Posts
 $CFG->enablerssfeeds = 1;
 $CFG->enableplagiarism = 1;
+$CFG->enableglobalsearch = 1;
 // CCLE-7144 - Enable stealth activities
 $CFG->allowstealth = 1;
 

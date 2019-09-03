@@ -54,7 +54,7 @@ $PAGE->set_course($course);
 $PAGE->set_url('/local/ucla_syllabus/index.php', array('id' => $id));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($coursecontext);
-$PAGE->set_pagelayout('incourse');
+$PAGE->set_pagelayout('course');
 $PAGE->set_pagetype('course-view-' . $course->format);
 
 // See if user wants to handle a manually uploaded syllabus. If a user has not

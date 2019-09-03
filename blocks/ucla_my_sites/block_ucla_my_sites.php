@@ -422,6 +422,7 @@ class block_ucla_my_sites extends block_base {
             $templatecontext['content'][] = $template;
         }
 
+        $templatecontext['output'] = $OUTPUT;
         $this->content->text = $OUTPUT->render_from_template('block_ucla_my_sites/mysites', $templatecontext);
 
         return $this->content;

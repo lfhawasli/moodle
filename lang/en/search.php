@@ -60,7 +60,10 @@ $string['enteryoursearchquery'] = 'Enter your search query';
 $string['error_indexing'] = 'An error occurred while indexing';
 $string['errors'] = 'Errors';
 $string['errorareanotavailable'] = '{$a} search area is not available.';
-$string['everywhere'] = 'Everywhere you can access';
+// START UCLA MOD: CCLE-8569 - Change string from 'Everywhere you can access' to 'My sites'.
+// $string['everywhere'] = 'Everywhere you can access';
+$string['everywhere'] = 'My sites';
+// END UCLA MOD: CCLE-8569.
 $string['filesinindexdirectory'] = 'Files in index directory';
 $string['filterheader'] = 'Filter';
 $string['fromtime'] = 'Modified after';

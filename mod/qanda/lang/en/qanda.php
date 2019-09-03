@@ -9,7 +9,7 @@
 $string['created'] = 'Created';
 $string['updated'] = 'Updated';
 $string['postby'] = 'Posted by';
-$string['searchterms'] = 'Q&A search terms';
+$string['searchterms'] = 'Search Q&A...';
 
 $string['addcomment'] = 'Add comment';
 $string['addentry'] = 'Ask a question';
@@ -262,6 +262,8 @@ $string['rssarticles_help'] = 'This setting specifies the number of Q&A entry qu
 $string['rsssubscriberss'] = 'Display the RSS feed for \'{$a}\' questions';
 $string['rsstype'] = 'RSS feed for this activity';
 $string['rsstype_help'] = 'To enable the RSS feed for this activity, select either questions with author or questions without author to be included in the feed.';
+$string['search:entry'] = 'Q&A - entries';
+$string['search:activity'] = 'Q&A - activity information';
 $string['searchinanswer'] = 'Search full text';
 $string['secondaryqanda'] = 'Secondary Q&A';
 $string['showall'] = 'Show \'ALL\' link';

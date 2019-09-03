@@ -80,6 +80,9 @@ $string['authsettings'] = 'Manage authentication';
 $string['autolang'] = 'Language autodetect';
 $string['autologinguests'] = 'Auto-login guests';
 $string['searchareas'] = 'Search areas';
+// START UCLA MOD: CCLE-8504 - Change search fields to look similar.
+$string['searchbarplaceholder'] = 'Search Site administration...';
+// END UCLA MOD: CCLE-8504.
 $string['availableto'] = 'Available to';
 $string['availablelicenses'] = 'Available licences';
 $string['backgroundcolour'] = 'Transparent colour';

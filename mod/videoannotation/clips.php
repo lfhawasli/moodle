@@ -186,6 +186,7 @@ if ($mform->is_cancelled()) {
         $clip->videowidth = $data->videowidth;
         $clip->videoheight = $data->videoheight;
         $clip->timecreated = time();
+        $clip->timemodified = time();
         $DB->insert_record('videoannotation_clips', $clip);
         redirect("view.php?id=" . $cm->id . ($groupid ? '&group=' . $groupid : ''));
         echo get_string('clipadded', 'videoannotation');

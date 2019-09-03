@@ -268,6 +268,7 @@ if (has_capability('mod/videoannotation:submit', $modulecontext) &&
         $submission->groupid = $groupid;
         $submission->clipid = $clip->id;
         $submission->timesubmitted = $submission->timecreated = time();
+        $submission->timemodified = time();
         $DB->insert_record('videoannotation_submissions', $submission);
         $readonly = true;
     }
@@ -406,6 +407,7 @@ if (!optional_param('printable', false, PARAM_BOOL)) {
                     $submission->grade = optional_param('grade', null, PARAM_INT);
                     $submission->gradecomment = optional_param('feedback', 0, PARAM_RAW);
                     $submission->timegraded = $submission->timecreated = time();
+                    $submission->timemodified = time();
                     $DB->insert_record('videoannotation_submissions', $submission);
                 }
             }

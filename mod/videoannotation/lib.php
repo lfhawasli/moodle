@@ -91,6 +91,7 @@ function videoannotation_supports($feature) {
 function videoannotation_add_instance($videoannotation) {
     global $DB;
     $videoannotation->timecreated = time();
+    $videoannotation->timemodified = time();
     $videoannotation->id = $DB->insert_record('videoannotation', $videoannotation);
     if (!$videoannotation->id) {
         return false;
@@ -107,6 +108,7 @@ function videoannotation_add_instance($videoannotation) {
         $clip->videoheight = $videoannotation->videoheight;
 
         $clip->timecreated = time();
+        $clip->timemodified = time();
         $clipid = $DB->insert_record('videoannotation_clips', $clip);
         if (!$clipid) {
             return false;
@@ -166,6 +168,7 @@ function videoannotation_update_instance($videoannotation) {
             }
         } else {
             $clip->timecreated = time();
+            $clip->timemodified = time();
             if (!($clipid = $DB->insert_record('videoannotation_clips', $clip))) {
                 return false;
             }
@@ -295,7 +298,7 @@ function videoannotation_user_complete($course, $user, $mod, $videoannotation) {
  * @todo Finish documenting this function
  */
 function videoannotation_print_recent_activity($course, $isteacher, $timestart) {
-    return false;  //  True if anything was printed, otherwise false.
+    return false;  // True if anything was printed, otherwise false.
 }
 
 /**

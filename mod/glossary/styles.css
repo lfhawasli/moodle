@@ -126,3 +126,10 @@
     /*rtl:ignore*/
     padding-left: 20px;
 }
+
+/* START UCLA MOD: CCLE-8504 - Change search fields to look similar. */
+#region-main .ucla-search.glossary-search {
+    margin-left: 0;
+    margin-right: 1rem;
+}
+/* END UCLA MOD: CCLE-8504. */

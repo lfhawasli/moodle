@@ -383,12 +383,25 @@ if ($showcommonelements ) {
     echo '<form method="post" class="form form-inline m-b-1" action="' . $CFG->wwwroot . '/mod/glossary/view.php">';
 
 
-    if ($mode == 'search') {
-        echo '<input type="text" name="hook" size="20" value="'.s($hook).'" alt="'.$strsearch.'" class="form-control"/> ';
-    } else {
-        echo '<input type="text" name="hook" size="20" value="" alt="'.$strsearch.'" class="form-control"/> ';
-    }
-    echo '<input type="submit" value="'.$strsearch.'" name="searchbutton" class="btn btn-secondary m-r-1"/> ';
+    // START UCLA MOD: CCLE-8504 - Change search fields to look similar.
+    // if ($mode == 'search') {
+    //     echo '<input type="text" name="hook" size="20" value="'.s($hook).'" alt="'.$strsearch.'" class="form-control"/> ';
+    // } else {
+    //     echo '<input type="text" name="hook" size="20" value="" alt="'.$strsearch.'" class="form-control"/> ';
+    // }
+    // echo '<input type="submit" value="'.$strsearch.'" name="searchbutton" class="btn btn-secondary m-r-1"/> ';
+    echo html_writer::start_div('ucla-search search-wrapper glossary-search');
+    echo html_writer::start_tag('button',
+        array('type' => 'submit', 'name' => 'searchbutton', 'class' => 'fa fa-search btn'));
+    echo html_writer::end_tag('button');
+    $value = ($mode == 'search') ? s($hook) : '';
+    echo html_writer::empty_tag('input',
+        array('type' => 'text', 'name' => 'hook', 'size' => '20', 'value' => $value, 'alt' => $strsearch,
+            'class' => 'form-control ucla-search-input rounded', 'placeholder' => get_string('searchbarplaceholder', 'glossary')));
+    echo html_writer::end_div();
+
+    // END UCLA MOD: CCLE-8504.
+
     if ($fullsearch || $mode != 'search') {
         $fullsearchchecked = 'checked="checked"';
     } else {

@@ -486,9 +486,15 @@ class manager {
                     'id, category, sortorder, shortname, fullname, idnumber, startdate, visible, ' .
                     'groupmode, groupmodeforce, cacherev');
         } else {
+            // START UCLA MOD: CCLE-8643 - Allow searching within unenrolled courses.
             // Get the courses where the current user has access.
-            $courses = enrol_get_my_courses(array('id', 'cacherev'), 'id', 0, [],
-                    (bool)get_config('core', 'searchallavailablecourses'));
+            // $courses = enrol_get_my_courses(array('id', 'cacherev'), 'id', 0, [],
+            //         (bool)get_config('core', 'searchallavailablecourses'));
+            // If searching within a course, user does not need to be enrolled to search public material.
+            $searcheverywhere = $limitcourseids ? true : (bool)get_config('core', 'searchallavailablecourses');
+            // Get the courses where the current user has access.
+            $courses = enrol_get_my_courses(array('id', 'cacherev'), 'id', 0, [], $searcheverywhere);
+            // END UCLA MOD: CCLE-8643.
         }
 
         if (empty($limitcourseids) || in_array(SITEID, $limitcourseids)) {

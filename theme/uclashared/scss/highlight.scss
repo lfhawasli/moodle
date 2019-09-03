@@ -1,0 +1,11 @@
+// To highlight search results in global search, glossary, forum, and site administration.
+.highlight {
+    background-color: $highlight-background-color;
+    color: $highlight-text-color !important;
+}
+a .highlight {
+    color: $highlight-link-color !important;
+}
+a:hover .highlight {
+    color: $highlight-link-hover-color !important;
+}

@@ -299,6 +299,9 @@ $string['rsstype'] = 'RSS feed for this activity';
 $string['rsstype_help'] = 'To enable the RSS feed for this activity, select either concepts with author or concepts without author to be included in the feed.';
 $string['search:activity'] = 'Glossary - activity information';
 $string['search:entry'] = 'Glossary - entries';
+// START UCLA MOD: CCLE-8504 - Change search fields to look similar.
+$string['searchbarplaceholder'] = 'Search glossary...';
+// END UCLA MOD: CCLE-8504.
 $string['searchindefinition'] = 'Search full text';
 $string['secondaryglossary'] = 'Secondary glossary';
 $string['showall'] = 'Show \'ALL\' link';
