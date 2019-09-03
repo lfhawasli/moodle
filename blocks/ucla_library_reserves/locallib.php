@@ -188,7 +188,19 @@ function show_research_guide($courseid, $activetab) {
  * @param string $url The URL to be displayed.
  */
 function get_iframe($url) {
-    echo '<iframe id="contentframe" height="600px" width="100%" src="'.$url.'"webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+    $decodedurl = urldecode ( $url );
+    $courseid = strpos($decodedurl, 'courseId');
+    $decodedurl = substr($decodedurl, $courseid? $courseid+strlen('courseId'): strpos($decodedurl,'shortname')+strlen('shortname')+1);
+    $courseshortname = substr($decodedurl, 0, strpos($decodedurl,'&'));
+    $title = '';
+    if ( $courseid ) {
+        $courseshortname = substr($courseshortname, strpos($courseshortname, '|')+1);
+        $courseshortname = str_replace ( ':', ' ', $courseshortname);
+        $title = get_string('iframecoursereserves', 'block_ucla_library_reserves', $courseshortname);
+    } else {
+        $title = get_string('iframeresearchguide', 'block_ucla_library_reserves', $courseshortname);
+    }
+    echo '<iframe id="contentframe" title="'.$title.'" height="600px" width="100%" src="'.$url.'"webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
     // Output script to make the iframe tag be as large as possible.
     $resize = '
         <script type="text/javascript">

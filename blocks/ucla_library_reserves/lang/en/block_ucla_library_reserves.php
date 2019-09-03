@@ -32,6 +32,8 @@ $string['title'] = 'Library resources';
 
 $string['researchguide'] = 'Research guide';
 $string['coursereserves'] = 'Course reserves';
+$string['iframecoursereserves'] = 'Course reserves for {$a}';
+$string['iframeresearchguide'] = 'Research guide for {$a}';
 // Event names for logging.
 $string['eventresearchguideindexviewed'] = 'Research guide index viewed';
 $string['eventcoursereservesindexviewed'] = 'Course reserves index viewed';

@@ -27,6 +27,9 @@ require_once($CFG->dirroot.'/blocks/ucla_library_reserves/locallib.php');
 
 $courseshortname = optional_param('courseshortname', '', PARAM_TEXT);
 $course = get_course(required_param('courseid', PARAM_INT));
+if ($courseshortname == '') {
+    $courseshortname = $course->shortname;
+}
 $url = new moodle_url('/blocks/ucla_library_reserves/index.php', array('courseid' => $course->id));
 $context = context_course::instance($course->id, MUST_EXIST);
 
