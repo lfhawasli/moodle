@@ -39,6 +39,11 @@ if (!$entry = $DB->get_record("qanda_entries", array("id" => $entry))) {
     print_error('invalidentry');
 }
 
+// Permission checks are based on the course module instance so make sure it is correct.
+if ($cm->instance != $entry) {
+    print_error('invalidentry');
+}
+
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/qanda:manageentries', $context);
