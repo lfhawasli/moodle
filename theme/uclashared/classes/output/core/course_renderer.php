@@ -411,4 +411,19 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
         $content .= html_writer::end_tag('div'); // .coursebox
         return $content;
     }
+
+    /**
+     * Renders html to display a course search form.
+     *
+     * @param string $value default value to populate the search field
+     * @param string $format display format - 'plain' (default), 'short' or 'navbar'
+     * @return string
+     */
+    public function course_search_form($value = '', $format = 'plain') {
+        // Return an empty string, since we no longer want this search box as per CCLE-8732.
+        if ($format == 'navbar') {
+            return '';
+        }
+        return parent::course_search_form($value, $format);
+    }
 }
