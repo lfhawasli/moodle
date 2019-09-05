@@ -2,6 +2,13 @@
     padding-left: 50px;
 }
 
-#page-backup-restore .root_setting:nth-of-type(5) {
-    padding-left: 50px;
+#page-backup-restore .root_setting {
+    width: 100%;
+    display: block;
+    padding: 0.3rem;
+    clear: both;
+}
+
+#page-backup-restore .root_setting div:first-child {
+    width: 50%;
 }
