@@ -73,6 +73,12 @@ init_page($course, $context,
                 'offset' => $offset)), $mode, $title);
 echo $OUTPUT->header();
 
+// Check the ip address and give warning if not on campus.
+$ip = $_SERVER['REMOTE_ADDR'];
+if (is_on_campus_ip($ip) === false) {
+    echo $OUTPUT->notification(get_string('videoreservesipwarning', 'block_ucla_media'));
+}
+
 // Are we allowed to display this page?
 if (is_enrolled($context) || has_capability('moodle/course:view', $context) || !empty($iscrosslist)) {
 
