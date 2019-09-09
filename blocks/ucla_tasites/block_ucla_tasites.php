@@ -293,7 +293,7 @@ class block_ucla_tasites extends block_base {
                 break;
             default:
                 $course->numsections = 10;
-        }        
+        }
         $newcourse = create_course($course);
 
         // Tag site as TA site.
@@ -352,6 +352,12 @@ class block_ucla_tasites extends block_base {
             // Do we need to restrict this site?
             if ($restrictgrouping) {
                 self::change_default_grouping($newcourse->id, $tasitegrouping->id);
+                $discussionforum = forum_get_course_forum($newcourse->id, 'general');
+                $restriction = \core_availability\tree::get_root_json(
+                        [\availability_grouping\condition::get_json($tasitegrouping->id)]);
+                $DB->set_field('course_modules', 'availability',
+                        json_encode($restriction), ['instance' => $discussionforum->id]);
+                rebuild_course_cache($newcourse->id, true);
             }
         }
 
@@ -359,7 +365,7 @@ class block_ucla_tasites extends block_base {
         $newsforum = forum_get_course_forum($newcourse->id, 'news');
         forum_delete_instance($newsforum->id);
 
-        // Disable enrol invitation plugin on ta sites
+        // Disable enrol invitation plugin on ta sites.
         $instances = enrol_get_instances($newcourse->id, false);
         $plugins   = enrol_get_plugins(false);
         foreach ($instances as $instance) {
@@ -814,7 +820,7 @@ class block_ucla_tasites extends block_base {
      */
     public static function has_tagrouping($courseid) {
         global $DB;
-        
+
         $where = "courseid=:courseid AND idnumber=:idnumber";
         return $DB->record_exists_select('groupings', $where,
                 array('courseid' => $courseid, 'idnumber' => self::GROUPINGID));
@@ -851,8 +857,8 @@ class block_ucla_tasites extends block_base {
             $result = true;
             if ($enrol->customint2 != self::get_ta_role_id() ||
                     $enrol->customint3 != self::get_ta_admin_role_id() ||
-                    self::get_ta_admin_role_id() == NULL ||
-                    self::get_ta_role_id() == NULL) {
+                    self::get_ta_admin_role_id() == null ||
+                    self::get_ta_role_id() == null) {
                 $result = false;
             }
             $cacheistasite[$enrol->id] = $result;
