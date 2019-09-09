@@ -165,6 +165,9 @@ $string['gradeover'] = 'Override grade for submission';
 $string['gradesreport'] = 'Workshop grades report';
 $string['gradereceivedfrom'] = '&lt;';
 $string['gradeinfo'] = 'Grade: {$a->received} of {$a->max}';
+// START UCLA MOD: CCLE-8740 - Show students other assessments.
+$string['gradeforassessing'] = 'Your grade for assessing: {$a}';
+// END UCLA MOD: CCLE-8740.
 $string['gradetopasssubmission'] = 'Submission grade to pass';
 $string['gradetopassgrading'] = 'Assessment grade to pass';
 $string['gradinggrade'] = 'Grade for assessment';

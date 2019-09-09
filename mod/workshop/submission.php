@@ -271,6 +271,12 @@ if (($workshop->phase == workshop::PHASE_CLOSED) and ($ownsubmission or $canview
 // and possibly display the submission's review(s)
 
 if ($isreviewer) {
+    // START UCLA MOD: CCLE-8740 - Show students other assessments.
+    // Get user's grade for assessing the submission.
+    $data = $workshop->prepare_grading_report_data($submission->authorid, 0, 0, 0, null, null);
+    $owngrade = reset($data->grades)->reviewedby[$USER->id]->gradinggrade . ' of ' . $data->maxgradinggrade;
+    // END UCLA MOD: CCLE-8740.
+
     // user's own assessment
     $strategy   = $workshop->grading_strategy_instance();
     $mform      = $strategy->get_assessment_form($PAGE->url, 'assessment', $userassessment, false);
@@ -279,6 +285,9 @@ if ($isreviewer) {
         'showauthor'    => $showauthor,
         'showform'      => !is_null($userassessment->grade),
         'showweight'    => true,
+        // START UCLA MOD: CCLE-8740 - Show students other assessments.
+        'owngrade'  => $owngrade,
+        // END UCLA MOD: CCLE-8740.
     );
     $assessment = $workshop->prepare_assessment($userassessment, $mform, $options);
     $assessment->title = get_string('assessmentbyyourself', 'workshop');
@@ -303,11 +312,20 @@ if ($isreviewer) {
     }
 }
 
-if (has_capability('mod/workshop:viewallassessments', $workshop->context) or ($ownsubmission and $workshop->assessments_available())) {
+// START UCLA MOD: CCLE-8740 - Show students other assessments.
+if (has_capability('mod/workshop:viewallassessments', $workshop->context)
+        or (has_capability('mod/workshop:submit', $workshop->context)
+            and (($workshop->phase == workshop::PHASE_CLOSED) or ($workshop->phase == workshop::PHASE_EVALUATION)))
+        or ($ownsubmission and $workshop->assessments_available())) {
+// END UCLA MOD: CCLE-8740.
     // other assessments
     $strategy       = $workshop->grading_strategy_instance();
     $assessments    = $workshop->get_assessments_of_submission($submission->id);
     $showreviewer   = has_capability('mod/workshop:viewreviewernames', $workshop->context);
+    // START UCLA MOD: CCLE-8740 - Show students other assessments.
+    // Show assessment title only if have viewallassessments capability.
+    $showassessmenttitle = has_capability('mod/workshop:viewallassessments', $workshop->context);
+    // END UCLA MOD: CCLE-8740.
     foreach ($assessments as $assessment) {
         if ($assessment->reviewerid == $USER->id) {
             // own assessment has been displayed already
@@ -323,6 +341,9 @@ if (has_capability('mod/workshop:viewallassessments', $workshop->context) or ($o
             'showauthor'    => $showauthor,
             'showform'      => !is_null($assessment->grade),
             'showweight'    => true,
+            // START UCLA MOD: CCLE-8740 - Show students other assessments.
+            'showassessmenttitle' => $showassessmenttitle
+            // END UCLA MOD: CCLE-8740.
         );
         $displayassessment = $workshop->prepare_assessment($assessment, $mform, $options);
         if ($canoverride) {

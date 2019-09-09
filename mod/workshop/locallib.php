@@ -4205,6 +4205,14 @@ abstract class workshop_assessment_base {
     /** @var workshop */
     public $workshop;
 
+    // START UCLA MOD: CCLE-8740 - Show students other assessments.
+    /** @var boolean|true toggle to show the assessment title */
+    public $showassessmenttitle = TRUE;
+
+    /** @var string|null contains the grade got from assessing */
+    public $owngrade = null;
+    // END UCLA MOD: CCLE-8740.
+
     /**
      * Copies the properties of the given database record into properties of $this instance
      *
@@ -4235,6 +4243,16 @@ abstract class workshop_assessment_base {
         if (!empty($options['showauthor'])) {
             $this->author = user_picture::unalias($record, null, 'authorid', 'author');
         }
+
+        // START UCLA MOD: CCLE-8740 - Show students other assessments.
+        if(array_key_exists('showassessmenttitle', $options)) {
+            $this->showassessmenttitle = $options['showassessmenttitle'];
+        }
+
+        if(array_key_exists('owngrade', $options)) {
+            $this->owngrade = $options['owngrade'];
+        }
+        // END UCLA MOD: CCLE-8740.
     }
 
     /**
