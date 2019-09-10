@@ -41,6 +41,13 @@ require_once($CFG->dirroot . '/lib/weblib.php');
 class video_reserves extends \core_search\base {
 
     /**
+     * The context levels the search area is working on.
+     *
+     * @var array
+     */
+    protected static $levels = [CONTEXT_COURSE];
+
+    /**
      * Returns true if this area uses file indexing.
      *
      * @return bool
