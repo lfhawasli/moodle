@@ -34,7 +34,7 @@ function videoannotation_backup_clips($bf, $preferences, $videoannotation, $acti
                   FROM {$CFG->prefix}videoannotationclips
                  WHERE videoannotationid = " . (int) $videoannotation . "
                    AND userid IS NULL AND groupid IS NULL
-                 ORDER BY id"
+                 ORDER BY id";
         $videoannotationclips = get_records_sql($sql);
     } else {
         $videoannotationclips = get_records('videoannotationclips', 'videoannotationid', $videoannotation, "id");

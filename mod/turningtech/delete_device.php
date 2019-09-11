@@ -29,7 +29,7 @@ $devicemap   = null;
 if (!$devicemap = TurningTechDeviceMap::fetch(array(
                 'id' => $devicemapid
 ))) {
-    print_error('couldnotfinddeviceid', 'turningtech', '', $devicemapid));
+    print_error('couldnotfinddeviceid', 'turningtech', '', $devicemapid);
 }
 // Has the form been confirmed.
 $confirm = optional_param('confirm', 0, PARAM_BOOL);
