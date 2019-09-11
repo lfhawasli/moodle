@@ -16,9 +16,10 @@
 /**
  * Cache for course reserves URL.
  *
- * @package    ucla_library_reserves
+ * @package    block_ucla_library_reserves
  * @category   cache
  * @copyright  2019 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();

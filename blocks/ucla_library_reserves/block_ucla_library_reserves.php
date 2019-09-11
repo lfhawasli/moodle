@@ -26,6 +26,13 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/local/ucla/lib.php');
 
+/**
+ * Block definition file for UCLA Library Reserves.
+ *
+ * @package    block_ucla_library_reserves
+ * @copyright  2019 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_ucla_library_reserves extends block_base {
 
     /**
@@ -52,7 +59,10 @@ class block_ucla_library_reserves extends block_base {
     }
 
     /**
-     * Use UCLA Course menu block hook
+     * Hook into UCLA Site menu block.
+     *
+     * @param array $course
+     * @return array
      */
     public static function get_navigation_nodes($course) {
         global $DB, $COURSE;

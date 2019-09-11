@@ -24,6 +24,7 @@
 
 require_once(dirname(__FILE__).'/../../config.php');
 require_once($CFG->dirroot.'/blocks/ucla_library_reserves/locallib.php');
+require_login(null, true, null, true, false);
 
 $courseshortname = optional_param('courseshortname', '', PARAM_TEXT);
 $course = get_course(required_param('courseid', PARAM_INT));
@@ -55,7 +56,7 @@ if (can_request_course_reserves($course->id)) {
     echo html_writer::empty_tag('br');
     echo html_writer::link('http://ucla.libsurveys.com/rg-feedback',
         get_string('libraryfeedback', 'block_ucla_library_reserves'),
-        array('class'=> 'btn btn-secondary', 'role' => 'button'));
+        array('class' => 'btn btn-secondary', 'role' => 'button'));
 }
 
 echo $OUTPUT->footer();

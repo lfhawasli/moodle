@@ -28,6 +28,15 @@ define('BLOCK_UCLA_LIBRARY_RESERVES_LIB_RESERVES', 2);
 require_once($CFG->dirroot.'/local/ucla/lib.php');
 require_once($CFG->dirroot.'/admin/tool/uclacoursecreator/uclacoursecreator.class.php');
 
+/**
+ * Initializes all $PAGE variables.
+ *
+ * @param object $course
+ * @param context_course $context
+ * @param moodle_url $url
+ * @param int $mode         Optional. Add link to index page for given mode.
+ * @param string $title     Optional. Add link to breakcrumbs.
+ */
 function init_pagex($course, $context, $url, $mode = null, $title = null) {
     global $PAGE;
 
@@ -64,13 +73,20 @@ function init_pagex($course, $context, $url, $mode = null, $title = null) {
     }
 }
 
-function print_library_tabs($activetab, $courseid, $print_reserves = true) {
+/**
+ * Prints tabs for course library content.
+ *
+ * @param string $activetab
+ * @param int $courseid courseid of the active tab
+ * @param boolean $printreserves courseid of the active tab
+ */
+function print_library_tabs($activetab, $courseid, $printreserves = true) {
     $tabs = [];
     $tabs[] = new tabobject(get_string('researchguide', 'block_ucla_library_reserves'),
         new moodle_url('/blocks/ucla_library_reserves/index.php',
             array('courseid' => $courseid)),
             get_string('researchguide', 'block_ucla_library_reserves'));
-    if ($print_reserves) {
+    if ($printreserves) {
         $tabs[] = new tabobject(get_string('coursereserves', 'block_ucla_library_reserves'),
         new moodle_url('/blocks/ucla_library_reserves/course_reserves.php',
             array('courseid' => $courseid)),
@@ -79,6 +95,10 @@ function print_library_tabs($activetab, $courseid, $print_reserves = true) {
     print_tabs(array($tabs), $activetab);
 }
 
+/**
+ * Creates the object that contains the necessary information to call the LTI tool.
+ * @return stdObject contains information to pass into the function that calls the LTI tool.
+ */
 function construct_lti_config() {
     $toolconfig = new stdClass();
     // Add config info.
@@ -190,17 +210,22 @@ function show_research_guide($courseid, $activetab) {
 function get_iframe($url) {
     $decodedurl = urldecode ( $url );
     $courseid = strpos($decodedurl, 'courseId');
-    $decodedurl = substr($decodedurl, $courseid? $courseid+strlen('courseId'): strpos($decodedurl,'shortname')+strlen('shortname')+1);
-    $courseshortname = substr($decodedurl, 0, strpos($decodedurl,'&'));
+    $decodedurl = substr(
+        $decodedurl, $courseid
+        ? $courseid + strlen('courseId')
+        : strpos($decodedurl, 'shortname') + strlen('shortname') + 1
+    );
+    $courseshortname = substr($decodedurl, 0, strpos($decodedurl, '&'));
     $title = '';
     if ( $courseid ) {
-        $courseshortname = substr($courseshortname, strpos($courseshortname, '|')+1);
+        $courseshortname = substr($courseshortname, strpos($courseshortname, '|') + 1);
         $courseshortname = str_replace ( ':', ' ', $courseshortname);
         $title = get_string('iframecoursereserves', 'block_ucla_library_reserves', $courseshortname);
     } else {
         $title = get_string('iframeresearchguide', 'block_ucla_library_reserves', $courseshortname);
     }
-    echo '<iframe id="contentframe" title="'.$title.'" height="600px" width="100%" src="'.$url.'"webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+    echo '<iframe id="contentframe" title="'.$title.'" height="600px" width="100%" src="' .
+        $url . '"webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
     // Output script to make the iframe tag be as large as possible.
     $resize = '
         <script type="text/javascript">
@@ -245,12 +270,16 @@ function get_hostcourseurl($courseid) {
                    AND reserves.quarter = classes.term
              WHERE classes.hostcourse = 1
                    AND classes.courseid = :id", array('id' => $courseid), IGNORE_MULTIPLE);
-        if ($courseurl) $courseurl = $courseurl->url;
+        if ($courseurl) {
+            $courseurl = $courseurl->url;
+        }
         // If link is not https, convert it to https.
         if (!(strpos($courseurl, 'https') !== false)) {
             $courseurl = preg_replace('|http://|i', 'https://', $courseurl, 1);
         }
-        if (!$courseurl) $courseurl = null;
+        if (!$courseurl) {
+            $courseurl = null;
+        }
         $cache->set($courseid, $courseurl);
     }
     return $courseurl;

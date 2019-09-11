@@ -24,6 +24,7 @@
 
 require_once(dirname(__FILE__).'/../../config.php');
 require_once($CFG->dirroot.'/blocks/ucla_library_reserves/locallib.php');
+require_login();
 
 $course = get_course(required_param('courseid', PARAM_INT));
 $url = new moodle_url('/blocks/ucla_library_reserves/course_reserves.php', array('courseid' => $course->id));
@@ -47,13 +48,13 @@ if (can_request_course_reserves($course->id)) {
     echo html_writer::empty_tag('br');
     echo html_writer::link('https://www.library.ucla.edu/use/borrow-renew-return/course-reserves/information-instructors',
         get_string('lcrequest', 'block_ucla_library_reserves'),
-        array('class'=> 'btn btn-primary', 'role' => 'button'));
+        array('class' => 'btn btn-primary', 'role' => 'button'));
     // Show feedback link.
     echo html_writer::empty_tag('br'); // First <br> is of size 0x0 because of the above button.
     echo html_writer::empty_tag('br');
     echo html_writer::link('http://ucla.libsurveys.com/rg-feedback',
         get_string('libraryfeedback', 'block_ucla_library_reserves'),
-        array('class'=> 'btn btn-secondary', 'role' => 'button'));
+        array('class' => 'btn btn-secondary', 'role' => 'button'));
 } else {
     if ($hostcourseurl) {
         get_iframe($hostcourseurl);

@@ -53,7 +53,7 @@ It can be used by the tool provider to uniquely identify the Moodle site from wh
 $string['lticonsumerkeylibraryreservesdefault'] = 'ucla.libapps.com';
 // Library reserves LTI shared secret.
 $string['ltisecretlibraryreserves'] = 'Shared secret';
-$string['ltisecretlibraryreserveshelp'] = 'The shared secret can be thought of as a password used to authenticate access to the tool. 
+$string['ltisecretlibraryreserveshelp'] = 'The shared secret can be thought of as a password used to authenticate access to the tool.
 
 It should be provided along with the consumer key from the tool provider.';
 
