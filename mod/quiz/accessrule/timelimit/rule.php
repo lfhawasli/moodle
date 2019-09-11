@@ -78,32 +78,46 @@ class quizaccess_timelimit extends quiz_access_rule_base {
             MoodleQuickForm $mform, $attemptid) {
         $mform->addElement('header', 'honestycheckheader',
                 get_string('confirmstartheader', 'quizaccess_timelimit'));
-        // START UCLA MOD CCLE-5699 AND CCLE-6042 Improve Quiz pop-up Warning.
-//        $mform->addElement('static', 'honestycheckmessage', '',
-//                get_string('confirmstart', 'quizaccess_timelimit', format_time($this->quiz->timelimit)));
+        // START UCLA MOD: CCLE-5699/CCLE-6042/SSC-4084 - Improve Quiz pop-up warning.
+        //$mform->addElement('static', 'honestycheckmessage', '',
+        //        get_string('confirmstart', 'quizaccess_timelimit', format_time($this->quiz->timelimit)));
+        global $CFG;
+        $quiztipslink = $CFG->quiztipslink;
         if (strcmp($this->quiz->overduehandling, "autoabandon") == 0) {
             if ($this->quiz->attempts != 0) {
-                $a = (object)array('timelimit'=>format_time($this->quiz->timelimit),
-                    'attempts'=>$this->quiz->attempts);
+                $a = (object) array(
+                    'timelimit' => format_time($this->quiz->timelimit),
+                    'attempts' => $this->quiz->attempts,
+                    'quiztipslink' => $quiztipslink
+                );
                 $mform->addElement('static', 'honestycheckmessage', '',
                         get_string('confirmstart', 'quizaccess_timelimit', $a));
             } else {
+                $a = (object) array(
+                    'timelimit' => format_time($this->quiz->timelimit),
+                    'quiztipslink' => $quiztipslink
+                );
                 $mform->addElement('static', 'honestycheckmessage', '',
-                        get_string('confirmstartnolimit', 'quizaccess_timelimit',
-                                format_time($this->quiz->timelimit)));
+                        get_string('confirmstartnolimit', 'quizaccess_timelimit', $a));
             }
         } else {
             if ($this->quiz->attempts != 0) {
-                $a = (object)array('timelimit'=>format_time($this->quiz->timelimit),
-                    'attempts'=>$this->quiz->attempts);
+                $a = (object) array(
+                    'timelimit' => format_time($this->quiz->timelimit),
+                    'attempts' => $this->quiz->attempts,
+                    'quiztipslink' => $quiztipslink
+                );
                 $mform->addElement('static', 'honestycheckmessage', '',
                         get_string('confirmstartsafe', 'quizaccess_timelimit', $a));
             } else {
+                $a = (object) array(
+                    'timelimit' => format_time($this->quiz->timelimit),
+                    'quiztipslink' => $quiztipslink
+                );
                 $mform->addElement('static', 'honestycheckmessage', '',
-                        get_string('confirmstartsafenolimit', 'quizaccess_timelimit',
-                                format_time($this->quiz->timelimit)));
+                        get_string('confirmstartsafenolimit', 'quizaccess_timelimit', $a));
             }
         }
-        // END UCLA MOD CCLE- 6042 AND CCLE-5699 Fixed Quiz Confirmation.
+        // END UCLA MOD: CCLE-5699/CCLE-6042/SSC-4084.
     }
 }

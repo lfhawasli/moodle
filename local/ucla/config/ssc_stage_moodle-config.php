@@ -133,6 +133,9 @@ $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_api'] = 'https://mood
 $CFG->forced_plugin_settings['block_ucla_help']['fromemail'] = 'help@ssc.ucla.edu';
 $block_ucla_help_support_contacts['System'] = 'new@tickets.sscnet.ucla.edu,help@ssc.ucla.edu';  // default
 
+// SSC-4084 - Include links to Quiz tips.
+$CFG->quiztipslink = 'https://moodle2help.sscnet.ucla.edu/docs/Tips_for_taking_quizzes_in_CCLE_Moodle';
+
 // CCLE-2301 - COURSE MENU BLOCK
 $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 

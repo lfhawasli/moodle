@@ -116,6 +116,9 @@ $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_api'] = 'https://docs
 $block_ucla_help_support_contacts['System'] = 'support';  // Default.
 $CFG->forced_plugin_settings['block_ucla_help']['maxfilesize'] = 10485760;
 
+// SSC-4084 - Include links to Quiz tips.
+$CFG->quiztipslink = 'https://docs.ccle.ucla.edu/w/Tips_for_taking_quizzes_in_CCLE_Moodle';
+
 // CCLE-2301 - COURSE MENU BLOCK
 $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 
