@@ -171,6 +171,11 @@ class workshop {
     /** @var int maximum size of one file attached to the overall feedback */
     public $overallfeedbackmaxbytes;
 
+    // START UCLA MOD: CCLE-8786 - setting to toggle students' ability to view other's assessments.
+    /** @var bool optional feature: students can see other students\' assessments */
+    public $viewotherassessments;
+    // END UCLA MOD: CCLE-8786.
+    
     /**
      * @var workshop_strategy grading strategy instance
      * Do not use directly, get the instance using {@link workshop::grading_strategy_instance()}

@@ -389,6 +389,11 @@ $string['userplanaccessibilitytitle'] = 'Workshop timeline with {$a} phases';
 $string['useselfassessment'] = 'Use self-assessment';
 $string['useselfassessment_help'] = 'If enabled, a user may be allocated their own submission to assess and will receive a grade for assessment in addition to a grade for their submission.';
 $string['useselfassessment_desc'] = 'Students may assess their own work';
+// START UCLA MOD: CCLE-8786 - setting to toggle students' ability to view other's assessments.
+$string['viewotherassessments'] = 'Allow students to view assessments';
+$string['viewotherassessments_help'] = 'If enabled, students can only see the assessment text and not the names of the students associated with the text.';
+$string['viewotherassessments_desc'] = 'Students can see other students\' assessments';
+// END UCLA MOD: CCLE-8786.
 $string['viewworkshopsummary'] = 'View workshop summary';
 $string['weightinfo'] = 'Weight: {$a}';
 $string['withoutsubmission'] = 'Reviewer without own submission';

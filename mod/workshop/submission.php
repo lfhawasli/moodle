@@ -273,8 +273,11 @@ if (($workshop->phase == workshop::PHASE_CLOSED) and ($ownsubmission or $canview
 if ($isreviewer) {
     // START UCLA MOD: CCLE-8740 - Show students other assessments.
     // Get user's grade for assessing the submission.
-    $data = $workshop->prepare_grading_report_data($submission->authorid, 0, 0, 0, null, null);
-    $owngrade = reset($data->grades)->reviewedby[$USER->id]->gradinggrade . ' of ' . $data->maxgradinggrade;
+    $owngrade = '';
+    if($workshop->viewotherassessments) {
+        $data = $workshop->prepare_grading_report_data($submission->authorid, 0, 0, 0, null, null);
+        $owngrade = reset($data->grades)->reviewedby[$USER->id]->gradinggrade . ' of ' . $data->maxgradinggrade;
+    }
     // END UCLA MOD: CCLE-8740.
 
     // user's own assessment
@@ -315,7 +318,8 @@ if ($isreviewer) {
 // START UCLA MOD: CCLE-8740 - Show students other assessments.
 if (has_capability('mod/workshop:viewallassessments', $workshop->context)
         or (has_capability('mod/workshop:submit', $workshop->context)
-            and (($workshop->phase == workshop::PHASE_CLOSED) or ($workshop->phase == workshop::PHASE_EVALUATION)))
+            and (($workshop->phase == workshop::PHASE_CLOSED) or ($workshop->phase == workshop::PHASE_EVALUATION))
+            and ($workshop->viewotherassessments))
         or ($ownsubmission and $workshop->assessments_available())) {
 // END UCLA MOD: CCLE-8740.
     // other assessments

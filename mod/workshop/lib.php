@@ -85,6 +85,9 @@ function workshop_add_instance(stdclass $workshop) {
     $workshop->latesubmissions       = (int)!empty($workshop->latesubmissions);
     $workshop->phaseswitchassessment = (int)!empty($workshop->phaseswitchassessment);
     $workshop->evaluation            = 'best';
+    // START UCLA MOD: CCLE-8786 - setting to toggle students' ability to view other's assessments.
+    $workshop->viewotherassessments = (int)!empty($workshop->viewotherassessments);
+    // END UCLA MOD: CCLE-8786.
 
     if (isset($workshop->gradinggradepass)) {
         $workshop->gradinggradepass = (float)unformat_float($workshop->gradinggradepass);
@@ -168,6 +171,9 @@ function workshop_update_instance(stdclass $workshop) {
     $workshop->useselfassessment     = (int)!empty($workshop->useselfassessment);
     $workshop->latesubmissions       = (int)!empty($workshop->latesubmissions);
     $workshop->phaseswitchassessment = (int)!empty($workshop->phaseswitchassessment);
+    // START UCLA MOD: CCLE-8786 - setting to toggle students' ability to view other's assessments.
+    $workshop->viewotherassessments = (int)!empty($workshop->viewotherassessments);
+    // END UCLA MOD: CCLE-8786.
 
     if (isset($workshop->gradinggradepass)) {
         $workshop->gradinggradepass = (float)unformat_float($workshop->gradinggradepass);

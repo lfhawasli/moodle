@@ -164,6 +164,13 @@ class mod_workshop_mod_form extends moodleform_mod {
         $mform->addElement('checkbox', 'useselfassessment', $label, $text);
         $mform->addHelpButton('useselfassessment', 'useselfassessment', 'workshop');
 
+        // START UCLA MOD: CCLE-8786 - setting to toggle students' ability to view other's assessments.
+        $label = get_string('viewotherassessments', 'workshop');
+        $text = get_string('viewotherassessments_desc', 'workshop');
+        $mform->addElement('checkbox', 'viewotherassessments', $label, $text);
+        $mform->addHelpButton('viewotherassessments', 'viewotherassessments', 'workshop');
+        // END UCLA MOD: CCLE-8786.
+
         // Feedback -------------------------------------------------------------------
         $mform->addElement('header', 'feedbacksettings', get_string('feedbacksettings', 'workshop'));
 

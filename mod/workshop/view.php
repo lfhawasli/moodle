@@ -597,29 +597,31 @@ case workshop::PHASE_CLOSED:
             echo $output->render($workshop->prepare_submission_summary($submission, true));
 
             // START UCLA MOD: CCLE-8740 - Show students other assessments.
-            $perpage = get_user_preferences('workshop_perpage', 1);
-            $groupid = groups_get_activity_group($workshop->cm, true);
-            $data = $workshop->prepare_grading_report_data($USER->id, $groupid, $page, $perpage, $sortby, $sorthow);
-            $reportopts = new stdclass();
-            if ($data) {
-                $showauthornames    = has_capability('mod/workshop:viewauthornames', $workshop->context);
-                $showreviewernames  = has_capability('mod/workshop:viewreviewernames', $workshop->context);
-                // Prepare paging bar.
-                $baseurl = new moodle_url($PAGE->url, array('sortby' => $sortby, 'sorthow' => $sorthow));
-                $pagingbar = new paging_bar($data->totalcount, $page, $perpage, $baseurl, 'page');
+            if($workshop->viewotherassessments) {
+                $perpage = get_user_preferences('workshop_perpage', 1);
+                $groupid = groups_get_activity_group($workshop->cm, true);
+                $data = $workshop->prepare_grading_report_data($USER->id, $groupid, $page, $perpage, $sortby, $sorthow);
+                $reportopts = new stdclass();
+                if ($data) {
+                    $showauthornames    = has_capability('mod/workshop:viewauthornames', $workshop->context);
+                    $showreviewernames  = has_capability('mod/workshop:viewreviewernames', $workshop->context);
+                    // Prepare paging bar.
+                    $baseurl = new moodle_url($PAGE->url, array('sortby' => $sortby, 'sorthow' => $sorthow));
+                    $pagingbar = new paging_bar($data->totalcount, $page, $perpage, $baseurl, 'page');
 
-                // Grading report display options.
-                $reportopts->showauthornames        = $showauthornames;
-                $reportopts->showreviewernames      = $showreviewernames;
-                $reportopts->sortby                 = $sortby;
-                $reportopts->sorthow                = $sorthow;
-                $reportopts->showsubmissiongrade    = true;
-                $reportopts->showgradinggrade       = true;
-                $reportopts->workshopphase          = $workshop->phase;
+                    // Grading report display options.
+                    $reportopts->showauthornames        = $showauthornames;
+                    $reportopts->showreviewernames      = $showreviewernames;
+                    $reportopts->sortby                 = $sortby;
+                    $reportopts->sorthow                = $sorthow;
+                    $reportopts->showsubmissiongrade    = true;
+                    $reportopts->showgradinggrade       = true;
+                    $reportopts->workshopphase          = $workshop->phase;
 
-                $filtereddata = $data;
-                $filtereddata->grades = [$filtereddata->grades[$USER->id]];
-                $gradetablehtml = $output->render(new workshop_grading_report($filtereddata, $reportopts));
+                    $filtereddata = $data;
+                    $filtereddata->grades = [$filtereddata->grades[$USER->id]];
+                    $gradetablehtml = $output->render(new workshop_grading_report($filtereddata, $reportopts));
+                }
             }
             // END UCLA MOD: CCLE-8740.
         } else {
@@ -634,7 +636,7 @@ case workshop::PHASE_CLOSED:
         print_collapsible_region_end();
 
         // START UCLA MOD: CCLE-8740 - Show students other assessments.
-        if($gradetablehtml) {
+        if($gradetablehtml && $workshop->viewotherassessments) {
             print_collapsible_region_start('', 'workshop-viewlet-gradereport', get_string('gradesreport', 'workshop'));
             echo $output->box_start('generalbox gradesreport');
             echo $output->container(groups_print_activity_menu($workshop->cm, $PAGE->url, true), 'groupwidget');
