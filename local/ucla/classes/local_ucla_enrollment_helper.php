@@ -312,12 +312,14 @@ class local_ucla_enrollment_helper {
                     if (empty($user->$field) && !empty($enrollment[$field])) {
                         $blankfields[$field] = $enrollment[$field];
                     }
-
-                    $this->trace->output(
+                    // Do not update name according to registrar data from $enrollment.
+                    if ($field != 'firstname' && $field != 'lastname' ) {
+                        $user->$field = $enrollment[$field];
+                        $this->trace->output(
                             sprintf('User %d needs update: %s [%s] => [%s]',
                                     $user->id, $field, $user->$field,
                                     $enrollment[$field]), 2);
-                    $user->$field = $enrollment[$field];
+                    }
                 }
             }
 

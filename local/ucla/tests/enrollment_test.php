@@ -127,61 +127,61 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
                     'enrol_database');
         }
 
-        switch (get_class($DB)) {
-            case 'mssql_native_moodle_database':
-                set_config('dbtype', 'mssql_n', 'enrol_database');
-                set_config('dbsybasequoting', '1', 'enrol_database');
-                break;
+        switch ($DB->get_dbfamily()) {
 
-            case 'mysqli_native_moodle_database':
+            case 'mysql':
                 set_config('dbtype', 'mysqli', 'enrol_database');
                 set_config('dbsetupsql', "SET NAMES 'UTF-8'", 'enrol_database');
                 set_config('dbsybasequoting', '0', 'enrol_database');
                 if (!empty($CFG->dboptions['dbsocket'])) {
                     $dbsocket = $CFG->dboptions['dbsocket'];
-                    if ((strpos($dbsocket, '/') === false and strpos($dbsocket,
-                                    '\\') === false)) {
+                    if ((strpos($dbsocket, '/') === false and strpos($dbsocket, '\\') === false)) {
                         $dbsocket = ini_get('mysqli.default_socket');
                     }
-                    set_config('dbtype',
-                            'mysqli://' . rawurlencode($CFG->dbuser) .
-                            ':' . rawurlencode($CFG->dbpass) . '@' .
-                            rawurlencode($CFG->dbhost) . '/' .
-                            rawurlencode($CFG->dbname) . '?socket=' .
-                            rawurlencode($dbsocket), 'enrol_database');
+                    set_config('dbtype', 'mysqli://'.rawurlencode($CFG->dbuser).':'.rawurlencode($CFG->dbpass).'@'.rawurlencode($CFG->dbhost).'/'.rawurlencode($CFG->dbname).'?socket='.rawurlencode($dbsocket), 'enrol_database');
                 }
                 break;
 
-            case 'oci_native_moodle_database':
+            case 'oracle':
                 set_config('dbtype', 'oci8po', 'enrol_database');
                 set_config('dbsybasequoting', '1', 'enrol_database');
                 break;
 
-            case 'pgsql_native_moodle_database':
+            case 'postgres':
                 set_config('dbtype', 'postgres7', 'enrol_database');
                 $setupsql = "SET NAMES 'UTF-8'";
                 if (!empty($CFG->dboptions['dbschema'])) {
-                    $setupsql .= "; SET search_path = '" . $CFG->dboptions['dbschema'] . "'";
+                    $setupsql .= "; SET search_path = '".$CFG->dboptions['dbschema']."'";
                 }
                 set_config('dbsetupsql', $setupsql, 'enrol_database');
                 set_config('dbsybasequoting', '0', 'enrol_database');
                 if (!empty($CFG->dboptions['dbsocket']) and ($CFG->dbhost === 'localhost' or $CFG->dbhost === '127.0.0.1')) {
                     if (strpos($CFG->dboptions['dbsocket'], '/') !== false) {
-                        set_config('dbhost', $CFG->dboptions['dbsocket'],
-                                'enrol_database');
+                        $socket = $CFG->dboptions['dbsocket'];
+                        if (!empty($CFG->dboptions['dbport'])) {
+                            $socket .= ':' . $CFG->dboptions['dbport'];
+                        }
+                        set_config('dbhost', $socket, 'enrol_database');
                     } else {
-                        set_config('dbhost', '', 'enrol_database');
+                      set_config('dbhost', '', 'enrol_database');
                     }
                 }
                 break;
 
-            case 'sqlsrv_native_moodle_database':
+            case 'mssql':
                 set_config('dbtype', 'mssqlnative', 'enrol_database');
                 set_config('dbsybasequoting', '1', 'enrol_database');
+
+                // The native sqlsrv driver uses a comma as separator between host and port.
+                $dbhost = $CFG->dbhost;
+                if (!empty($dboptions['dbport'])) {
+                    $dbhost .= ',' . $dboptions['dbport'];
+                }
+                set_config('dbhost', $dbhost, 'enrol_database');
                 break;
 
             default:
-                throw new exception('Unknown database driver ' . get_class($DB));
+                throw new exception('Unknown database driver '.get_class($DB));
         }
 
         // NOTE: It is stongly discouraged to create new tables in
@@ -621,6 +621,7 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
      * Make sure that createorfinduser does update a user's information if
      * information is out of date according to the externaldb and user has not
      * logged in for a while.
+     * Make sure that the user's first name and last name will not be updated.
      *
      * @dataProvider provider_diff_conditions
      *
@@ -641,8 +642,16 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
             // The empty case makes no sense for this test.
             return;
         }
+
         foreach ($diffconditions as $field) {
             $diffuser->$field = str_shuffle($diffuser->$field);
+        }
+
+        if (!in_array('firstname', $diffconditions)) {
+            $diffuser->firstname = str_shuffle($diffuser->firstname);
+        }
+        if (!in_array('lastname', $diffconditions)) {
+            $diffuser->lastname = str_shuffle($diffuser->lastname);
         }
 
         $enrollment = array('uid' => $diffuser->idnumber,
@@ -655,12 +664,15 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
 
         // Make sure returned user does have info updated.
         $dbuser = $DB->get_record('user', array('id' => $user->id));
-        foreach (array('firstname', 'lastname', 'email') as $field) {
-            $this->assertEquals($diffuser->$field, $founduser->$field,
-                    'Field being processed: ' . $field);
-            // Make sure local DB was updated as well.
-            $this->assertEquals($dbuser->$field, $founduser->$field,
-                    'Field being processed: ' . $field);
+        $this->assertEquals($diffuser->email, $founduser->email,
+            'Field being processed: email.');
+        // Make sure local DB was updated as well.
+        $this->assertEquals($dbuser->email, $founduser->email,
+            'Field being processed: email.' );
+        // Make sure name did not change.
+        foreach (array('firstname', 'lastname') as $field) {
+            $this->assertEquals($user->$field, $founduser->$field,
+                'Field being processed: ' . $field);
         }
     }
 
@@ -838,7 +850,7 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
 
         // Make sure default message includes course fullname and url.
         $coursefullname = quoted_printable_encode($course->fullname);
-        $urlstring = quoted_printable_encode("$CFG->wwwroot/course/view.php?id=$course->id");
+        $urlstring = quoted_printable_encode("view.php?id=$course->id");
         $this->assertTrue(strpos($parsedemail->body, $coursefullname) !== false);
         $this->assertTrue(strpos($parsedemail->body, $urlstring) !== false);
 
@@ -861,8 +873,6 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
         $this->assertEquals(1, count($messages));
         $sink->clear();
         $parsedemail = array_pop($messages);
-
-        // Make sure custom subject, replyto, message was emailed.
         $this->assertTrue(strpos($parsedemail->header,
                 'Reply-To: ' . $enrolplugin->customchar1) !== false);
         $this->assertEquals($parsedemail->subject, $enrolplugin->customchar2);
@@ -887,7 +897,7 @@ class local_ucla_enrollment_testcase extends advanced_testcase {
         $parsedemail = array_pop($messages);
 
         // Verify that course url is now friendly.
-        $urlstring = quoted_printable_encode("$CFG->wwwroot/course/view/$course->shortname");
+        $urlstring = quoted_printable_encode("view/$course->shortname");
         $this->assertTrue(strpos($parsedemail->body, $urlstring) !== false);
     }
 
