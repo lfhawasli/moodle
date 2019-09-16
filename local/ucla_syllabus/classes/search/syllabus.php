@@ -141,7 +141,12 @@ class syllabus extends \core_search\base {
             return false;
         }
 
-        $context = \context_course::instance($record->courseid);
+        try {
+            $context = \context_course::instance($record->courseid, MUST_EXIST);
+        } catch (\dml_exception $e) {
+            mtrace("---- Syllabus found with unknown courseid {$record->courseid}. Skipping indexing of this file.");
+            return false;
+        }
 
         // Prepare associative array with data from DB.
         $doc = \core_search\document_factory::instance($record->id, $this->componentname, $this->areaname);
