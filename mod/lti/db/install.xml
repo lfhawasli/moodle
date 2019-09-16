@@ -147,5 +147,19 @@
         <INDEX NAME="ltiid" UNIQUE="false" FIELDS="ltiid"/>
       </INDEXES>
     </TABLE>
+    <TABLE NAME="lti_course_menu_placements" COMMENT="Course menu link placements">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Primary key of course (null for system-wide settings)"/>
+        <FIELD NAME="typeid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Primary key of course" />
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Date/time at which the record was created"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Date/time at which the record was last modified"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="toolid" TYPE="foreign" FIELDS="type" REFTABLE="lti_types" REFFIELDS="id" COMMENT="The tool referenced"/>
+        <KEY NAME="course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id" COMMENT="The course for which the setting exists"/>
+      </KEYS>
+    </TABLE>
   </TABLES>
 </XMLDB>
