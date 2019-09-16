@@ -1,5 +1,5 @@
 <?php
-// This file is part of the UCLA library research portal plugin for Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -13,19 +13,19 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * UCLA Library Research Portal block settings
+ * Cache for course reserves URL.
  *
- * @package    block_ucla_library_portal
- * @copyright  2014 UC Regents
+ * @package    block_ucla_library_reserves
+ * @category   cache
+ * @copyright  2019 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-defined('MOODLE_INTERNAL') || die;
 
-if ($ADMIN->fulltree) {
-    $settings->add(new admin_setting_configtext('block_ucla_library_portal/url',
-            get_string('url', 'block_ucla_library_portal'), '', 'http://www.library.ucla.edu/redirect/ccle', PARAM_URL));
-    $settings->add(new admin_setting_configtext('block_ucla_library_portal/maxrecords', new lang_string('maxrecords', 'block_ucla_library_portal'),
-        new lang_string('maxrecordsdesc', 'block_ucla_library_portal'), 10, PARAM_INT));
-}
+defined('MOODLE_INTERNAL') || die();
+$definitions = array(
+    // Store reserves url to avoid repetitive DB queries within one request.
+    'hostcourseurl' => array(
+        'mode' => cache_store::MODE_APPLICATION,
+    )
+);

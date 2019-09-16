@@ -187,150 +187,35 @@ class modify_navigation {
     }
 
     /**
-     * Add link to media resources.
+     * General function to add link to navigation bar.
+     * Pass in the block that defines get_navigation_nodes()
+     * and optionally pass in whether that function returns an array
+     * or not.
      */
-    private function add_mediaresources() {
+    private function add_link($blockname, $returnsarray = false) {
         global $COURSE;
 
         $params['course'] = $COURSE;
 
-        $mediaresourcenode = block_method_result('ucla_media', 'get_navigation_nodes', $params);
-        if (!empty($mediaresourcenode)) {
-            // If media resources node is to be displayed as a new flat nav block.
-            if ($this->showdividercalled === false) {
-                $mediaresourcenode = new \flat_navigation_node($mediaresourcenode, 0);
-                $mediaresourcenode->set_showdivider(true);
-                $this->showdividercalled = true;
-            }
-            $this->coursenode->add_node($mediaresourcenode);
-        }
-    }
-
-    /**
-     * Add link to Library reserves.
-     */
-    private function add_libraryreserves() {
-        global $COURSE;
-
-        $params['course'] = $COURSE;
-
-        $libraryreserves = block_method_result('ucla_library_reserves', 'get_navigation_nodes', $params);
-        if (!empty($libraryreserves)) {
-            // Iterate the array if multiple library reserves are to be displayed.
-            foreach ($libraryreserves as $libraryreservenode) {
-                // If library reserve node is to be displayed as a new flat nav block.
+        $link = block_method_result($blockname, 'get_navigation_nodes', $params);
+        if ($returnsarray && !empty($link)) {
+            foreach ($link as $linknode) {
                 if ($this->showdividercalled === false) {
-                    $libraryreservenode = new \flat_navigation_node($libraryreservenode, 0);
-                    $libraryreservenode->set_showdivider(true);
+                    $linknode = new \flat_navigation_node($linknode, 0);
+                    $linknode->set_showdivider(true);
                     $this->showdividercalled = true;
                 }
-                $this->coursenode->add_node($libraryreservenode);
+                $this->coursenode->add_node($linknode);
             }
-        }
-    }
-
-    /**
-     * Add More section.
-     */
-    private function add_more() {
-        global $COURSE;
-
-        // Create More Section node. Flat node so it.
-        $morenode = \navigation_node::create(get_string('moresection', 'theme_uclashared'),
-                new \moodle_url('/course/view.php', array('id' => $COURSE->id)), // We have to add a URL to the course node,
-                                                                                // otherwise the node wouldn't be added to
-                                                                                // the flat navigation by Boost.
-                                                                                // There is no better choice than the course
-                                                                                // home page.
-                \navigation_node::TYPE_CUSTOM,
-                null,
-                'themeuclasharedmore',
-                null);
-        // Prevent that the more section node is marked as active and added to the breadcrumb when showing the
-        // course home page.
-        $morenode->make_inactive();
-        $morenode->isexpandable = true;
-
-        // Get the user preference for the collapse state of the more section node and set the collapse and hidden
-        // node attributes of the more section node accordingly. At the same time, reallocate the parent of the
-        // existing section nodes.
-        $userprefmorenode = get_user_preferences('theme_uclashared-collapse_'.
-                'themeuclasharedmorenode', 1);
-        if ($userprefmorenode == 1) {
-            $morenode->collapse = true;
-        } else {
-            $morenode->collapse = false;
-        }
-
-        // If More Section node is to be displayed as a new flat nav block.
-        if ($this->showdividercalled === false) {
-            $morenode = new \flat_navigation_node($morenode, 0);
-            $morenode->set_showdivider(true);
-            $this->showdividercalled = true;
-        }
-
-        // Add the more section node.
-        $this->coursenode->add_node($morenode);
-
-        // Parameter $params is used to send to the blocks which generate the nav nodes.
-        $params['course'] = $COURSE;
-
-        // Add library reserve guide node.
-        $librarynode = block_method_result('ucla_library_portal', 'get_navigation_nodes', $params);
-        if (!empty($librarynode)) {
-            if ($userprefmorenode == 1) {
-                $librarynode->hidden = true;
-            } else {
-                $librarynode->hidden = false;
-            }
-
-            // Add the library node to the coursehome node.
-            $this->coursenode->add_node($librarynode);
-
-            // Need to set parent only after adding it.
-            $librarynode->set_parent($morenode);
-        }
-
-        // Add subject area nodes.
-        $subjectlinks = block_method_result('ucla_subject_links', 'get_navigation_nodes', $params);
-        if (!empty($subjectlinks)) {
-            // Iterate the array if multiple subject links are to be displayed.
-            foreach ($subjectlinks as $subjectlinknode) {
-                if ($userprefmorenode == 1) {
-                    $subjectlinknode->hidden = true;
-                } else {
-                    $subjectlinknode->hidden = false;
+        } else if (!$returnsarray) {
+            if (!empty($link)) {
+                if ($this->showdividercalled === false) {
+                    $link = new \flat_navigation_node($link, 0);
+                    $link->set_showdivider(true);
+                    $this->showdividercalled = true;
                 }
-
-                // Add the library node to the coursehome node.
-                $this->coursenode->add_node($subjectlinknode);
-
-                // Need to set parent only after adding it.
-                $subjectlinknode->set_parent($morenode);
+                $this->coursenode->add_node($link);
             }
-        }
-
-        // Add MyEngineering node.
-        $myengineeringnode = block_method_result('ucla_myengineer', 'get_navigation_nodes', $params);
-        if (!empty($myengineeringnode)) {
-            if ($userprefmorenode == 1) {
-                $myengineeringnode->hidden = true;
-            } else {
-                $myengineeringnode->hidden = false;
-            }
-
-            // Add the library node to the coursehome node.
-            $this->coursenode->add_node($myengineeringnode);
-
-            // Need to set parent only after adding it.
-            $myengineeringnode->set_parent($morenode);
-        }
-
-        // Make more section collapsible.
-        $this->collapsenodesforjs[] = 'themeuclasharedmore';
-
-        if (empty($librarynode) && empty($subjectlinks) && empty($myengineeringnode)) {
-            $morenode->remove();
         }
     }
 
@@ -901,7 +786,7 @@ class modify_navigation {
 
     /**
      * Retrieve the proper link location for the grades node is set in course settings.
-     * 
+     *
      * @param string $courseid  Default value is the page's courseid
      * @return moodle_url
      */
@@ -927,7 +812,7 @@ class modify_navigation {
                 list($srssql, $params) = $DB->get_in_or_equal($srslist, SQL_PARAMS_NAMED, 'srs');
                 $params['userid'] = $USER->id;
                 $params['term'] = $courseterm;
-                    
+
                 $sql = "SELECT urc.srs
                           FROM {ccle_roster_class_cache} crcc,
                                {ucla_reg_classinfo} urc,
@@ -958,7 +843,7 @@ class modify_navigation {
                     $redirectlink = new \moodle_url('https://be.my.ucla.edu/login/directLink.aspx', 
                                                     array('featureID' => 75, 'term' => $courseterm, 'srs' => $coursesrs));
                 }
-            } 
+            }
         }
         return $redirectlink;
     }
@@ -993,10 +878,11 @@ class modify_navigation {
             $this->add_tasiteparent();
             $this->add_show_all();
             $this->add_new_section();
-            $this->add_libraryreserves();
-            $this->add_mediaresources();
+            $this->add_link('ucla_library_reserves', true);
+            $this->add_link('ucla_media');
             $this->add_activityresources();
-            $this->add_more();
+            $this->add_link('ucla_subject_links', true);
+            $this->add_link('ucla_myengineer');
             $this->add_editingmode();
             $this->add_adminpanel();
             $this->add_download_course_material();

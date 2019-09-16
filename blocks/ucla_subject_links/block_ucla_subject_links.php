@@ -33,7 +33,7 @@ class block_ucla_subject_links extends block_base {
             foreach ($subjname as $sub) {
                 $url = new moodle_url('/blocks/ucla_subject_links/view.php',array('course_id' => $course->id, 'subj_area' => $sub));
                 $node = navigation_node::create(get_string('link_text', 'block_ucla_subject_links', $sub), 
-                        $url, global_navigation::TYPE_CUSTOM, null, null, new pix_icon('spacer', ''));
+                        $url, global_navigation::TYPE_CUSTOM, null, null, null);
                 $node->add_class('subject-area-link');
                 $nodes[] = $node;
             }
@@ -85,9 +85,9 @@ class block_ucla_subject_links extends block_base {
                 }   
             }
         }
-        return $subjname; 
+        return $subjname;
     }
-    
+
     public static function subject_exist($course, $subjarea) {
         $subjname = self::get_subject_areas($course);
         return in_array($subjarea, $subjname);

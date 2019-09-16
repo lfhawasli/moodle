@@ -55,10 +55,14 @@ if (is_enrolled($context) || has_capability('moodle/course:view', $context)) {
         // Display request link.
         if (can_request_media($courseid)) {
             print_media_page_tabs(get_string('headervidres', 'block_ucla_media'), $course->id);
-            echo get_string('vresourcesnotavailable', 'block_ucla_media');
+            $vrnotavailable = html_writer::start_tag('div', array('class' => 'alert alert-danger'));
+            $vrnotavailable .= html_writer::div(get_string('vresourcesnotavailable', 'block_ucla_media'));
+            $vrnotavailable .= html_writer::end_tag('div');
+            echo $vrnotavailable;
             echo html_writer::empty_tag('br');
             echo html_writer::link('https://oid.ucla.edu/imcs/requesting-access-online-materials',
-                get_string('vrrequest', 'block_ucla_media'));
+                get_string('vrrequest', 'block_ucla_media'),
+                array('class'=> 'btn btn-primary', 'role' => 'button'));
         } else {
             echo get_string('vresourcesnotavailable', 'block_ucla_media');
         }

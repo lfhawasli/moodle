@@ -70,6 +70,17 @@ $string['error_delete_locked'] = 'Cannot delete locked results';
 $string['undefined_action'] = 'The requested action , {$a} , is undefined';
 $string['confirm_delete'] = 'Are you sure you want to delete the result?';
 
+// Strings for library_reserves_visits.
+$string['library_reserves_visits'] = 'Library reserves visits';
+$string['library_reserves_visits_help'] = 'Returns the number of student views on the Research guide and Course reserves tab';
+$string['coursename'] = 'Course name';
+$string['coursenumber'] = 'Course number';
+$string['totalstudents'] = 'Total students enrolled';
+$string['resguideviewcount'] = 'Views for research guide';
+$string['coursereservesviewcount'] = 'Views for course reserves';
+$string['coursereservesviewpercent'] = '% of students viewed course reserves';
+$string['resguideviewpercent'] = '% of students viewed research guide';
+
 // Strings for sites_per_term.
 $string['sites_per_term'] = 'Sites per term (course)';
 $string['sites_per_term_help'] = 'Returns number of Registrar course sites built for a given term.';
