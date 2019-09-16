@@ -1,37 +1,58 @@
 <?php
+// This file is part of the UCLA Library Reserves block for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
  * Keeps track of upgrades to the UCLA library reserves block
  *
- * @package    ucla
+ * @package    block_ucla_library_reserves
  * @subpackage format
  * @copyright  UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Upgrade function.
+ *
+ * @param int $oldversion
+ * @return boolean
+ */
 function xmldb_block_ucla_library_reserves_upgrade($oldversion) {
     global $CFG, $DB;
 
     $dbman = $DB->get_manager();
 
-    // add indexes
+    // Add indexes.
     if ($oldversion < 2012052500) {
         $table = new xmldb_table('ucla_library_reserves');
         $indexes[] = new xmldb_index('term_srs', XMLDB_INDEX_NOTUNIQUE, array('quarter', 'srs'));
         $indexes[] = new xmldb_index('term_course', XMLDB_INDEX_NOTUNIQUE, array('quarter', 'department_code', 'course_number'));
-        
+
         foreach ($indexes as $index) {
-            // Conditionally launch add index term_srs
+            // Conditionally launch add index term_srs.
             if (!$dbman->index_exists($table, $index)) {
                 $dbman->add_index($table, $index);
-            }        
+            }
         }
-        
-        // ucla savepoint reached
+
+        // Ucla savepoint reached.
         upgrade_block_savepoint(true, 2012052500, 'ucla_library_reserves');
     }
-    
-    // add courseid
+
+    // Add courseid.
     if ($oldversion < 2012060300) {
         $table = new xmldb_table('ucla_library_reserves');
 
@@ -39,12 +60,12 @@ function xmldb_block_ucla_library_reserves_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         $key = new xmldb_key('courseid', XMLDB_KEY_FOREIGN, array('courseid'), 'course', array('id'));
         $dbman->add_key($table, $key);
 
-        // ucla_library_reserves savepoint reached
-        upgrade_block_savepoint(true, 2012060300, 'ucla_library_reserves');        
+        // Savepoint ucla_library_reserves reached.
+        upgrade_block_savepoint(true, 2012060300, 'ucla_library_reserves');
     }
 
     // Change source URL and drop unneeded columns.

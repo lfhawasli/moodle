@@ -14,14 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace block_ucla_library_reserves\task;
-require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/ucladatasourcesync/lib.php');
-
 /**
  * Upgrades database for library reserves.
  *
  * @package    block_ucla_library_reserves
  * @author     Anant Mahajan
+ * @copyright  2016 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+defined('MOODLE_INTERNAL') || die();
+
+namespace block_ucla_library_reserves\task;
+require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/ucladatasourcesync/lib.php');
+
+/**
+ * Class file.
+ *
+ * @package    block_ucla_library_reserves
  * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -44,16 +53,17 @@ class update extends \core\task\scheduled_task {
      * SRS Number: VARCHAR2(9)
      * Quarter: CHAR(3)
      *
+     * Indices in datasource:
+     *      'name',
+     *      'type',
+     *      'min_size',
+     *      'max_size'
+     *
      * @return mixed
      */
     private function define_data_source() {
         $retval = array();
 
-        /* [index in datasource] => ['name']
-         *                          ['type']
-         *                          ['min_size']
-         *                          ['max_size']
-         */
         $retval[] = array('name' => 'course_number',
                             'type' => 'coursenum',
                             'min_size' => '0',
@@ -86,9 +96,9 @@ class update extends \core\task\scheduled_task {
         return $retval;
     }
 
-   /**
-    * Updates library reserves.
-    */
+    /**
+     * Updates library reserves.
+     */
     public function execute() {
         global $DB;
 
@@ -100,6 +110,9 @@ class update extends \core\task\scheduled_task {
             echo get_string('lrnoentries', 'tool_ucladatasourcesync') . "\n";
             return false;
         }
+
+        // Purge the cached hostcourse urls.
+        cache_helper::purge_by_definition('block_ucla_library_reserves', 'hostcourseurl');
 
         // Wrap everything in a transaction, because we don't want to have an empty.
         // Table while data is being updated.
@@ -156,7 +169,7 @@ class update extends \core\task\scheduled_task {
      */
     private function get_datasource() {
         $retval = array();
-        
+
         // Check to see that config variable is initialized.
         $datasourceurl = get_config('block_ucla_library_reserves', 'source_url');
         if (empty($datasourceurl)) {
@@ -209,19 +222,17 @@ class update extends \core\task\scheduled_task {
         return $retval;
     }
 
-   /**
-    * Returns task name.
-    *
-    * @return string
-    */
+    /**
+     * Returns task name.
+     *
+     * @return string
+     */
     public function get_name() {
         return get_string('taskupdate', 'block_ucla_library_reserves');
     }
 
     /**
      * Parses the data at the given source and outputs clean, usable data.
-     *
-     * @param string $datasourceurl
      * @return array    False on error.
      */
     private function parse_datasource() {
@@ -264,6 +275,7 @@ class update extends \core\task\scheduled_task {
             if (!empty($invalidfields)) {
                 $error = new \stdClass();
                 $error->fields = implode(', ', $invalidfields);
+                // @codingStandardsIgnoreLine
                 $error->data = print_r($entry, true);
 
                 // Compile a list of parsing errors and send all errors in one email.
@@ -289,8 +301,8 @@ class update extends \core\task\scheduled_task {
     /**
      * Converts data url from web service from XML to PHP array.
      *
-     * @param type $url
-     * @return boolean
+     * @param object $url
+     * @return boolean|array url in PHP array form.
      */
     private function read_xml_data($url) {
         $xml = simplexml_load_file($url);

@@ -55,7 +55,7 @@ $string['bcnoentries'] = 'No BruinCast entries found. Nothing changed.';
 $string['bcinvalidcrosslists'] = 'Invalid crosslists: {$a}';
 $string['bccrosslistmedia'] = 'Crosslisting media';
 $string['bccrosslistentries'] = 'Crosslisting {$a->course1} with {$a->course2}';
-$string['bcfoundupdatedentry'] = 'Already updated {$a}';
+$string['bcfoundupdatedentry'] = 'Found duplicate BruinCast entry: {$a}';
 
 // Strings for libraryreserves_dbsync.
 // Error messages.

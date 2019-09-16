@@ -15,15 +15,27 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version file.
+ * This file contains code to view library reserves lti activity instance.
  *
  * @package    block_ucla_library_reserves
- * @copyright  2016 UC Regents
+ * @copyright  2019 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+require_once("../../config.php");
+require_once($CFG->dirroot.'/mod/lti/locallib.php');
+require_once($CFG->dirroot.'/blocks/ucla_library_reserves/locallib.php');
 
-$plugin->version    = 2019081200;
-$plugin->requires   = 2010112400;
-$plugin->component = 'block_ucla_library_reserves';
+$id = required_param('id', PARAM_INT); // Course ID.
+$shortname = optional_param('shortname', '', PARAM_TEXT);
+$placement = 'activity';
+$lti = construct_lti_config();
+$lti->course = $id;
+$course = get_course($id);
+require_login($course);
+if ($shortname != '') {
+    $course->shortname = $shortname;
+}
+$PAGE->set_course($course);
+lti_launch_tool($lti, $placement);
+

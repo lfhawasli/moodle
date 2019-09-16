@@ -1998,6 +1998,11 @@ function lti_get_type_type_config($id) {
         }
     }
 
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    if (isset($config['toolurl_ContentItemSelectionRequest'])) {
+        $type->lti_toolurl_ContentItemSelectionRequest = $config['toolurl_ContentItemSelectionRequest'];
+    }
+    // END UCLA MOD: CCLE-6956.
     return $type;
 }
 
@@ -2039,6 +2044,35 @@ function lti_prepare_type_for_save($type, $config) {
     }
 
     // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    $type->asassignment = false;
+    $type->asmenulink = false;
+    $type->asrichtexteditorplugin = false;
+
+    if (isset($config->lti_asassignment)) {
+        $type->asassignment = $config->lti_asassignment;
+    }
+    if (isset($config->lti_asmenulink)) {
+        $type->asmenulink = $config->lti_asmenulink;
+    }
+    if (isset($config->lti_asrichtexteditorplugin)) {
+        $type->asrichtexteditorplugin = $config->lti_asrichtexteditorplugin;
+    }
+
+    $type->assignmenturl = $config->lti_assignmenturl;
+    $type->menulinkurl = $config->lti_menulinkurl;
+    $type->richtexteditorurl = $config->lti_richtexteditorurl;
+    // END UCLA MOD: CCLE-6956.
+
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    if (isset($config->lti_toolurl_ContentItemSelectionRequest)) {
+        if (!empty($config->lti_toolurl_ContentItemSelectionRequest)) {
+            $type->toolurl_ContentItemSelectionRequest = $config->lti_toolurl_ContentItemSelectionRequest;
+        } else {
+            $type->toolurl_ContentItemSelectionRequest = '';
+        }
+        $config->lti_toolurl_ContentItemSelectionRequest = $type->toolurl_ContentItemSelectionRequest;
+    }
+
     $type->asassignment = false;
     $type->asmenulink = false;
     $type->asrichtexteditorplugin = false;
@@ -2113,11 +2147,12 @@ function lti_update_type($type, $config) {
 
 // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
 /**
- * Get all types that can be placed in a specific placement
+ * Get all types that can be placed in a specific placement.
  * 
- * @param string $placementname, one of 'assignment', 'activity', 'menulink', or 'richtexteditorplugin'
+ * @param string $placementname Either'assignment', 'activity', 'menulink', or
+ * 'richtexteditorplugin'
  * 
- * @return array arry of tools
+ * @return array array of tools
  */
 function lti_load_type_by_placement (string $placementname) {
     global $DB;
@@ -2132,6 +2167,72 @@ function lti_load_type_by_placement (string $placementname) {
     return $DB->get_records('lti_types', [$queryfield => 1], 'name');
 }
 // END UCLA MOD: CCLE-6956.
+
+// START UCLA MOD: CCLE-6955 - LTI Apps in Course Menu Links
+/**
+ * Returns LTI tools that can be placed in the course menu.
+ *
+ * @param int $courseid
+ * @param boolean $activeonly
+ * @return array
+ */
+function lti_load_course_menu_links(int $courseid, $activeonly=false) {
+    global $DB;
+
+    $join = '';
+    if (!$activeonly) {
+        $join = ' LEFT ';
+    }
+    $records = $DB->get_recordset_sql(
+        "SELECT l.id,
+                l.name,
+                l.description,
+                lc.course
+           FROM {lti_types} AS l
+     $join JOIN {lti_course_menu_placements} AS lc ON (lc.typeid=l.id AND lc.course=?)
+          WHERE l.asmenulink=1
+       ORDER BY l.name", [$courseid]
+    );
+    
+    $types = [];   
+    foreach ($records as $record) {
+        $type = new stdClass();
+        $type->id = $record->id;
+        $type->name = $record->name;
+        $type->description = trim($record->description);
+        $type->selected = $record->course != null;
+        $types[] = $type;
+    }
+    return $types;
+}
+
+/**
+ * For given course, set course menu links.
+ *
+ * @param int $courseid
+ * @param array $menulinks
+ */
+function lti_set_course_menu_links(int $courseid, array $menulinks) {
+    global $DB;
+    $transaction = $DB->start_delegated_transaction();
+    try {
+        $DB->delete_records('lti_course_menu_placements', ['course' => $courseid]);
+        foreach ($menulinks as $key => $_) {
+            $pieces = explode('-', $key);
+            if ($pieces[0] !== 'include') {
+                continue;
+            }
+            $DB->insert_record('lti_course_menu_placements', (object)[
+                'typeid' => $pieces[1],
+                'course' => $courseid,
+            ]);
+        }
+        $transaction->allow_commit();
+    } catch (Exception $e) {
+        $transaction->rollback($e);
+    }
+}
+// END UCLA MOD: CCLE-6955.
 
 function lti_add_type($type, $config) {
     global $USER, $SITE, $DB;

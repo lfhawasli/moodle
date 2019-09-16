@@ -101,6 +101,8 @@ $string['successful_unrestrict'] = 'Successfully unrestricted syllabus';
 $string['err_file_not_uploaded'] = 'Please upload a PDF.';
 $string['err_file_url_not_uploaded'] = 'Please upload a file or add a valid URL for your syllabus.';
 $string['err_missing_courseid'] = 'Missing required courseid';
+$string['err_syllabus_corrupted'] = 'Sorry, the syllabus added to this course was deleted because the file added was corrupted. Please contact your instructor/TA.';
+$string['err_syllabus_corrupted_manage'] = 'Sorry, the syllabus added to this course was deleted because the file added was corrupted. <a href="{$a}">Please re-upload your syllabus again</a>.';
 $string['err_syllabus_mismatch'] = 'Selected syllabus does not belong to course';
 $string['err_syllabus_not_allowed'] = 'Sorry, you must be logged in or associated with the course to view this syllabus';
 $string['err_syllabus_notexist'] = 'Sorry, but given syllabus does not exist';

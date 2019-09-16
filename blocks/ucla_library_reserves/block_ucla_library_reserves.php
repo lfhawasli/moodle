@@ -1,15 +1,45 @@
 <?php
+// This file is part of the UCLA Library Reserves block for Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Block definition file for UCLA Library Reserves.
+ *
+ * @package    block_ucla_library_reserves
+ * @copyright  2019 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(dirname(dirname(__FILE__))) . '/local/ucla/lib.php');
 
+/**
+ * Block definition file for UCLA Library Reserves.
+ *
+ * @package    block_ucla_library_reserves
+ * @copyright  2019 UC Regents
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class block_ucla_library_reserves extends block_base {
 
     /**
      * Called by moodle
      */
     public function init() {
-        // Initialize name and title
+        // Initialize name and title.
         $this->title = get_string('title', 'block_ucla_library_reserves');
     }
 
@@ -29,38 +59,24 @@ class block_ucla_library_reserves extends block_base {
     }
 
     /**
-     * Use UCLA Course menu block hook
+     * Hook into UCLA Site menu block.
+     *
+     * @param array $course
+     * @return array
      */
     public static function get_navigation_nodes($course) {
-        // get global variables
         global $DB, $COURSE;
 
         $nodes = array();
-        $links = array();        
-        
-        $reserves = $DB->get_records('ucla_library_reserves', 
-                array('courseid' => $COURSE->id));
 
-        // if only one entry was found, then just give the name "Library reserves"
-        $lr_string = get_string('title', 'block_ucla_library_reserves');        
-        if (count($reserves) == 1) {
-            $link = array_pop($reserves);
-            $node = navigation_node::create($lr_string,
-                            new moodle_url($link->url));  
+        if (!is_collab_site($COURSE)) {
+            $nodetitle = get_string('title', 'block_ucla_library_reserves');
+            $node = navigation_node::create($nodetitle, new moodle_url('/blocks/ucla_library_reserves/index.php',
+                            array('courseid' => $COURSE->id)));
             $node->add_class('library-reserve-link');
             $nodes[] = $node;
-        } else {
-            // else display link with subj_area and coursenum appended
-            foreach ($reserves as $reserve) {
-                $node = navigation_node::create(sprintf('%s %s %s', 
-                        $lr_string, $reserve->department_code, 
-                        $reserve->course_number), 
-                        new moodle_url($reserve->url));    
-                $node->add_class('library-reserve-link');
-                $nodes[] = $node;
-            }            
         }
-        
+
         return $nodes;
     }
 
@@ -85,21 +101,21 @@ class block_ucla_library_reserves extends block_base {
             'block-ucla_library_reserves' => false,
             'not-really-applicable' => true
         );
-        // hack to make sure the block can never be instantiated
+        // Hack to make sure the block can never be instantiated.
     }
 
     /**
      * Called by moodle
      */
     public function instance_allow_multiple() {
-        return false; //disables multiple blocks per page
+        return false; // Disables multiple blocks per page.
     }
 
     /**
      * Called by moodle
      */
     public function instance_allow_config() {
-        return false; // disables instance configuration
+        return false; // Disables instance configuration.
     }
 
 }

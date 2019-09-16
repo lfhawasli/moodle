@@ -51,8 +51,8 @@ class block_ucla_myengineer extends block_base {
         if (is_engineering($course['course']->id)) {
             $myengineerurl = 'https://my.engineering.ucla.edu';
             $urlobj = new moodle_url($myengineerurl);
-            $node = navigation_node::create(get_string('title', 'block_ucla_myengineer'), 
-                    $urlobj, global_navigation::TYPE_CUSTOM, null, null, new pix_icon('spacer', ''));
+            $node = navigation_node::create(get_string('title', 'block_ucla_myengineer'),
+                    $urlobj, global_navigation::TYPE_CUSTOM, null, null, null);
 
             $node->add_class('myengineer-link');
             return $node;

@@ -808,6 +808,7 @@ abstract class ucla_syllabus {
      *                              uploaded, otherwise returns null.
      */
     public function locate_syllabus_file() {
+        global $CFG, $DB;
         $retval = null;
 
         if (empty($this->properties->id) || empty($this->properties->courseid)) {
@@ -822,8 +823,17 @@ abstract class ucla_syllabus {
         // Should really have just one file uploaded, but handle weird cases.
         if (count($files) < 1 && empty($this->properties->url)) {
             // No files uploaded and no URL added!
-            throw new moodle_exception('Warning, no file uploaded for given ucla_syllabus entry for course '
-                    . $this->properties->courseid);
+            $DB->delete_records('ucla_syllabus', array('id' => $this->properties->id));
+            // Students should not be linked to syllabus manager through the error message.
+            if (has_capability('local/ucla_syllabus:managesyllabus', $coursecontext)) {
+                $errstring = 'err_syllabus_corrupted_manage';
+            } else {
+                $errstring = 'err_syllabus_corrupted';
+            }
+            redirect("$CFG->wwwroot/course/view.php?id=" . $this->properties->courseid,
+                get_string($errstring, 'local_ucla_syllabus',
+                    "$CFG->wwwroot/local/ucla_syllabus/index.php?id=" . $this->properties->courseid),
+                null, \core\output\notification::NOTIFY_ERROR);
         } else {
             if (count($files) > 1) {
                  throw new moodle_exception('Warning, more than one syllabus file uploaded for given ucla_syllabus entry for course '
