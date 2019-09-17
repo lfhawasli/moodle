@@ -22,9 +22,10 @@
  * @copyright  2016 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace block_ucla_library_reserves\task;
+
 defined('MOODLE_INTERNAL') || die();
 
-namespace block_ucla_library_reserves\task;
 require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/ucladatasourcesync/lib.php');
 
 /**
