@@ -97,6 +97,14 @@ class block_ucla_weeksdisplay_summer_session extends block_ucla_weeksdisplay_ses
         }
 
         $content = implode(' | ', array_keys($out));
+
+        if (empty($content)) {
+            // No active summer sessions.
+            $termstring = parent::string_for_quarter(); // Do not include session.
+            $weekstring = get_string('summer_break', 'block_ucla_weeksdisplay');
+            $renderable = new ucla_week($termstring, $weekstring);
+            $content = $renderer->render($renderable);
+        }
         $this->renderedweek = $renderer->display_wrapper($content, $this->quarter_name());
 
         // Save to config.
