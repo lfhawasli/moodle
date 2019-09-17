@@ -139,9 +139,11 @@ function theme_uclashared_page_init(moodle_page $page) {
     function theme_uclashared_parsed_weeks_display() {
         $parsed = array();
         $weeksdata = get_config('local_ucla', 'current_week_display');
-        // Fix front page quarter and week display for summer.
+        $summerbreak = get_string('summer_break', 'block_ucla_weeksdisplay');
+        // Fix front page quarter and week display for summer (ignore summer break).
         // Case when there is a session overlap for summer.
-        if (stripos($weeksdata, 'summer') !== false) {
+        if (stripos($weeksdata, 'summer') !== false &&
+                strpos($weeksdata, $summerbreak) == false) {
             $weeksdata = trim(strip_tags($weeksdata));
             if(strpos($weeksdata, '|') !== false) {
                 list($session1, $session2) = explode('|', $weeksdata);

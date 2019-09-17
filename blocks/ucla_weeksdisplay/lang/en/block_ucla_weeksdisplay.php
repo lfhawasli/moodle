@@ -29,6 +29,7 @@ $string['pluginname'] = 'UCLA weeks display';
 $string['session'] = 'Session {$a}';
 $string['spring'] = 'Spring';
 $string['summer'] = 'Summer';
+$string['summer_break'] = 'Summer break';
 $string['task'] = 'Update the weeks display';
 $string['week'] = 'Week {$a}';
 $string['winter'] = 'Winter';
