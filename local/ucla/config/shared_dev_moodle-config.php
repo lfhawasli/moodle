@@ -286,7 +286,7 @@ $CFG->country = 'US';
 $CFG->langstringcache = false;
 
 // Site administration > Plugins > Activity modules > Assignment
-$CFG->forced_plugin_settings['assign']['submissiondrafts'] = 1;
+$CFG->forced_plugin_settings['assign']['submissiondrafts'] = 0;
 // CCLE-5193: Disable assignment module default student notification
 $CFG->forced_plugin_settings['assign']['sendstudentnotifications'] = 0;
 
