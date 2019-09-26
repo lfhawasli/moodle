@@ -50,7 +50,7 @@ defined('MOODLE_INTERNAL') || die;
 
 // START UCLA MOD: CCLE-6955 -- Integration point in course menu
 //$plugin->version   = 2018051400;    // The current module version (Date: YYYYMMDDXX).
-$plugin->version   = 2018051401;    // The current module version (Date: YYYYMMDDXX).
+$plugin->version   = 2018051402;    // The current module version (Date: YYYYMMDDXX).
 // END UCLA MOD: CCLE-6955
 $plugin->requires  = 2018050800;    // Requires this Moodle version.
 $plugin->component = 'mod_lti';     // Full name of the plugin (used for diagnostics).
