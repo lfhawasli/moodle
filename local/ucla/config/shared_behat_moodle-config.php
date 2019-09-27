@@ -371,6 +371,9 @@ $CFG->forced_plugin_settings['editor_tinymce']['customtoolbar'] = '
 
     fontselect,fontsizeselect,code,search,replace,wrap,cleanup,removeformat,pastetext,pasteword,wrap,fullscreen';
 
+// Site administration > Plugins > Local plugins > Kaltura Media Gallery.
+$CFG->forced_plugin_settings['local_kalturamediagallery']['link_location'] = '1';   // Course settings.
+
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 
@@ -432,6 +435,7 @@ $CFG->behat_extraallowedsettings = array(
     'custommenuitems',
     'timezone'
 );
+$CFG->behat_increasetimeout = 3;    // Increase timeout to 30 seconds.
 
 // If you want to have un-revisioned configuration data, place in config_private
 // $CFG->dirroot is overwritten later

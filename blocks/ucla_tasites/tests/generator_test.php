@@ -101,6 +101,10 @@ class block_ucla_tasites_generator_testcase extends advanced_testcase {
         // Remove any previous registrar data.
         unset($this->mockregdata);
         $this->mockregdata = array();
+
+        // Make sure TA roles exists.
+        $this->getDataGenerator()->get_plugin_generator('local_ucla')
+                ->create_ucla_roles(['ta', 'ta_admin']);
     }
 
     /**
@@ -178,7 +182,7 @@ class block_ucla_tasites_generator_testcase extends advanced_testcase {
 
         // Enroll TA into parent site. Normally would be via Registrar, but we
         // are skipping that for now.
-        $this->getDataGenerator()->enrol_user($ta->id, $parentcourse->id);
+        $this->getDataGenerator()->enrol_user($ta->id, $parentcourse->id, $this->tasitegen->taid);
 
         // Add sections to course. First using the group management tool.
 
@@ -278,7 +282,7 @@ class block_ucla_tasites_generator_testcase extends advanced_testcase {
 
         // Enroll TA into parent site. Normally would be via Registrar, but we
         // are skipping that for now.
-        $this->getDataGenerator()->enrol_user($ta->id, $parentcourse->id);
+        $this->getDataGenerator()->enrol_user($ta->id, $parentcourse->id, $this->tasitegen->taid);
 
         // Add sections to course. First using the group management tool.
 

@@ -1018,7 +1018,12 @@ function groups_get_course_group($course, $update=false, $allowedgroups=null) {
     if (has_capability('moodle/site:accessallgroups', $context)) {
         $groupmode = 'aag';
     }
-
+    // START UCLA MOD: CCLE-6780 - Always display group filter in Gradebook.
+    else if (!$groupmode = $course->groupmode) {
+         // NOGROUPS used
+         return false;
+    }
+    // END UCLA MOD: CCLE-6780.
     if (!is_array($allowedgroups)) {
         if ($groupmode == VISIBLEGROUPS or $groupmode === 'aag') {
             $allowedgroups = groups_get_all_groups($course->id, 0, $course->defaultgroupingid);

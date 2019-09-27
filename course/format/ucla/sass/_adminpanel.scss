@@ -56,3 +56,11 @@
     bottom: 18px;
     right: 18px;
 }
+
+/* CCLE-7940 - Added tipbox inside the Admin Panel. */
+#page-course-format-ucla-admin_panel .admin-panel .container .admin-panel-row:last-child .col-md-4:nth-child(3) {
+    background:   #f9fb7d;
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: auto;
+} 

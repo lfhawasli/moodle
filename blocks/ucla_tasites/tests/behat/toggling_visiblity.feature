@@ -15,6 +15,7 @@ Scenario: Hide and show TA site
     # Need ta and ta_admin roles for TA sites to work.
     And the following ucla "roles" exist:
         | role     |
+        | ta       |
         | ta_admin |
     And the following ucla "enrollments" exist:
         | user | course | role |
@@ -24,7 +25,7 @@ Scenario: Hide and show TA site
         | parentsrs | term | uid       |
         | 111222000 | 16S  | 123456789 |
     And I log in as "ta1"
-    And I follow "Test course 1"
+    And I am on "Test course 1" course homepage
     And I follow "Admin panel"
     And I follow "TA sites"
     And I click on "#id_confirmation" "css_element"

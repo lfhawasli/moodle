@@ -547,7 +547,6 @@ $CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
 // Site administration > Plugins > Text editors > TinyMCE HTML editor > Add Panopto Video
 $CFG->forced_plugin_settings['tinymce_panoptobutton']['panoptoservername'] = 'https://test-ccle-ucla.hosted.panopto.com';
 
-// Site administration > Plugins > Local plugins > Moodle Mobile additional features
 // Site administration > Plugins > Local plugins > Kaltura Media Gallery.
 $CFG->forced_plugin_settings['local_kalturamediagallery']['link_location'] = '1';   // Course settings.
 
