@@ -118,7 +118,7 @@ class PublicPrivate_Course {
      * @return int
      */
     public function get_group() {
-        return $this->is_activated() ? $this->_course->grouppublicprivate : false;
+        return $this->_course->grouppublicprivate;
     }
 
     /**
@@ -149,10 +149,10 @@ class PublicPrivate_Course {
      * @return int
      */
     public function get_grouping() {
-        if (!is_null($this->_course->defaultgroupingid)) {
+        if (!empty($this->_course->defaultgroupingid)) {
             return $this->_course->defaultgroupingid;
         }
-        return $this->is_activated() ? $this->_course->groupingpublicprivate : false;
+        return $this->_course->groupingpublicprivate;
     }
 
     /**
