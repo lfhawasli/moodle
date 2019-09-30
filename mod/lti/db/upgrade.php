@@ -180,6 +180,16 @@ function xmldb_lti_upgrade($oldversion) {
         
         upgrade_mod_savepoint(true, 2018051401, 'lti');
     }
+    if ($oldversion < 2018051402) {
+        // Add missing keys.
+        $table = new xmldb_table('lti_course_menu_placements');
+        $key = new xmldb_key('typeid', XMLDB_KEY_FOREIGN, array('typeid'), 'lti_types', array('id'));
+        $dbman->add_key($table, $key);
+        $key = new xmldb_key('course', XMLDB_KEY_FOREIGN, array('course'), 'course', array('id'));
+        $dbman->add_key($table, $key);
+
+        upgrade_mod_savepoint(true, 2018051402, 'lti');
+    }
     // END UCLA MOD: CCLE-6955.
 
     return true;
