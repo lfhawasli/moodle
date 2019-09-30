@@ -48,6 +48,8 @@ class local_ucla_import_course_search extends import_course_search {
                 . "AND $tablealias.contextlevel = $contextlevel)");
 
         $params = array(
+            'useractive' => ENROL_USER_ACTIVE,
+            'statusenabled' => ENROL_INSTANCE_ENABLED,
             'fullnamesearch' => '%'.$this->get_search().'%',
             'shortnamesearch' => '%'.$this->get_search().'%',
             'teacherfirstnamesearch' => '%'.$this->get_search().'%',
@@ -59,7 +61,9 @@ class local_ucla_import_course_search extends import_course_search {
         $from   = "       FROM {course} c ";
         $join   = "  LEFT JOIN {role} r ON (r.shortname = 'editinginstructor' OR r.shortname='supervising_instructor')
                      LEFT JOIN {role_assignments} ra ON ra.contextid = ctx.id AND r.id = ra.roleid
-                     LEFT JOIN {user} usr ON usr.id = ra.userid";
+                     LEFT JOIN {enrol} e ON (e.courseid = c.id AND e.status = :statusenabled)
+                     LEFT JOIN {user_enrolments} ue ON (ue.enrolid = e.id AND ue.status = :useractive)
+                     LEFT JOIN {user} usr ON (usr.id = ra.userid AND usr.id = ue.userid)";
         $where  = "      WHERE (".$DB->sql_like('CONCAT(usr.lastname, ", ", usr.firstname)', ':teacherfullnamesearch', false). "
                                OR ".$DB->sql_like('usr.lastname', ':teacherlastnamesearch', false). "
                                OR ".$DB->sql_like('usr.firstname', ':teacherfirstnamesearch', false). "
