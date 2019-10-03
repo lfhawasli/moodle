@@ -310,7 +310,8 @@ class local_ucla_generator extends testing_data_generator {
                 'contextlevels' => 1,
                 'allowassign'   => 1,
                 'allowoverride' => 1,
-                'allowswitch'   => 1);
+                'allowswitch'   => 1,
+                'allowview'   => 1);
             $definitiontable = new tool_uclarolesmigration_import_table(context_system::instance(), $role->id);
             $definitiontable->force_preset($xml, $options);
             $definitiontable->save_changes();

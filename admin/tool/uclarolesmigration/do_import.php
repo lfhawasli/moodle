@@ -33,7 +33,8 @@ $options = array(
     'contextlevels' => 1,
     'allowassign'   => 1,
     'allowoverride' => 1,
-    'allowswitch'   => 1);
+    'allowswitch'   => 1,
+    'allowview'   => 1);
 
 // Variable $importxmls is declared in importroles.php.
 foreach ($importxmls as $importxml) {

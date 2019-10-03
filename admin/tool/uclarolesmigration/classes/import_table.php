@@ -76,7 +76,7 @@ class tool_uclarolesmigration_import_table extends core_role_define_role_table_a
             }
         }
 
-        foreach (array('assign', 'override', 'switch') as $type) {
+        foreach (array('assign', 'override', 'switch', 'view') as $type) {
             if ($options['allow'.$type] && isset($info['allow'.$type])) {
                 $key = array_search(-1, $info['allow'.$type]);
                 if ($key >= 0) {
@@ -148,6 +148,7 @@ class tool_uclarolesmigration_import_table extends core_role_define_role_table_a
         $this->save_allow('assign');
         $this->save_allow('override');
         $this->save_allow('switch');
+        $this->save_allow('view');
 
         // Permissions.
         $capabilitiestoupdate = array();
