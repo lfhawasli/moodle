@@ -26,6 +26,11 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/behat/lib.php');
 
+if (!method_exists($OUTPUT, 'region_main_settings_menu')) {
+    echo $OUTPUT->doctype();
+    $OUTPUT = $PAGE->get_renderer('theme_uclasharedcourse', 'core');
+}
+
 $blockshtml = $OUTPUT->blocks('side-pre');
 $hasblocks = strpos($blockshtml, 'data-block=') !== false;
 $regionmainsettingsmenu = $OUTPUT->region_main_settings_menu();
@@ -65,10 +70,6 @@ if (in_array($PAGE->pagelayout, array('course', 'incourse')) && $PAGE->flatnav->
     $hidenavigation = true;
 }
 
-if (!method_exists($OUTPUT, 'region_main_settings_menu')) {
-    echo $OUTPUT->doctype();
-    $OUTPUT = $PAGE->get_renderer('theme_uclasharedcourse', 'core');
-}
 // Made navdraweropen true on every page load except for quiz attempt and preview page.
 if ('mod-quiz-attempt' == $PAGE->pagetype || 'mod-quiz-review' == $PAGE->pagetype
         || 'mod-quiz-summary' == $PAGE->pagetype) {
