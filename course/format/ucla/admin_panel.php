@@ -82,17 +82,23 @@ if ($node) {
     $container = navigation_node::create(get_string('managematerial', 'format_ucla'),
             null, navigation_node::TYPE_CONTAINER, null, 'managematerial');
 
+    $foundrecyclebin = false;
     foreach ($settings as $name => $type) {
         if ($setting = $node->find($name, $type)) {
             $setting->remove();
             $container->add_node($setting);
+            if ($name == 'tool_recyclebin') {
+                $foundrecyclebin = true;
+            }
         }
     }
 
     if (can_request_media($courseid)) {
         $setting = navigation_node::create(get_string('mrrequest', 'block_ucla_media'),
             new moodle_url('/blocks/ucla_media/bcast.php', array('courseid' => $courseid)));
-        $container->add_node($setting, 'tool_recyclebin');
+        // TA users have access to Admin Panel but not much else in it.
+        $beforekey = $foundrecyclebin ? 'tool_recyclebin' : 'managetasites';
+        $container->add_node($setting, $beforekey);
     }
 
     $rowcontainer->add_node($container);
@@ -186,17 +192,23 @@ if ($node) {
     $container = navigation_node::create(get_string('logsandreports', 'format_ucla'),
             null, navigation_node::TYPE_CONTAINER, null, 'logsandreports');
 
+    $foundcompetency = false;
     foreach ($settings as $name => $type) {
         if ($setting = $node->find($name, $type)) {
             $setting->remove();
             $container->add_node($setting);
+            if ($name == 'report_competency') {
+                $foundcompetency = true;
+            }
         }
     }
 
     // Manage competencies.
     $setting = navigation_node::create(get_string('managecompetency', 'format_ucla'),
         new moodle_url("/admin/tool/lp/coursecompetencies.php", array('courseid' => $course->id)));
-    $container->add_node($setting, 'report_competency');
+    // TA users have access to Admin Panel but not much else in it.
+    $beforekey = $foundcompetency ? 'report_competency' : null;
+    $container->add_node($setting, $beforekey);
 
     // Activity completion.
     $setting = navigation_node::create(get_string('pluginname', 'report_progress'),

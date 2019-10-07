@@ -39,6 +39,10 @@ class block_ucla_tasites_test extends advanced_testcase {
      */
     protected function setUp() {
         $this->resetAfterTest(true);
+
+        // Make sure TA roles exists.
+        $this->getDataGenerator()->get_plugin_generator('local_ucla')
+                ->create_ucla_roles(['ta', 'ta_admin']);
     }
 
     /**
