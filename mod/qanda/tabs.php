@@ -20,50 +20,11 @@
         $tab = $defaulttab;
     }
 
-
-    $browserow[] = new tabobject(QANDA_STANDARD_VIEW,
-                                 $CFG->wwwroot.'/mod/qanda/view.php?id='.$id.'&amp;mode=letter',
-                                 get_string('standardview', 'qanda'));
-
-
-
-    $browserow[] = new tabobject(QANDA_DATE_VIEW,
-                                 $CFG->wwwroot.'/mod/qanda/view.php?id='.$id.'&amp;mode=date',
-                                 get_string('dateview', 'qanda'));
-/*
-        $browserow[] = new tabobject(qanda_CATEGORY_VIEW,
-                                 $CFG->wwwroot.'/mod/qanda/view.php?id='.$id.'&amp;mode=cat',
-                                 get_string('categoryview', 'qanda'));
- $browserow[] = new tabobject(qanda_AUTHOR_VIEW,
-                                 $CFG->wwwroot.'/mod/qanda/view.php?id='.$id.'&amp;mode=author',
-                                 get_string('authorview', 'qanda'));
- *  */
-
-
-    if ($tab < QANDA_STANDARD_VIEW ) {//|| $tab > qanda_AUTHOR_VIEW   // We are on second row
-        $inactive = array('edit');
-        $activated = array('edit');
-
-        $browserow[] = new tabobject('edit', '#', get_string('edit'));
-    }
-
-/// Put all this info together
-
-    $tabrows = array();
-    $tabrows[] = $browserow;     // Always put these at the top
-    if ($toolsrow) {
-        $tabrows[] = $toolsrow;
-    }
-
-
 ?>
   <div class="qanda-display">
 
 
 <?php 
-    // Print tabs.
-    if ($showcommonelements) { print_tabs($tabrows, $tab, $inactive, $activated); }
-
     // Print add and search box.
     /// All this depends if whe have $showcommonelements
     if ($showcommonelements) {
