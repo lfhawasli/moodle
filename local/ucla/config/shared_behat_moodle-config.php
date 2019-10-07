@@ -128,6 +128,9 @@ $CFG->forced_plugin_settings['block_ucla_help']['maxfilesize'] = 10485760;
 // CCLE-2301 - COURSE MENU BLOCK.
 $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 
+// SSC-4084 - Include links to Quiz tips.
+$CFG->quiztipslink = 'https://docs.ccle.ucla.edu/w/Tips_for_taking_quizzes_in_CCLE_Moodle';
+
 // UCLA Theme settings.
 $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'behat';
 $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage-image-shared';
