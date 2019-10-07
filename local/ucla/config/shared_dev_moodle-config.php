@@ -145,6 +145,9 @@ $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_api'] = 'https://docs
 $block_ucla_help_support_contacts['System'] = 'support';  // Default.
 $CFG->forced_plugin_settings['block_ucla_help']['maxfilesize'] = 10485760;
 
+// SSC-4084 - Include links to Quiz tips.
+$CFG->quiztipslink = 'https://docs.ccle.ucla.edu/w/Tips_for_taking_quizzes_in_CCLE_Moodle';
+
 // CCLE-2301 - COURSE MENU BLOCK
 $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 
@@ -547,7 +550,6 @@ $CFG->forced_plugin_settings['tinymce_dragmath']['requiretex'] = 0;
 // Site administration > Plugins > Text editors > TinyMCE HTML editor > Add Panopto Video
 $CFG->forced_plugin_settings['tinymce_panoptobutton']['panoptoservername'] = 'https://test-ccle-ucla.hosted.panopto.com';
 
-// Site administration > Plugins > Local plugins > Moodle Mobile additional features
 // Site administration > Plugins > Local plugins > Kaltura Media Gallery.
 $CFG->forced_plugin_settings['local_kalturamediagallery']['link_location'] = '1';   // Course settings.
 

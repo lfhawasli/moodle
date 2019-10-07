@@ -374,3 +374,6 @@ $string['lowefficiencytooltip'] = 'This is a question that may need review becau
 $string['purgeusersquizattempts'] = 'Cron task to purge users\' quiz attempts from list of courses in admin settings';
 $string['purgefromcoursesname'] = 'Purge from courses';
 $string['purgefromcoursesdesc'] = 'Purge users\' quiz attempts from this comma seperated list of course shortnames.';
+
+// SSC-4063 - Deactivate duplicate iClicker registrations.
+$string['deactivateduplicateiclickers'] = 'Check for duplicate iClicker registrations and keep latest registration';

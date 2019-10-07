@@ -15,7 +15,7 @@
 	url = https://github.com/ndunand/moodle-mergeusers.git
 [submodule "admin/tool/editrolesbycap"]
 	path = admin/tool/editrolesbycap
-	url = git://github.com/moodleou/moodle-tool_editrolesbycap
+	url = https://github.com/moodleou/moodle-tool_editrolesbycap.git
 [submodule "report/editdates"]
 	path = report/editdates
 	url = https://github.com/ccle/moodle-report_editdates.git
@@ -102,7 +102,7 @@
 	url = https://github.com/netspotau/moodle-block_mediagallery.git
 [submodule "mod/assign/submission/mediagallery"]
 	path = mod/assign/submission/mediagallery
-	url = git@github.com:ccle/moodle-assignsubmission_mediagallery.git
+	url = https://github.com/ccle/moodle-assignsubmission_mediagallery.git
 [submodule "lib/editor/tinymce/plugins/mediagallery"]
 	path = lib/editor/tinymce/plugins/mediagallery
 	url = https://github.com/netspotau/moodle-tinymce_mediagallery.git

@@ -238,6 +238,11 @@ class block_ucla_my_sites extends block_base {
         // From now on we can combine the base and parent categories.
         $categories = array_merge($parentcategories, $categories);
 
+        // Sort categories based on their name.
+        usort($categories, function($cata, $catb) {
+            return $cata->name <=> $catb->name;
+        });
+
         // Attach collab sites as properties of base categories.
         // Note how each category is passed by reference.
         foreach ($categories as &$category) {

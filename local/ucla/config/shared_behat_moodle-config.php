@@ -128,6 +128,9 @@ $CFG->forced_plugin_settings['block_ucla_help']['maxfilesize'] = 10485760;
 // CCLE-2301 - COURSE MENU BLOCK.
 $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 
+// SSC-4084 - Include links to Quiz tips.
+$CFG->quiztipslink = 'https://docs.ccle.ucla.edu/w/Tips_for_taking_quizzes_in_CCLE_Moodle';
+
 // UCLA Theme settings.
 $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'behat';
 $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage-image-shared';
@@ -371,6 +374,9 @@ $CFG->forced_plugin_settings['editor_tinymce']['customtoolbar'] = '
 
     fontselect,fontsizeselect,code,search,replace,wrap,cleanup,removeformat,pastetext,pasteword,wrap,fullscreen';
 
+// Site administration > Plugins > Local plugins > Kaltura Media Gallery.
+$CFG->forced_plugin_settings['local_kalturamediagallery']['link_location'] = '1';   // Course settings.
+
 // Site administration > Plugins > Local plugins > UCLA configurations
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 
@@ -432,6 +438,7 @@ $CFG->behat_extraallowedsettings = array(
     'custommenuitems',
     'timezone'
 );
+$CFG->behat_increasetimeout = 3;    // Increase timeout to 30 seconds.
 
 // If you want to have un-revisioned configuration data, place in config_private
 // $CFG->dirroot is overwritten later

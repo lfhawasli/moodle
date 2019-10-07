@@ -54,7 +54,6 @@ function email_students($course, $container) {
     }
 
     if (is_null($coursemodule)) {
-        debugging('could not find one news forum');
         return false;
     }
 

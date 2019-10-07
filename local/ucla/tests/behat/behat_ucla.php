@@ -29,6 +29,7 @@ require_once(__DIR__ . '/../../../../lib/behat/behat_files.php');
 require_once(__DIR__ . '/../../../../lib/tests/behat/behat_data_generators.php');
 
 use Behat\Behat\Context\Step\Given as Given,
+    Behat\Behat\Context\Step\Then as Then,
     Behat\Behat\Context\Step\When as When,
     Behat\Gherkin\Node\TableNode as TableNode,
     Behat\Mink\Exception\ExpectationException as ExpectationException,
@@ -103,6 +104,9 @@ class behat_ucla extends behat_files {
 
         // Enable course requestor.
         set_config('enablecourserequests', 1);
+
+        // Enable these settings for Admin Panel to work.
+        set_config('autohide', 0, 'tool_recyclebin');
 
         // Purge all caches to force new configs to take effect.
         purge_all_caches();
@@ -440,14 +444,12 @@ class behat_ucla extends behat_files {
     /**
      * Shortcut for clicking links in the left hand navigation.
      *
-     * @When I follow the :section section in the ucla site menu
+     * @When /^I follow the "([^"]*)" section in the ucla site menu$/
      *
      * @param string $section
      */
     public function i_follow_site_menu_section($section) {
-        return array(
-            new When('I click on "' . $section . '" "link" in the "#nav-drawer" "css_element"')
-        );
+        $this->execute('behat_theme_boost_behat_navigation::i_select_from_flat_navigation_drawer', $section);
     }
 
     /**
