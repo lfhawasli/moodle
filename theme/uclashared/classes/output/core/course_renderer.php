@@ -144,80 +144,6 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
     }
 
     /**
-     * Renders HTML to show course module availability information (for someone who isn't allowed
-     * to see the activity itself, or for staff)
-     *
-     * @param cm_info $mod
-     * @param array $displayoptions
-     * @return string
-     */
-    public function course_section_cm_availability(cm_info $mod, $displayoptions = array()) {
-        global $CFG;
-        $output = '';
-        if (!$mod->is_visible_on_course_page()) {
-            return $output;
-        }
-        if (!$mod->uservisible) {
-            // this is a student who is not allowed to see the module but might be allowed
-            // to see availability info (i.e. "Available from ...")
-            if (!empty($mod->availableinfo)) {
-                $formattedinfo = \core_availability\info::format_info(
-                        $mod->availableinfo, $mod->get_course());
-                $output = $this->availability_info($formattedinfo, 'isrestricted');
-            }
-            return $output;
-        }
-        // this is a teacher who is allowed to see module but still should see the
-        // information that module is not available to all/some students
-        $modcontext = \context_module::instance($mod->id);
-        $canviewhidden = has_capability('moodle/course:viewhiddenactivities', $modcontext);
-        if ($canviewhidden && !$mod->visible) {
-            // This module is hidden but current user has capability to see it.
-            // Do not display the availability info if the whole section is hidden.
-            // START CCLE-8508: Restrict access details don't show in hidden sections.
-            // Display the availability info even if the whole section is hidden.
-            $output .= $this->availability_info(get_string('hiddenfromstudents'), 'ishidden');
-            // if ($mod->get_section_info()->visible) {
-            //     $output .= $this->availability_info(get_string('hiddenfromstudents'), 'ishidden');
-            // }
-            // END CCLE-8508.
-        } else if ($mod->is_stealth()) {
-            // This module is available but is normally not displayed on the course page
-            // (this user can see it because they can manage it).
-            $output .= $this->availability_info(get_string('hiddenoncoursepage'), 'isstealth');
-        }
-        if ($canviewhidden && !empty($CFG->enableavailability)) {
-            // Display information about conditional availability.
-            // Don't add availability information if user is not editing and activity is hidden.
-            // START CCLE-8508: Restrict access details don't show in hidden sections.
-            // Add availability information even if user is not editing and activity is hidden.
-            $hidinfoclass = 'isrestricted isfullinfo';
-            $ci = new \core_availability\info_module($mod);
-            $fullinfo = $ci->get_full_information();
-            if ($fullinfo) {
-                $formattedinfo = \core_availability\info::format_info(
-                        $fullinfo, $mod->get_course());
-                $output .= $this->availability_info($formattedinfo, $hidinfoclass);
-            }
-            // if ($mod->visible || $this->page->user_is_editing()) {
-            //     $hidinfoclass = 'isrestricted isfullinfo';
-            //     if (!$mod->visible) {
-            //         $hidinfoclass .= ' hide';
-            //     }
-            //     $ci = new \core_availability\info_module($mod);
-            //     $fullinfo = $ci->get_full_information();
-            //     if ($fullinfo) {
-            //         $formattedinfo = \core_availability\info::format_info(
-            //                 $fullinfo, $mod->get_course());
-            //         $output .= $this->availability_info($formattedinfo, $hidinfoclass);
-            //     }
-            // }
-            // END CCLE-8508.
-        }
-        return $output;
-    }
-
-    /**
      * Renders HTML to display one course module in a course section
      *
      * This includes link, content, availability, completion info and additional information
@@ -285,6 +211,9 @@ class course_renderer extends \theme_boost\output\core\course_renderer{
 
         $link = html_writer::link('#', get_string('availabilityconditions', 'local_ucla'), array('aria-haspopup' => 'true'));
         $classes = 'groupinglabel availabilitypopup'; // CSS classes for the popup.
+        if (empty($availabilityhtml)) {
+            $classes .= ' hide';
+        }
 
         $ppmodule = \PublicPrivate_Module::build($mod);
         $ppstate = $ppmodule->is_private() ? 'private' : 'public';
