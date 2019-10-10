@@ -199,3 +199,6 @@
 [submodule "local/visibility"]
 	path = local/visibility
 	url = https://github.com/ucla/moodle-local_visibility.git
+[submodule "report/componentgrades"]
+	path = report/componentgrades
+	url = https://github.com/pauln/moodle-report_componentgrades.git
