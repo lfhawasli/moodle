@@ -32,14 +32,7 @@ require_once($CFG->dirroot.'/'.$CFG->admin.'/tool/uclacourserequestor/lib.php');
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class lib_test extends advanced_testcase {
-
-    /**
-     * Setup.
-     */
-    protected function setUp() {
-        $this->resetAfterTest();
-    }
+class lib_test extends basic_testcase {
 
     /**
      * Makes sure that the get_course_num() function returns the proper course

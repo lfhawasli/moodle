@@ -101,6 +101,7 @@ class uclacoursecreator_test extends advanced_testcase {
      */
     public function test_valid_email_template() {
         $validtemplatefile = dirname(__FILE__) . '/fixtures/valid_email_template.txt';
+        $this->expectOutputRegex('/Parsing .* successful/');
         $result = $this->uclacoursecreator->email_parse_file($validtemplatefile);
 
         $this->assertTrue(is_array($result));
