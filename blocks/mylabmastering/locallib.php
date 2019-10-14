@@ -314,7 +314,7 @@ function mylabmastering_create_lti_type($link, $courseid, $userid) {
 	$cps = $link->customParameters;
 
 	foreach ($cps as $cp) {
-		$n = $cp->name;
+		$n =  strtolower($cp->name);
 
 		$v = $cp->value;
 
