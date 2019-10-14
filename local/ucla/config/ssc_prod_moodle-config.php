@@ -195,6 +195,9 @@ $CFG->enableglobalsearch = 1;
 // CCLE-7144 - Enable stealth activities
 $CFG->allowstealth = 1;
 
+// Site administration > Mobile app > Mobile authentication
+$CFG->forced_plugin_settings['tool_mobile']['forcedurlscheme'] = 'cclemobile';
+
 // Site administration > Users > Accounts > User default preferences
 $CFG->defaultpreference_autosubscribe = 0;
 $CFG->defaultpreference_trackforums = 1;
@@ -522,6 +525,10 @@ $CFG->forced_plugin_settings['report_emaillog']['daysexpire'] = 30;
 
 // Site administration > Plugins > Web services > Mobile
 $CFG->enablemobilewebservice = 1;
+$CFG->forced_plugin_settings['tool_mobile']['androidappid'] = 'edu.ucla.ccle.moodlemobile';
+$CFG->forced_plugin_settings['tool_mobile']['iosappid'] = 1356392252;
+$CFG->forced_plugin_settings['tool_mobile']['enablesmartappbanners'] = 1;
+$CFG->forced_plugin_settings['tool_mobile']['setuplink'] = 'https://moodle2help.sscnet.ucla.edu/wiki/index.php?title=CCLE_Mobile_App';
 
 // Site administration > Security > Site policies
 $CFG->forceloginforprofiles = true;
@@ -661,9 +668,6 @@ $CFG->forced_plugin_settings['tool_uclasupportconsole']['log_prepop'] = '/home/m
 // Enable customscripts for Respondus and other UCLA custom changes.
 // NOTE: config is in local/ucla/configs, even though it is linked in root.
 $CFG->customscripts = $_dirroot_ . "/local/ucla/customscripts";
-
-// CCLE-7309 - Modify Footer
-$CFG->forced_plugin_settings['tool_mobile']['setuplink'] = '';
 
 // This will bootstrap the moodle functions.
 require_once($_dirroot_ . '/lib/setup.php');
