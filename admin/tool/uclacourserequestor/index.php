@@ -276,10 +276,42 @@ if ($requests === null) {
                 $hc = ($uclacrqs->setindex[$setid]);
                 $hcourse = array_pop($hc);
 
-                // This assumes that crosslisting courses requires the
-                // crosslisted courses to be in the same term (quarter).
-                $crssrs = ucla_courserequests::get_main_srs($hcourse['term'], $listsrs[$newestsrs]);
-                $changes[$setid]['crosslists'][$newestsrs] = $crssrs;
+                // Check if user is requesting a bulk range of SRS numbers.
+                $crosslistsrses = [];
+                $founderror = false;
+                $crosslists = explode('..', $listsrs[$newestsrs]);
+                if (count($crosslists) == 2) {
+                    // User was requesting a range.
+                    $start = intval($crosslists[0]);
+                    $end = intval($crosslists[1]);
+                    if ($start < $end) {
+                        // Valid range.
+                        for ($srs = $start; $srs <= $end; $srs++) {
+                            // Make sure SRS is 9 digits long.
+                            $srs = sprintf('%09s', $srs);
+                            if (ucla_validator('srs', $srs)) {
+                                $crosslistsrses[] = $srs;
+                            }
+                        }
+                    } else {
+                        $founderror = true;
+                    }
+                } else {
+                    $crosslistsrses = explode(',', $listsrs[$newestsrs]);
+                }
+
+                // If any errors, then silently fail bulk load.
+                if (!$founderror) {
+                    $crosslistsrses = array_map('trim', $crosslistsrses);
+                    $crosslistsrses = array_unique($crosslistsrses);
+                    foreach ($crosslistsrses as $srs) {
+                        // This assumes that crosslisting courses requires the
+                        // crosslisted courses to be in the same term (quarter).
+                        $crssrs = ucla_courserequests::get_main_srs($hcourse['term'], $srs);
+                        $changes[$setid]['crosslists'][$newestsrs] = $crssrs;
+                        ++$newestsrs;
+                    }
+                }
             }
 
         }

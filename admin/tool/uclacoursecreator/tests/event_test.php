@@ -80,6 +80,7 @@ class event_test extends advanced_testcase {
                 array('courseid' => $course->courseid));
         $this->assertTrue($exists);
 
+        $this->expectOutputRegex('/Deleted - Grades/');
         delete_course($course->courseid);
 
         $this->resetDebugging();
@@ -108,6 +109,7 @@ class event_test extends advanced_testcase {
         $plugingen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
         $class = $plugingen->create_class(array());
         $course = reset($class);
+        $this->expectOutputRegex('/Deleted - Grades/');
         delete_course($course->courseid);
         $this->resetDebugging();
 
@@ -148,6 +150,7 @@ class event_test extends advanced_testcase {
         $this->assertTrue($pos !== false);
 
         // Now delete course.
+        $this->expectOutputRegex('/Deleted - Grades/');
         delete_course($course->courseid);
         $this->resetDebugging();
 
@@ -183,6 +186,7 @@ class event_test extends advanced_testcase {
         }
 
         // Now delete course.
+        $this->expectOutputRegex('/Deleted - Grades/');
         delete_course($course->courseid);
         $this->resetDebugging();
 
@@ -200,8 +204,6 @@ class event_test extends advanced_testcase {
      * Test not clearing of an existing MyUCLA url that isn't on current server.
      */
     public function test_existing_nonlocal_myuclaurl() {
-        global $CFG;
-
         $cc = new uclacoursecreator();
         $myuclarlupdater = $cc->get_myucla_urlupdater();
 
@@ -220,6 +222,7 @@ class event_test extends advanced_testcase {
         $this->assertTrue($pos !== false);
 
         // Now delete course.
+        $this->expectOutputRegex('/Deleted - Grades/');
         delete_course($course->courseid);
         $this->resetDebugging();
 
