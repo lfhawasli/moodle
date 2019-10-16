@@ -166,7 +166,7 @@ $string['notice_quizhidden_later_redirect'] = 'Visible quizzes reminder set for 
 
 $string['lti_warning'] = 'There are risks using external tools. Please read ' .
         'this help document for more information: ' .
-        '<a target="_blank" href="https://docs.ccle.ucla.edu/w/LTI">https://docs.ccle.ucla.edu/w/LTI</a>';
+        '<a target="_blank" href="{$a->docsiteurl}">{$a->docsiteurl}</a>';
 
 // Settings.
 $string['student_access_ends_week'] = 'Prevent student access on week';

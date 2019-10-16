@@ -67,9 +67,9 @@ class help_form extends moodleform {
 
             $docswikiurl = get_config('block_ucla_help', 'docs_wiki_url');
             $changeemail = new stdClass;
-            $changeemail->students = html_writer::link(($docswikiurl . 'Changing_your_email_address#Students'),
+            $changeemail->students = html_writer::link(($docswikiurl . '/index.php?title=Changing_your_email_address#Students'),
                     'Students');
-            $changeemail->facultystaff = html_writer::link(($docswikiurl . 'Changing_your_email_address#Faculty.2FStaff'),
+            $changeemail->facultystaff = html_writer::link(($docswikiurl . '/index.php?title=Changing_your_email_address#Faculty.2FStaff'),
                     'faculty/staff');
             $mform->addElement('static', '', '', get_string('helpform_alternative', 'block_ucla_help',
                     $changeemail));

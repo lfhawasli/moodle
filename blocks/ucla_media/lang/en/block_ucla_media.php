@@ -98,7 +98,7 @@ $string['bcmediafinished'] = 'Finished';
 $string['bcother'] = 'Other';
 $string['bchelp'] = 'Lecture recordings may take up to 24 hours before they are '
         . 'available. For help regarding BruinCast content please read our '
-        . '<a href="https://docs.ccle.ucla.edu/w/BruinCast">help document</a>.';
+        . '<a href="{$a->docsiteurl}">help document</a>.';
 
 // Strings for video reserves display.
 $string['vrtitle'] = 'Title';

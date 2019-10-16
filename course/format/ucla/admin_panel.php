@@ -252,12 +252,13 @@ if ($node) {
             null, navigation_node::TYPE_CONTAINER, null, 'tipbox');
 
     $systemname = get_config('theme_uclashared', 'system_name');
+    $docwikiurl = get_config('block_ucla_help', 'docs_wiki_url');
     if (strpos($systemname, 'Social Sciences System') !== false) {
         $documentationurl = 'https://moodle2help.sscnet.ucla.edu/docs/The_Admin_Panel';
         $updateurl = 'https://moodle2help.sscnet.ucla.edu/docs/Upgrades';
     } else {
-        $documentationurl = 'https://docs.ccle.ucla.edu/w/Admin_panel';
-        $updateurl = 'https://docs.ccle.ucla.edu/w/What%27s_New_in_Moodle_3.5';
+        $documentationurl = $docwikiurl . '/index.php?title=Admin_panel';
+        $updateurl = $docwikiurl . '/index.php?title=What%27s_New_in_Moodle_3.5';
     }
 
     foreach ($settings as $name => $type) {
