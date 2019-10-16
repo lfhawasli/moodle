@@ -37,6 +37,7 @@ function mylabmastering_create_highlander_link($id, $url, $title) {
         $moduleinfo->modulename = 'lti';
         $moduleinfo->course = $COURSE->id;
         $moduleinfo->section = 0;
+        $moduleinfo->cmidnumber = $id;
         $moduleinfo->visible = 1;
         $moduleinfo->introeditor = array(
             'text' => '',
