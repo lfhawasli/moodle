@@ -143,6 +143,9 @@ $string['examplesbeforesubmission'] = 'Examples must be assessed before own subm
 $string['examplesmode'] = 'Mode of examples assessment';
 $string['examplesubmissions'] = 'Example submissions';
 $string['examplesvoluntary'] = 'Assessment of example submission is voluntary';
+// START UCLA MOD: CCLE-8859 - Export workshop data.
+$string['exportreport'] = 'Export workshop report';
+// END UCLA MOD: CCLE-8859.
 $string['exportsubmission'] = 'Export this page';
 $string['feedbackauthor'] = 'Feedback for the author';
 $string['feedbackauthorattachment'] = 'Attachment';
