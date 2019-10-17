@@ -28,6 +28,8 @@ $err = new stdClass();
 $course_id = required_param('course_id', PARAM_TEXT);
 $user_id = required_param('user_id', PARAM_TEXT);
 
+//set context
+$PAGE->set_context(context_system::instance());
 
 // Send the AJAX headers
 echo($OUTPUT->header());

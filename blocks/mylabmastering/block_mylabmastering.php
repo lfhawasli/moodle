@@ -59,6 +59,26 @@ class block_mylabmastering extends block_base {
 	    		
 	    		rebuild_course_cache($COURSE->id);
 	    	} else {
+                    // START UCLA MOD: CCLE-8810 - Pearson MyLabMastering block error.
+                    // Does the Pearson LTI link module exists?
+                    preg_match('/lti\/view.php\?l=(\d+)/', $mm_local_config->description, $matches);
+                    $ltiid = intval($matches[1]);   // ID is second match.
+
+                    $foundlti = false;
+                    if (empty($ltiid)) {
+                        // If cannot find LTI id, then ignore looking it up and
+                        // proceed as normal.
+                        $foundlti = true;
+                    } else {
+                        $foundlti = $DB->record_exists('lti', ['id' => $ltiid]);
+                    }
+
+                    // If not, then delete course config and reload page.
+                    if (empty($foundlti)) {
+                        $DB->delete_records('mylabmastering', ['id' => $mm_local_config->id]);
+                        redirect($PAGE->url, '', 0);
+                    }
+                    // END UCLA MOD: CCLE-8810.
 				// Call the JavaScript function to validate and update the page as needed.
 				$PAGE->requires->js_init_call('M.block_mylabmastering.init', array($COURSE->id, $USER->id, $mm_local_config->code), true);
 			}
