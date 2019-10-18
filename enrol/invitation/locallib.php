@@ -245,6 +245,10 @@ class invitation_manager {
                 $helpurl = new moodle_url('/blocks/ucla_help/index.php', array('course' => $this->courseid));
                 $helpurl = $helpurl->out(false);
                 $messageparams->helpurl = $helpurl;
+                // START UCLA MOD: CCLE-8840 - Fix URLs for doc site.
+                // Set doc site url
+                $messageparams->docsiteurl = get_config('block_ucla_help', 'docs_wiki_url') . '/index.php?title=Create_UCLA_Logon_ID';
+                // END UCLA MOD: CCLE-8840.
                 $message .= get_string('emailmsgtxt', 'enrol_invitation', $messageparams);
                 $htmlmessage = get_string('htmlemailmsgtxt', 'enrol_invitation', $messageparams);
                 if (!$resend) {
@@ -253,7 +257,6 @@ class invitation_manager {
                 } else {
                     $retval = $data->id;
                 }
-
                 // User sending invitation.
                 $fromuser = new stdClass();
                 $fromuser->email = $data->fromemail;

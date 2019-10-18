@@ -68,5 +68,17 @@ function xmldb_workshop_upgrade($oldversion) {
     // Automatically generated Moodle v3.5.0 release upgrade line.
     // Put any upgrade step following this.
 
+    // START UCLA MOD: CCLE-8786 - setting to toggle students' ability to view other's assessments.
+    if ($oldversion < 2018051401) {
+        $table = new xmldb_table('workshop');
+        $field = new xmldb_field('viewotherassessments', XMLDB_TYPE_INTEGER, '2', null, null, null, 0, 'overallfeedbackmaxbytes');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2018051401, 'workshop');
+    }
+    // END UCLA MOD: CCLE-8786.
+
     return true;
 }

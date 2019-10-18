@@ -120,16 +120,13 @@ $CFG->divertallemailsto = 'ccle-email-test@lists.ucla.edu';
 // CCLE-2306 - HELP SYSTEM BLOCK.
 // If using JIRA, jira_user, jira_password, jira_pid should be defined in config_private.php.
 $CFG->forced_plugin_settings['block_ucla_help']['jira_endpoint'] = 'https://ucla-ccle.atlassian.net/rest/api/latest/issue';
-$CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://docs.ccle.ucla.edu/w/';
+$CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_url'] = 'https://docs.ccle.ucla.edu';
 $CFG->forced_plugin_settings['block_ucla_help']['docs_wiki_api'] = 'https://docs.ccle.ucla.edu/api.php';
 $block_ucla_help_support_contacts['System'] = 'support';  // Default.
 $CFG->forced_plugin_settings['block_ucla_help']['maxfilesize'] = 10485760;
 
 // CCLE-2301 - COURSE MENU BLOCK.
 $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
-
-// SSC-4084 - Include links to Quiz tips.
-$CFG->quiztipslink = 'https://docs.ccle.ucla.edu/w/Tips_for_taking_quizzes_in_CCLE_Moodle';
 
 // UCLA Theme settings.
 $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'behat';
@@ -401,7 +398,7 @@ $CFG->themedesignermode = 0;    // Need to be fast.
 $CFG->allowcoursethemes = 1;
 $CFG->custommenuitems = "helprequest,theme_uclashared|/blocks/ucla_help/index.php|helprequest
     selfhelp,theme_uclashared|https://docs.ccle.ucla.edu/|selfhelp
-    tipsupdates,theme_uclashared|https://docs.ccle.ucla.edu/w/Tips_and_Updates|tipsupdates
+    tipsupdates,theme_uclashared|https://docs.ccle.ucla.edu/index.php?title=Tips_and_Updates|tipsupdates
     requestsite,theme_uclashared|/course/request.php|requestsite";
 
 // Site administration > Appearance > Navigation

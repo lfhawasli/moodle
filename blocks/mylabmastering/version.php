@@ -9,12 +9,12 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017052300;
-$plugin->requires  = 2013051408;
+$plugin->version   = 2019012000;
+$plugin->requires  = 2017051500;
 $plugin->cron      = 0;
 $plugin->component = 'block_mylabmastering';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.0';
+$plugin->release   = '1.0.1';
 
 $plugin->dependencies = array(
 		'mod_lti' => ANY_VERSION

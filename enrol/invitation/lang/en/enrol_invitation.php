@@ -41,7 +41,7 @@ Follow the link to view invitation: {$a->inviteurl}
 
 Please note:
   •   You must have a UCLA Logon ID to accept this invitation.
-      Follow the link for more information: https://docs.ccle.ucla.edu/w/Create_UCLA_Logon_ID
+      Follow the link for more information: {$a->docsiteurl}
   •   The invitation can be only used once.
   •   The invitation will expire on {$a->expiration}
   •   {$a->roleexpiration}
@@ -77,7 +77,7 @@ $string['htmlemailmsgtxt'] = <<<'EOD'
         {$a->privacynotice}
         <p>Please note:</p>
         <ul>
-            <li> You must have a <a href="https://docs.ccle.ucla.edu/w/Create_UCLA_Logon_ID"> UCLA Logon ID </a>
+            <li> You must have a <a href="{$a->docsiteurl}"> UCLA Logon ID </a>
             to accept this invitation. </li>
             <li> The invitation can be only used once. </li>
             <li> The invitation will expire on {$a->expiration} </li>
@@ -159,7 +159,7 @@ Follow the link to view invitation: [invite url]
 
 Please note:
 <ul>
-    <li> You must have a <a href="https://docs.ccle.ucla.edu/w/Create_UCLA_Logon_ID"> UCLA Logon ID </a>
+    <li> You must have a <a href="{$a->docsiteurl}"> UCLA Logon ID </a>
     to accept this invitation. </li>
     <li> The invitation can be only used once. </li>
     <li> The invitation will expire on [invite expiration] </li>

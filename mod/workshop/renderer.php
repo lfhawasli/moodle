@@ -638,11 +638,15 @@ class mod_workshop_renderer extends plugin_renderer_base {
         } else {
             $title = get_string('assessment', 'workshop');
         }
-        if (($assessment->url instanceof moodle_url) and ($this->page->url != $assessment->url)) {
-            $o .= $this->output->container(html_writer::link($assessment->url, $title), 'title');
-        } else {
-            $o .= $this->output->container($title, 'title');
+        // START UCLA MOD: CCLE-8740 - Show students other assessments.
+        if($assessment->showassessmenttitle) {
+            if (($assessment->url instanceof moodle_url) and ($this->page->url != $assessment->url)) {
+                $o .= $this->output->container(html_writer::link($assessment->url, $title), 'title');
+            } else {
+                $o .= $this->output->container($title, 'title');
+            }
         }
+        // END UCLA MOD: CCLE-8740.
 
         if (!$anonymous) {
             $reviewer   = $assessment->reviewer;
@@ -681,6 +685,12 @@ class mod_workshop_renderer extends plugin_renderer_base {
                 );
             }
         }
+
+        // START UCLA MOD: CCLE-8740 - Show students other assessments.
+        if ($assessment->owngrade) {
+            $o .= $this->output->container(get_string('gradeforassessing', 'workshop', $assessment->owngrade), 'assessing-grade grade');
+        }
+        // END UCLA MOD: CCLE-8740.
 
         $o .= $this->output->container_start('actions');
         foreach ($assessment->actions as $action) {

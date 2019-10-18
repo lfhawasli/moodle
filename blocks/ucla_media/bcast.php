@@ -109,7 +109,9 @@ function display_all($course, $sort, $tab, $pageparams) {
         echo $OUTPUT->notification($notice);
     }
 
-    echo html_writer::tag('p', get_string('bchelp', 'block_ucla_media'));
+    $helplink = new stdClass();
+    $helplink->docsiteurl = get_config('block_ucla_help', 'docs_wiki_url') . '/index.php?title=BruinCast';
+    echo html_writer::tag('p', get_string('bchelp', 'block_ucla_media', $helplink));
 
     // Print BruinCast tabs.
     $courseinfo = get_course($tab);

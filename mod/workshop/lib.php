@@ -85,6 +85,9 @@ function workshop_add_instance(stdclass $workshop) {
     $workshop->latesubmissions       = (int)!empty($workshop->latesubmissions);
     $workshop->phaseswitchassessment = (int)!empty($workshop->phaseswitchassessment);
     $workshop->evaluation            = 'best';
+    // START UCLA MOD: CCLE-8786 - setting to toggle students' ability to view other's assessments.
+    $workshop->viewotherassessments = (int)!empty($workshop->viewotherassessments);
+    // END UCLA MOD: CCLE-8786.
 
     if (isset($workshop->gradinggradepass)) {
         $workshop->gradinggradepass = (float)unformat_float($workshop->gradinggradepass);
@@ -168,6 +171,9 @@ function workshop_update_instance(stdclass $workshop) {
     $workshop->useselfassessment     = (int)!empty($workshop->useselfassessment);
     $workshop->latesubmissions       = (int)!empty($workshop->latesubmissions);
     $workshop->phaseswitchassessment = (int)!empty($workshop->phaseswitchassessment);
+    // START UCLA MOD: CCLE-8786 - setting to toggle students' ability to view other's assessments.
+    $workshop->viewotherassessments = (int)!empty($workshop->viewotherassessments);
+    // END UCLA MOD: CCLE-8786.
 
     if (isset($workshop->gradinggradepass)) {
         $workshop->gradinggradepass = (float)unformat_float($workshop->gradinggradepass);
@@ -1725,6 +1731,13 @@ function workshop_extend_settings_navigation(settings_navigation $settingsnav, n
         $url = new moodle_url('/mod/workshop/allocation.php', array('cmid' => $PAGE->cm->id));
         $workshopnode->add(get_string('allocate', 'workshop'), $url, settings_navigation::TYPE_SETTING);
     }
+    // START UCLA MOD: CCLE-8859 - Export workshop data.
+    if (has_capability('mod/workshop:viewallassessments', $PAGE->context)) {
+        $url = $reporturl  = new moodle_url('export.php/',
+            array('courseid' => $PAGE->cm->course, 'workshopid' => $PAGE->cm->instance));
+        $workshopnode->add(get_string('exportreport', 'workshop'), $url, settings_navigation::TYPE_SETTING);
+    }
+    // END UCLA MOD: CCLE-8859.
 }
 
 /**

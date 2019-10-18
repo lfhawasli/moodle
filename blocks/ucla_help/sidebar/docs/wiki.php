@@ -272,7 +272,7 @@ class sidebar_wiki_parser extends nwiki_parser {
             $file = str_replace(' ', '', $img[0]);
             $src = $this->get_image_src($file);
             $image = html_writer::tag('img', '', array('src' => $src));
-            $url = html_writer::link($docsurl . str_replace(' ', '_', $text), $image, array('target' => '_blank')
+            $url = html_writer::link($docsurl . '/index.php?title=' . str_replace(' ', '_', $text), $image, array('target' => '_blank')
             );
             return parser_utils::h('div', $url, array('class' => 'sidebar-image'));
         } else if (preg_match('/^Category:/', $text)) {
@@ -287,7 +287,7 @@ class sidebar_wiki_parser extends nwiki_parser {
         foreach ($links as $link) {
             $newwindow = html_writer::span('', 'glyphicon glyphicon-new-window');
             $out .= parser_utils::h('a', $link . $newwindow, array(
-                        'href' => $docsurl . str_replace(' ', '_', trim($link)),
+                        'href' => $docsurl . '/index.php?title=' . str_replace(' ', '_', trim($link)),
                         'target' => '_blank',
                         'class' => 'external'
                             )

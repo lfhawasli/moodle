@@ -44,6 +44,9 @@ try {
         $activeinstructorfocused = new active_instructor_focused($USER);
         if ($activeinstructorfocused->has_additional_course_content($course)) {
 
+            $warning = new stdClass();
+            $warning->docsiteurl = get_config('block_ucla_help', 'docs_wiki_url') . '/index.php?title=LTI';
+
             $config = new stdClass;
             $config->title = get_string('deletecoursecontenttitle', 'local_ucla');
             $config->yesLabel = get_string('deletecoursecontentyes', 'local_ucla');
@@ -52,8 +55,8 @@ try {
             $url = new moodle_url('/backup/backup.php', array('id' => $course->id));
             $config->question = get_string('deletecoursecontentwarning', 'local_ucla',
                     array('shortname' => $course->shortname, 'fullname' => $course->fullname, 'backuplink' => (string)$url));
+            $config->warning = get_string('lti_warning', 'local_ucla', $warning);
             $config->url = (string) $url;
-
             // Set status.
             $obj->status = true;
             $obj->config = $config;
