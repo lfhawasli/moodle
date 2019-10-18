@@ -148,39 +148,43 @@ case workshop::PHASE_SUBMISSION:
 
     // is the assessment of example submissions considered finished?
     $examplesdone = has_capability('mod/workshop:manageexamples', $workshop->context);
-    if ($workshop->assessing_examples_allowed()
-            and has_capability('mod/workshop:submit', $workshop->context)
-                    and ! has_capability('mod/workshop:manageexamples', $workshop->context)) {
-        $examples = $userplan->get_examples();
-        $total = count($examples);
-        $left = 0;
-        // make sure the current user has all examples allocated
-        foreach ($examples as $exampleid => $example) {
-            if (is_null($example->assessmentid)) {
-                $examples[$exampleid]->assessmentid = $workshop->add_allocation($example, $USER->id, 0);
-            }
-            if (is_null($example->grade)) {
-                $left++;
-            }
-        }
-        if ($left > 0 and $workshop->examplesmode != workshop::EXAMPLES_VOLUNTARY) {
-            $examplesdone = false;
-        } else {
-            $examplesdone = true;
-        }
-        print_collapsible_region_start('', 'workshop-viewlet-examples', get_string('exampleassessments', 'workshop'), false, $examplesdone);
-        echo $output->box_start('generalbox exampleassessments');
-        if ($total == 0) {
-            echo $output->heading(get_string('noexamples', 'workshop'), 3);
-        } else {
-            foreach ($examples as $example) {
-                $summary = $workshop->prepare_example_summary($example);
-                echo $output->render($summary);
-            }
-        }
-        echo $output->box_end();
-        print_collapsible_region_end();
-    }
+    // START UCLA MOD: CCLE-8790 - Add example assessments to evaluation and closed phase.
+    // if ($workshop->assessing_examples_allowed()
+    //         and has_capability('mod/workshop:submit', $workshop->context)
+    //                 and ! has_capability('mod/workshop:manageexamples', $workshop->context)) {
+    //     $examples = $userplan->get_examples();
+    //     $total = count($examples);
+    //     $left = 0;
+    //     // make sure the current user has all examples allocated
+    //     foreach ($examples as $exampleid => $example) {
+    //         if (is_null($example->assessmentid)) {
+    //             $examples[$exampleid]->assessmentid = $workshop->add_allocation($example, $USER->id, 0);
+    //         }
+    //         if (is_null($example->grade)) {
+    //             $left++;
+    //         }
+    //     }
+    //     if ($left > 0 and $workshop->examplesmode != workshop::EXAMPLES_VOLUNTARY) {
+    //         $examplesdone = false;
+    //     } else {
+    //         $examplesdone = true;
+    //     }
+    //     print_collapsible_region_start('', 'workshop-viewlet-examples', get_string('exampleassessments', 'workshop'), false, $examplesdone);
+    //     echo $output->box_start('generalbox exampleassessments');
+    //     if ($total == 0) {
+    //         echo $output->heading(get_string('noexamples', 'workshop'), 3);
+    //     } else {
+    //         foreach ($examples as $example) {
+    //             $summary = $workshop->prepare_example_summary($example);
+    //             echo $output->render($summary);
+    //         }
+    //     }
+    //     echo $output->box_end();
+    //     print_collapsible_region_end();
+    // }
+
+    $workshop->print_example_assessments($userplan, $output, $examplesdone);
+    // END UCLA MOD: CCLE-8790.
 
     if (has_capability('mod/workshop:submit', $PAGE->context) and (!$examplesmust or $examplesdone)) {
         print_collapsible_region_start('', 'workshop-viewlet-ownsubmission', get_string('yoursubmission', 'workshop'));
@@ -344,40 +348,45 @@ case workshop::PHASE_ASSESSMENT:
         $examplesavailable = false;
     }
 
-    if ($workshop->assessing_examples_allowed()
-            and has_capability('mod/workshop:submit', $workshop->context)
-                and ! has_capability('mod/workshop:manageexamples', $workshop->context)
-                    and $examplesavailable) {
-        $examples = $userplan->get_examples();
-        $total = count($examples);
-        $left = 0;
-        // make sure the current user has all examples allocated
-        foreach ($examples as $exampleid => $example) {
-            if (is_null($example->assessmentid)) {
-                $examples[$exampleid]->assessmentid = $workshop->add_allocation($example, $USER->id, 0);
-            }
-            if (is_null($example->grade)) {
-                $left++;
-            }
-        }
-        if ($left > 0 and $workshop->examplesmode != workshop::EXAMPLES_VOLUNTARY) {
-            $examplesdone = false;
-        } else {
-            $examplesdone = true;
-        }
-        print_collapsible_region_start('', 'workshop-viewlet-examples', get_string('exampleassessments', 'workshop'), false, $examplesdone);
-        echo $output->box_start('generalbox exampleassessments');
-        if ($total == 0) {
-            echo $output->heading(get_string('noexamples', 'workshop'), 3);
-        } else {
-            foreach ($examples as $example) {
-                $summary = $workshop->prepare_example_summary($example);
-                echo $output->render($summary);
-            }
-        }
-        echo $output->box_end();
-        print_collapsible_region_end();
-    }
+    // START UCLA MOD: CCLE-8790 - Add example assessments to evaluation and closed phase.
+    // if ($workshop->assessing_examples_allowed()
+    //         and has_capability('mod/workshop:submit', $workshop->context)
+    //             and ! has_capability('mod/workshop:manageexamples', $workshop->context)
+    //                 and $examplesavailable) {
+    //     $examples = $userplan->get_examples();
+    //     $total = count($examples);
+    //     $left = 0;
+    //     // make sure the current user has all examples allocated
+    //     foreach ($examples as $exampleid => $example) {
+    //         if (is_null($example->assessmentid)) {
+    //             $examples[$exampleid]->assessmentid = $workshop->add_allocation($example, $USER->id, 0);
+    //         }
+    //         if (is_null($example->grade)) {
+    //             $left++;
+    //         }
+    //     }
+    //     if ($left > 0 and $workshop->examplesmode != workshop::EXAMPLES_VOLUNTARY) {
+    //         $examplesdone = false;
+    //     } else {
+    //         $examplesdone = true;
+    //     }
+    //     print_collapsible_region_start('', 'workshop-viewlet-examples', get_string('exampleassessments', 'workshop'), false, $examplesdone);
+    //     echo $output->box_start('generalbox exampleassessments');
+    //     if ($total == 0) {
+    //         echo $output->heading(get_string('noexamples', 'workshop'), 3);
+    //     } else {
+    //         foreach ($examples as $example) {
+    //             $summary = $workshop->prepare_example_summary($example);
+    //             echo $output->render($summary);
+    //         }
+    //     }
+    //     echo $output->box_end();
+    //     print_collapsible_region_end();
+    // }
+
+    $workshop->print_example_assessments($userplan, $output, $examplesdone, workshop::PHASE_ASSESSMENT, $examplesavailable);
+    // END UCLA MOD: CCLE-8790.
+
     if (!$examplesmust or $examplesdone) {
         print_collapsible_region_start('', 'workshop-viewlet-assignedassessments', get_string('assignedassessments', 'workshop'));
         if (! $assessments = $workshop->get_assessments_by_reviewer($USER->id)) {
@@ -507,6 +516,11 @@ case workshop::PHASE_EVALUATION:
         echo $output->box_end();
         print_collapsible_region_end();
     }
+
+    // START UCLA MOD: CCLE-8790 - Add example assessments to evaluation and closed phase.
+    $workshop->print_example_assessments($userplan, $output);
+    // END UCLA MOD: CCLE-8790.
+
     if ($assessments = $workshop->get_assessments_by_reviewer($USER->id)) {
         print_collapsible_region_start('', 'workshop-viewlet-assignedassessments', get_string('assignedassessments', 'workshop'));
         $shownames = has_capability('mod/workshop:viewauthornames', $PAGE->context);
@@ -646,6 +660,11 @@ case workshop::PHASE_CLOSED:
         }
         // END UCLA MOD: CCLE-8740.
     }
+
+    // START UCLA MOD: CCLE-8790 - Add example assessments to evaluation and closed phase. 
+    $workshop->print_example_assessments($userplan, $output);
+    // END UCLA MOD: CCLE-8790.
+
     if (has_capability('mod/workshop:viewpublishedsubmissions', $workshop->context)) {
         $shownames = has_capability('mod/workshop:viewauthorpublished', $workshop->context);
         if ($submissions = $workshop->get_published_submissions()) {
