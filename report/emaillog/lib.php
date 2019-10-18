@@ -41,3 +41,27 @@ function report_emaillog_extend_navigation_course($navigation, $course, $context
                 navigation_node::TYPE_SETTING, null, 'report_emaillog', new pix_icon('i/report', ''));
     }
 }
+
+/**
+ * This function extends the navigation of forum module with the report items.
+ *
+ * @param navigation_node $navigation The navigation node to extend
+ * @param stdClass $cm The course module to object for the report
+ */
+function report_emaillog_extend_navigation_module($navigation, $cm) {
+    global $PAGE, $DB;
+    if ($cm->modname == 'forum') {
+        $discussionid = '';
+        $params = $PAGE->url->params();
+        if (!empty($params['d'])) {
+            $discussionid = $params['d'];
+        }
+        if (has_capability('report/emaillog:view', $PAGE->context)) {
+            $url = new moodle_url('/report/emaillog/index.php',
+                    array('id' => $PAGE->course->id, 'chooselog' => 1,
+                        'forum' => $cm->instance,'discussion' => $discussionid));
+            $navigation->add(get_string('pluginname', 'report_emaillog'), $url,
+                    navigation_node::TYPE_SETTING, null, 'report_emaillog', new pix_icon('i/report', ''));
+        }
+    }
+}
