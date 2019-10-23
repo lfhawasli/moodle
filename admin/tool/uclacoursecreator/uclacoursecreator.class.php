@@ -2052,19 +2052,17 @@ class uclacoursecreator {
             return;
         }
 
-        // First 3 lines are headers.
-        for ($x = 0; $x < 3; $x++) {
+        // First 2 lines are headers.
+        for ($x = 0; $x < 2; $x++) {
             $line = fgets($fp);
             if (preg_match('/'.'^FROM:(.*)'.'/i', $line, $matches)) {
                 $emailparams['from'] = trim($matches[1]);
-            } else if (preg_match('/'.'^BCC:(.*)'.'/i', $line, $matches)) {
-                $emailparams['bcc'] = trim($matches[1]);
             } else if (preg_match('/'.'^SUBJECT:(.*)'.'/i', $line, $matches)) {
                 $emailparams['subject'] = trim($matches[1]);
             }
         }
 
-        if (count($emailparams) != 3) {
+        if (count($emailparams) != 2) {
             $this->debugln("ERROR: failed to parse headers in $file \n");
             return false;
         }
