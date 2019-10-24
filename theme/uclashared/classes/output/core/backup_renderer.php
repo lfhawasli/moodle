@@ -223,6 +223,19 @@ class theme_uclashared_core_backup_renderer extends core_backup_renderer {
         $table->head = array('', get_string('shortnamecourse'), get_string('fullnamecourse'), get_string('instructorcourse', 'theme_uclashared'));
         $table->data = array();
         foreach ($component->get_results() as $course) {
+            // START UCLA MOD: CCLE-8561 - Course import form shows wrong instructors list.
+            $course->professors = "";
+            if (method_exists(course_get_format($course), 'display_instructors') &&
+                $instructors = course_get_format($course)->display_instructors()) {
+                $einstructors = array();
+                if (!empty($instructors)) {
+                    foreach ($instructors as $instructor) {
+                        $einstructors[] = $instructor->lastname . ', ' . $instructor->firstname;
+                    }
+                    $course->professors = implode("\n", $einstructors);
+                }
+            }
+            // END UCLA MOD: CCLE-8561.
             $row = new html_table_row();
             $row->attributes['class'] = 'ics-course';
             if (!$course->visible) {
