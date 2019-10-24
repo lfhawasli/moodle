@@ -13,6 +13,19 @@
         background: $header-color-prod url([[pix:theme|footer-bg]]) repeat-x bottom !important;
     }
 
+    a {
+        color: #fff;
+        font-size: 0.8em;
+        text-decoration: none;
+        &:hover {
+            color: #ffe800;
+            text-decoration: none;
+        }
+        margin: 0 auto;
+        display: block;
+        text-align: center;
+    }
+    
     #footer-content {
 
         margin: 0 auto;
