@@ -146,10 +146,12 @@ class PublicPrivate_Course {
     /**
      * Get the id of the course public/private group or false if not active.
      *
+     * @param boolean $ppgroupingonly   If true, then only return the groupingpublicprivate value.
+     *
      * @return int
      */
-    public function get_grouping() {
-        if (!empty($this->_course->defaultgroupingid)) {
+    public function get_grouping($ppgroupingonly = false) {
+        if (!empty($this->_course->defaultgroupingid) && !$ppgroupingonly) {
             return $this->_course->defaultgroupingid;
         }
         return $this->_course->groupingpublicprivate;
@@ -778,7 +780,7 @@ class PublicPrivate_Course {
                 $this->create_group($groupid);
             }
         }
-        $groupingid = $this->get_grouping();
+        $groupingid = $this->get_grouping(true);
         $grouping = groups_get_grouping($groupingid);
         if ($grouping === false) {
             if (empty($fixthem)) {
