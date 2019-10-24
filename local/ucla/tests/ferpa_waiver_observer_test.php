@@ -60,6 +60,7 @@ class mod_casa_privacy_waiver_observer_testcase extends advanced_testcase {
         $this->assertEquals(1, $numwaivers);
 
         // Delete course.
+        $this->expectOutputRegex('/Deleted - Grades/');
         delete_course($course->id);
         $this->resetDebugging();    // Ignore debugging about Event API 1.
         // Make sure no entries exists.

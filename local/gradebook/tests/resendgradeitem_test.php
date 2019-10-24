@@ -109,7 +109,7 @@ class resendgradeitem_test extends advanced_testcase {
         $gradeitem->set_hidden($futuretime);
 
         // Clear adhoc tasks first
-        $record = $DB->delete_records('task_adhoc');
+        $DB->delete_records('task_adhoc');
 
         // Create scheduled task and run it
         $scheduledtask = $this->get_mock_myucla_task();
@@ -125,6 +125,9 @@ class resendgradeitem_test extends advanced_testcase {
 
         // Change last run time to be before pasttime and run the task again
         $scheduledtask->set_last_run_time($pasttime - (3600 * 24));
+        $this->expectOutputString(
+                sprintf("Sending grade_item with id %d that was hidden until %d to MyUCLA.\n",
+                        $gradeitem->id, $pasttime));
         $scheduledtask->execute();
 
         // Check that the adhoc task to resend is now queued.
