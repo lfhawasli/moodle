@@ -3183,6 +3183,7 @@ class workshop {
      * @param bool $examplesavailable Whether the examples can be assessed or not.
      */
     public function print_example_assessments($userplan, $output, $examplesdone = -1, $phase = 0, $examplesavailable = false) {
+        global $USER;
         if ($this->assessing_examples_allowed()
             and has_capability('mod/workshop:submit', $this->context)
                 and ! has_capability('mod/workshop:manageexamples', $this->context)
