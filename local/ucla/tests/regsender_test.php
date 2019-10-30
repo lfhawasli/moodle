@@ -81,18 +81,16 @@ class regsender_test extends advanced_testcase {
         set_config('registrar_dbhost', $CFG->dbhost);
         set_config('registrar_dbuser', $CFG->dbuser);
         set_config('registrar_dbpass', $CFG->dbpass);
+        set_config('registrar_dbname', $CFG->dbname);
 
         if (!empty($CFG->dboptions['dbport'])) {
             set_config('registrar_dbhost',
                     $CFG->dbhost . ':' . $CFG->dboptions['dbport']);
         }
 
-        switch (get_class($DB)) {
-            case 'mssql_native_moodle_database':
-                set_config('registrar_dbtype', 'mssql_n');
-                break;
+        switch ($DB->get_dbfamily()) {
 
-            case 'mysqli_native_moodle_database':
+            case 'mysql':
                 set_config('registrar_dbtype', 'mysqli');
                 if (!empty($CFG->dboptions['dbsocket'])) {
                     $dbsocket = $CFG->dboptions['dbsocket'];
@@ -110,24 +108,27 @@ class regsender_test extends advanced_testcase {
                 }
                 break;
 
-            case 'oci_native_moodle_database':
+            case 'oracle':
                 set_config('registrar_dbtype', 'oci8po');
                 break;
 
-            case 'pgsql_native_moodle_database':
+            case 'postgres':
                 set_config('registrar_dbtype', 'postgres7');
                 if (!empty($CFG->dboptions['dbsocket']) and ($CFG->dbhost === 'localhost'
                         or $CFG->dbhost === '127.0.0.1')) {
                     if (strpos($CFG->dboptions['dbsocket'], '/') !== false) {
-                        set_config('registrar_dbhost',
-                                $CFG->dboptions['dbsocket']);
+                        $socket = $CFG->dboptions['dbsocket'];
+                        if (!empty($CFG->dboptions['dbport'])) {
+                            $socket .= ':' . $CFG->dboptions['dbport'];
+                        }
+                        set_config('registrar_dbhost', $socket);
                     } else {
                         set_config('registrar_dbhost', '');
                     }
                 }
                 break;
 
-            case 'sqlsrv_native_moodle_database':
+            case 'mssql':
                 set_config('registrar_dbtype', 'mssqlnative');
                 break;
 
@@ -287,6 +288,7 @@ class regsender_test extends advanced_testcase {
         $this->process_adhoc_tasks();
         $this->is_adhoc_queue_clear(true);
         // Delete course and make sure that event queue is clear.
+        $this->expectOutputRegex('/Deleted - Grades/');
         delete_course($collab->id);
 
         $this->process_adhoc_tasks();
@@ -420,6 +422,7 @@ class regsender_test extends advanced_testcase {
         // Create new course and crosslist it with the existing course.
         $uclagen = $this->getDataGenerator()->get_plugin_generator('local_ucla');
         $anothercourse = $uclagen->create_class(array(array('term' => $this->_class->term)));
+        $this->expectOutputRegex('/Deleted - Grades/');
         $uclagen->crosslist_courses($this->_class, $anothercourse);
 
         // Now set same link and should return a partial update return code,
@@ -547,6 +550,7 @@ class regsender_test extends advanced_testcase {
         $this->assertNotEmpty($links[$this->_class->term][$this->_class->srs]['protect_syllabus_url']);
 
         // Delete course and make sure that syllabi are wiped out.
+        $this->expectOutputRegex('/Deleted - Grades/');
         delete_course($courseid);
         $this->process_adhoc_tasks();
 
