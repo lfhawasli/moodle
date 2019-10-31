@@ -55,7 +55,7 @@ class local_ucla_import_course_search extends import_course_search {
             'teacherfullnamesearch' => '%'.$this->get_search().'%',
             'siteid' => SITEID
         );
-        $select = "     SELECT DISTINCT c.id, c.format,c.fullname,c.shortname,c.visible,c.sortorder, usr.lastname, usr.firstname, GROUP_CONCAT(CONCAT(usr.lastname, ', ', usr.firstname) SEPARATOR '\n') AS professors";
+        $select = "     SELECT DISTINCT c.id, c.format,c.fullname,c.shortname,c.visible,c.sortorder";
         $from   = "       FROM {course} c ";
         $join   = "  LEFT JOIN {role} r ON (r.shortname = 'editinginstructor' OR r.shortname='supervising_instructor')
                      LEFT JOIN {role_assignments} ra ON ra.contextid = ctx.id AND r.id = ra.roleid
