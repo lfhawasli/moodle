@@ -27,6 +27,7 @@ require_once(__DIR__.'/locallib.php');
 
 $cmid = required_param('cmid', PARAM_INT); // Course module id.
 $id = optional_param('id', 0, PARAM_INT); // Submission id.
+$view = optional_param('view', 'byreviewer', PARAM_ALPHA); // View.
 $edit = optional_param('edit', false, PARAM_BOOL); // Open the page for editing?
 $assess = optional_param('assess', false, PARAM_BOOL); // Instant assessment required.
 $delete = optional_param('delete', false, PARAM_BOOL); // Submission removal requested.
@@ -322,6 +323,10 @@ if (has_capability('mod/workshop:viewallassessments', $workshop->context)
             and ($workshop->viewotherassessments))
         or ($ownsubmission and $workshop->assessments_available())) {
 // END UCLA MOD: CCLE-8740.
+    // START UCLA MOD: CCLE-8778 - Side by side view of assessments.
+    $workshop->print_assessment_tabs($cmid, $id, $view);
+    // END UCLA MOD: CCLE-8778.
+
     // other assessments
     $strategy       = $workshop->grading_strategy_instance();
     $assessments    = $workshop->get_assessments_of_submission($submission->id);
@@ -330,37 +335,47 @@ if (has_capability('mod/workshop:viewallassessments', $workshop->context)
     // Show assessment title only if have viewallassessments capability.
     $showassessmenttitle = has_capability('mod/workshop:viewallassessments', $workshop->context);
     // END UCLA MOD: CCLE-8740.
-    foreach ($assessments as $assessment) {
-        if ($assessment->reviewerid == $USER->id) {
-            // own assessment has been displayed already
-            continue;
-        }
-        if (is_null($assessment->grade) and !has_capability('mod/workshop:viewallassessments', $workshop->context)) {
-            // students do not see peer-assessment that are not graded yet
-            continue;
-        }
-        $mform      = $strategy->get_assessment_form($PAGE->url, 'assessment', $assessment, false);
-        $options    = array(
-            'showreviewer'  => $showreviewer,
-            'showauthor'    => $showauthor,
-            'showform'      => !is_null($assessment->grade),
-            'showweight'    => true,
-            // START UCLA MOD: CCLE-8740 - Show students other assessments.
-            'showassessmenttitle' => $showassessmenttitle
-            // END UCLA MOD: CCLE-8740.
-        );
-        $displayassessment = $workshop->prepare_assessment($assessment, $mform, $options);
-        if ($canoverride) {
-            $displayassessment->add_action($workshop->assess_url($assessment->id), get_string('assessmentsettings', 'workshop'));
-        }
-        echo $output->render($displayassessment);
 
-        if ($workshop->phase == workshop::PHASE_CLOSED and has_capability('mod/workshop:viewallassessments', $workshop->context)) {
-            if (strlen(trim($assessment->feedbackreviewer)) > 0) {
-                echo $output->render(new workshop_feedback_reviewer($assessment));
+    // START UCLA MOD: CCLE-8778 - Side by side view of assessments.
+    if (strcasecmp($view, 'byaspect') != 0) {
+    // END UCLA MOD: CCLE-8778.
+        foreach ($assessments as $assessment) {
+            if ($assessment->reviewerid == $USER->id) {
+                // own assessment has been displayed already
+                continue;
+            }
+            if (is_null($assessment->grade) and !has_capability('mod/workshop:viewallassessments', $workshop->context)) {
+                // students do not see peer-assessment that are not graded yet
+                continue;
+            }
+            $mform      = $strategy->get_assessment_form($PAGE->url, 'assessment', $assessment, false);
+            $options    = array(
+                'showreviewer'  => $showreviewer,
+                'showauthor'    => $showauthor,
+                'showform'      => !is_null($assessment->grade),
+                'showweight'    => true,
+                // START UCLA MOD: CCLE-8740 - Show students other assessments.
+                'showassessmenttitle' => $showassessmenttitle
+                // END UCLA MOD: CCLE-8740.
+            );
+            $displayassessment = $workshop->prepare_assessment($assessment, $mform, $options);
+
+            if ($canoverride) {
+                $displayassessment->add_action($workshop->assess_url($assessment->id), get_string('assessmentsettings', 'workshop'));
+            }
+            echo $output->render($displayassessment);
+
+            if ($workshop->phase == workshop::PHASE_CLOSED and has_capability('mod/workshop:viewallassessments', $workshop->context)) {
+                if (strlen(trim($assessment->feedbackreviewer)) > 0) {
+                    echo $output->render(new workshop_feedback_reviewer($assessment));
+                }
             }
         }
+    // START UCLA MOD: CCLE-8778 - Side by side view of assessments.
+    } else {
+        $workshop->print_assessment_table($submission->id, $workshop->id);
     }
+    // END UCLA MOD: CCLE-8778.
 }
 
 if (!$edit and $canoverride) {

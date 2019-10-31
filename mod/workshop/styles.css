@@ -684,3 +684,42 @@
 .path-mod-workshop .workshop-risk-dataloss {
     vertical-align: text-bottom;
 }
+
+/* START UCLA MOD: CCLE-8778 - Side by side view of assessments. */
+.path-mod-workshop .generaltable td,
+.path-mod-workshop .generaltable th {
+    border: 1px solid #a9a9a9;
+}
+
+.path-mod-workshop .generaltable thead th {
+    background-color: #ddd !important;
+}
+
+.path-mod-workshop .generaltable tr {
+    background-color: white !important;
+}
+
+.path-mod-workshop .g-1 {
+    background-color: #8BB8E8;
+}
+
+.path-mod-workshop .g-2 {
+    background-color: #DAEBFE;
+}
+
+.path-mod-workshop .g-3 {
+    background-color: #FFD100;
+}
+
+.path-mod-workshop .g-4 {
+    background-color: #FFFFFF;
+}
+
+.path-mod-workshop .g-5 {
+    background-color: #00FF87;
+}
+
+.path-mod-workshop .g-6 {
+    background-color: #00FFFF;
+}
+/* END UCLA MOD: CCLE-8778. */
