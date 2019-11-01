@@ -1,10 +1,11 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
 // Copyright (c) 2011-2019 Respondus, Inc.  All Rights Reserved.
-// Date: February 14, 2019.
+// Date: October 02, 2019.
 
 define("LOCKDOWNBROWSER_LOCKLIB_ENABLE_LOG", false); // set true to enable logging to temp file
 define("LOCKDOWNBROWSER_LOCKLIB_LOG", "ldb_locklib.log");
+define("LOCKDOWNBROWSER_LOCKLIB_ENABLE_4851", false); // set true to enable changes for Trac #4851
 
 if (!isset($CFG)) {
     require_once(dirname(dirname(dirname(__FILE__))) . "/config.php");
@@ -422,78 +423,79 @@ function lockdownbrowser_prevent_access_fragment_for_quiz($quiz, $fragment_type,
         $ldb_message = get_string('sessioninprogress', 'block_lockdownbrowser');
     }
     // CSS style section
-    $style = "<link rel=\"stylesheet\" type=\"text/css\" href=\"//fonts.googleapis.com/css?family=Open+Sans\" />"
-      . "<link rel=\"stylesheet\" type=\"text/css\" href=\"//fonts.googleapis.com/css?family=Raleway\" />"
-      . "<style type=\"text/css\">"
-      . ".ldb-message-text {"
-      . "  font-family: \"Open Sans\", Helvetica, sans-serif;"
-      . "  font-size: 18px;"
-      . "  font-weight: normal;"
-      . "  font-style: normal;"
-      . "  font-stretch: normal;"
-      . "  line-height: normal;"
-      . "  letter-spacing: normal;"
-      . "  text-align: center;"
-      . "  color: #c10e24;"
-      . "  margin-bottom: 25px;"
-      . "}";
+    $style = "<link rel=\"stylesheet\" type=\"text/css\" href=\"//fonts.googleapis.com/css?family=Open+Sans\" />\r\n"
+      . "<link rel=\"stylesheet\" type=\"text/css\" href=\"//fonts.googleapis.com/css?family=Raleway\" />\r\n"
+      . "<style type=\"text/css\">\r\n"
+      . ".ldb-message-text {\r\n"
+      . "  font-family: \"Open Sans\", Helvetica, sans-serif;\r\n"
+      . "  font-size: 18px;\r\n"
+      . "  font-weight: normal;\r\n"
+      . "  font-style: normal;\r\n"
+      . "  font-stretch: normal;\r\n"
+      . "  line-height: normal;\r\n"
+      . "  letter-spacing: normal;\r\n"
+      . "  text-align: center;\r\n"
+      . "  color: #c10e24;\r\n"
+      . "  margin-bottom: 25px;\r\n"
+      . "}\r\n";
 
     if ($fragment_type === 0    // LDB-required fragment
        || $fragment_type === 1    // LDB-autolaunch fragment
       ) {
-        $style .= ".ldb-links {"
-          . "  font-family: \"Open Sans\", Helvetica, sans-serif;"
-          . "  font-size: 14px;"
-          . "  font-weight: normal;"
-          . "  font-style: normal;"
-          . "  font-stretch: normal;"
-          . "  line-height: normal;"
-          . "  letter-spacing: normal;"
-          . "  text-align: center;"
-          . "  color: #387da6;"
-          . "  margin-bottom: 36px;"
-          . "}"
-          . "div.ldb-links a {"
-          . "  color: #387da6;"
-          . "}";
+        $style .= ".ldb-links {\r\n"
+          . "  font-family: \"Open Sans\", Helvetica, sans-serif;\r\n"
+          . "  font-size: 14px;\r\n"
+          . "  font-weight: normal;\r\n"
+          . "  font-style: normal;\r\n"
+          . "  font-stretch: normal;\r\n"
+          . "  line-height: normal;\r\n"
+          . "  letter-spacing: normal;\r\n"
+          . "  text-align: center;\r\n"
+          . "  color: #387da6;\r\n"
+          . "  margin-bottom: 36px;\r\n"
+          . "}\r\n"
+          . "div.ldb-links a {\r\n"
+          . "  color: #387da6;\r\n"
+          . "}\r\n";
     }
-    $style .= ".ldb-button {"
-      . "  width: 222px;"
-      . "  height: 40px;"
-      . "  object-fit: contain;"
-      . "  border-radius: 10px;"
-      . "  background-color: #387da6;"
-      . "  margin-left: auto;"
-      . "  margin-right: auto;"
-      . "  margin-bottom: 36px;"
-      . "  cursor: pointer;"
-      . "}"
-      . ":hover.ldb-button {"
-      . "  background-color: #569FCA;"
-      . "}"
-      . ".ldb-button-text {"
-      . "  object-fit: contain;"
-      . "  font-family: Raleway, Helvetica, sans-serif;"
-      . "  font-size: 14px;"
-      . "  font-weight: bold;"
-      . "  font-style: normal;"
-      . "  font-stretch: normal;"
-      . "  line-height: normal;"
-      . "  letter-spacing: normal;"
-      . "  color: #fafcea;"
-      . "  text-align: center;"
-      . "  line-height: 40px;"
-      . "}"
-      . "</style>";
+    $style .= ".ldb-button {\r\n"
+      . "  width: 222px;\r\n"
+      . "  height: 40px;\r\n"
+      . "  object-fit: contain;\r\n"
+      . "  border-radius: 10px;\r\n"
+      . "  background-color: #387da6;\r\n"
+      . "  margin-left: auto;\r\n"
+      . "  margin-right: auto;\r\n"
+      . "  margin-bottom: 36px;\r\n"
+      . "  cursor: pointer;\r\n"
+      . "}\r\n"
+      . ":hover.ldb-button {\r\n"
+      . "  background-color: #569FCA;\r\n"
+      . "}\r\n"
+      . ".ldb-button-text {\r\n"
+      . "  object-fit: contain;\r\n"
+      . "  font-family: Raleway, Helvetica, sans-serif;\r\n"
+      . "  font-size: 14px;\r\n"
+      . "  font-weight: bold;\r\n"
+      . "  font-style: normal;\r\n"
+      . "  font-stretch: normal;\r\n"
+      . "  line-height: normal;\r\n"
+      . "  letter-spacing: normal;\r\n"
+      . "  color: #fafcea;\r\n"
+      . "  text-align: center;\r\n"
+      . "  line-height: 40px;\r\n"
+      . "}\r\n"
+      . "</style>\r\n";
     $fragment = $style;
 
     // LDB message
-    $fragment .= "<div class=\"ldb-message-text\">$ldb_message</div>";
+    $fragment .= "<div class=\"ldb-message-text\">$ldb_message</div>\r\n";
 
     // LDB links
+    /*** Trac #5122
     $is_ipad = (isset($_SERVER['HTTP_USER_AGENT'])
        && stripos($_SERVER['HTTP_USER_AGENT'], "iPad") !== false);
-
+    ***/
     if ($fragment_type === 0     // LDB-required fragment
       || $fragment_type === 1    // LDB-autolaunch fragment
       ) {
@@ -506,51 +508,76 @@ function lockdownbrowser_prevent_access_fragment_for_quiz($quiz, $fragment_type,
             } else {
                 $ldb_links .= "<a href=\"$download_url\" target=\"_blank\">"
                   . get_string('ldbdownlink', 'block_lockdownbrowser')
-                  . "</a>";
+                  . "</a>\r\n";
             }
         }
         if ($fragment_type === 1) { // LDB-autolaunch fragment
             if (!empty($download_url)) {
                 $ldb_links .= "<a href=\"$download_url\" target=\"_blank\">"
                   . get_string('ldbdownlink', 'block_lockdownbrowser')
-                  . "</a>";
+                  . "</a>\r\n";
             }
+            /*** Trac #5122
             if (!empty($download_url) && $is_ipad === false) {
-                $ldb_links .= "&nbsp;&nbsp;|&nbsp;&nbsp;";
+                $ldb_links .= "&nbsp;&nbsp;|&nbsp;&nbsp;\r\n";
             }
             if ($is_ipad === false) {
                 $ldb_check_url = lockdownbrowser_autolaunch_check_url($ldb_quiz_type);
                 $ldb_links .= "<a href=\"$ldb_check_url\">"
                   . get_string('ldbchecklink', 'block_lockdownbrowser')
-                  . "</a>";
+                  . "</a>\r\n";
             }
+            ***/
+            $ldb_links .= "<script>\r\n"
+              . "if (navigator.platform == \"iPad\" || (navigator.platform == \"MacIntel\" && navigator.maxTouchPoints > 1)) {\r\n"
+              . "} else {\r\n";
+            if (!empty($download_url)) {
+              $ldb_links .= "    document.write(\"&nbsp;&nbsp;|&nbsp;&nbsp;\\r\\n\");\r\n";
+            }
+            $ldb_check_url = lockdownbrowser_autolaunch_check_url($ldb_quiz_type);
+            $ldb_links .= "    document.write(\"<a href=\\\"$ldb_check_url\\\">"
+              . get_string('ldbchecklink', 'block_lockdownbrowser')
+              . "</a>\\r\\n\");\r\n"
+              . "}\r\n"
+              . "</script>\r\n";
         }
         if (strlen($ldb_links) > 0) {
-            $fragment .= "<div class=\"ldb-links\">$ldb_links</div>";
+            $fragment .= "<div class=\"ldb-links\">$ldb_links</div>\r\n";
         }
     }
 
     // LDB button
     if (!$prevent_launch && $fragment_type === 1) { // LDB-autolaunch fragment
-        $launch_url = lockdownbrowser_autolaunch_url_for_quiz($quiz);
-        $script = "<script>";
+        $launch_url = lockdownbrowser_autolaunch_url_for_quiz($quiz, $ldb_quiz_type);
+        $script = "<script>\r\n";
+        /*** Trac #5122
         if ($is_ipad === true) {
             // avoid the servicenotavailable error
             $login_url = get_login_url();
             $session_cookie_name = $CFG->block_lockdownbrowser_ldb_session_cookie . $CFG->sessioncookie;
-            $script .= "if (document.cookie.indexOf(\"$session_cookie_name=\") == -1) {"
-              . "    document.location = \"$login_url\";"
-              . "}";
+            $script .= "if (document.cookie.indexOf(\"$session_cookie_name=\") == -1) {\r\n"
+              . "    document.location = \"$login_url\";\r\n"
+              . "}\r\n";
         }
-        $script .= "function ldbAutoLaunch() {"
-          . "    document.location = \"$launch_url\";"
-          . "}"
-          . "</script>";
+        ***/
+        // avoid the servicenotavailable error
+        $login_url = get_login_url();
+        $session_cookie_name = $CFG->block_lockdownbrowser_ldb_session_cookie . $CFG->sessioncookie;
+        $script .= "if (navigator.platform == \"iPad\" || (navigator.platform == \"MacIntel\" && navigator.maxTouchPoints > 1)) {\r\n"
+          . "    if (document.cookie.indexOf(\"$session_cookie_name=\") == -1) {\r\n"
+          . "        document.location = \"$login_url\";\r\n"
+          . "    }\r\n"
+          . "}\r\n";
+
+        $script .= "function ldbAutoLaunch() {\r\n"
+          . "    document.location = \"$launch_url\";\r\n"
+          . "}\r\n"
+          . "</script>\r\n";
         $fragment .= $script;
         $launch_button_title = get_string('autolaunchbutton', 'block_lockdownbrowser');
-        $fragment .= "<div class=\"ldb-button\" onclick=\"ldbAutoLaunch();\">"
-          . "<div class=\"ldb-button-text\">$launch_button_title</div>"
-          . "</div>";
+        $fragment .= "<div class=\"ldb-button\" onclick=\"ldbAutoLaunch();\">\r\n"
+          . "<div class=\"ldb-button-text\">$launch_button_title</div>\r\n"
+          . "</div>\r\n";
     }
     if ($fragment_type === 2) { // LDB-exit fragment
         $sdk2015_command_scheme = lockdownbrowser_get_sdk2015_command_scheme();
@@ -559,16 +586,16 @@ function lockdownbrowser_prevent_access_fragment_for_quiz($quiz, $fragment_type,
         $exit_url = $sdk2015_command_scheme
           . ":" . urlencode($sdk2015_command_exitb)
           . "=" . urlencode($sdk2015_exitb_value);
-        $script = "<script>"
-          . "function exitBrowser() {"
-          . "    document.location = '$exit_url';"
-          . "}"
-          . "</script>";
+        $script = "<script>\r\n"
+          . "function exitBrowser() {\r\n"
+          . "    document.location = '$exit_url';\r\n"
+          . "}\r\n"
+          . "</script>\r\n";
         $fragment .= $script;
         $exit_button_title = get_string('exitbrowserbutton', 'block_lockdownbrowser');
-        $fragment .= "<div class=\"ldb-button\" onclick=\"exitBrowser();\">"
-          . "<div class=\"ldb-button-text\">$exit_button_title</div>"
-          . "</div>";
+        $fragment .= "<div class=\"ldb-button\" onclick=\"exitBrowser();\">\r\n"
+          . "<div class=\"ldb-button-text\">$exit_button_title</div>\r\n"
+          . "</div>\r\n";
     }
     return $fragment;
 }
@@ -947,7 +974,7 @@ function lockdownbrowser_get_session_cookie() {
     return $session_cookie_value;
 }
 
-function lockdownbrowser_autolaunch_url_for_quiz($quiz) {
+function lockdownbrowser_autolaunch_url_for_quiz($quiz, $ldb_quiz_type) {
 
     global $DB;
     global $CFG;
@@ -985,8 +1012,15 @@ function lockdownbrowser_autolaunch_url_for_quiz($quiz) {
       . "<si>" . htmlspecialchars($user_name, ENT_XML1, 'UTF-8') . "</si>"
       . "<sf>" . htmlspecialchars($first_name, ENT_XML1, 'UTF-8') . "</sf>"
       . "<sl>" . htmlspecialchars($last_name, ENT_XML1, 'UTF-8') . "</sl>"
-      . "<tl>" . htmlspecialchars($quiz_title, ENT_XML1, 'UTF-8') . "</tl>"
-      . "</z>";
+      . "<tl>" . htmlspecialchars($quiz_title, ENT_XML1, 'UTF-8') . "</tl>";
+
+    if (LOCKDOWNBROWSER_LOCKLIB_ENABLE_4851) {
+        $examtype_monitor = lockdownbrowser_get_ldb_examtype_monitor();
+        if (strcmp($ldb_quiz_type, $examtype_monitor) === 0) {
+            $xml_payload .= "<rm>1</rm>";
+        }
+    }
+    $xml_payload .= "</z>";
 
     $url = lockdownbrowser_autolaunch_url_for_payload($xml_payload);
 
