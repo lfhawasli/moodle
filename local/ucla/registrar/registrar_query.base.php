@@ -320,18 +320,15 @@ abstract class registrar_query {
     /**
      * Create a Registrar connection object.
      *
-     * Stolen from enrol/database/lib.php:enrol_database_plugin.init_db()
+     * Stolen from enrol/database/lib.php:enrol_database_plugin.db_init()
      * @return ADOConnection
      */
     static public function open_registrar_connection() {
         global $CFG;
 
         // This will allow us to share connections.
-        $i = 'ucla_extdb_registrar_connection';
-        $adodbclass = 'ADONewConnection';
-
-        if (isset($CFG->$i)) {
-            return $CFG->$i;
+        if (isset($CFG->ucla_extdb_registrar_connection)) {
+            return $CFG->ucla_extdb_registrar_connection;
         }
 
         require_once($CFG->libdir . '/adodb/adodb.inc.php');
@@ -352,8 +349,7 @@ abstract class registrar_query {
         }
 
         // Connect to the external database.
-        $extdb = $adodbclass($dbtype);
-
+        $extdb = ADONewConnection($dbtype);
         if (!$extdb) {
             throw new registrar_query_exception(
                 'Could not connect to registrar!'
@@ -373,7 +369,8 @@ abstract class registrar_query {
         $status = $extdb->Connect(
             get_config('', 'registrar_dbhost'),
             get_config('', 'registrar_dbuser'),
-            get_config('', 'registrar_dbpass')
+            get_config('', 'registrar_dbpass'),
+            get_config('', 'registrar_dbname')
         );
 
         if ($status == false) {
@@ -384,7 +381,7 @@ abstract class registrar_query {
 
         $extdb->SetFetchMode(ADODB_FETCH_ASSOC);
 
-        $CFG->$i =& $extdb;
+        $CFG->ucla_extdb_registrar_connection =& $extdb;
 
         return $extdb;
     }
