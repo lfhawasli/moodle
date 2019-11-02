@@ -7,16 +7,17 @@ Feature: Viewing a public or private syllabus
 Background:
     Given I am in a ucla environment
     And the following "users" exist:
-      | username | firstname | lastname | email |
-      | teacher | Teacher  | 1 | teacher@asd.com |
-      | student | Student | 1 | student@asd.com |
+      | username | firstname | lastname | email           |
+      | teacher  | Teacher   | 1        | teacher@asd.com |
+      | student  | Student   | 1        | student@asd.com |
+      | viewer   | Viewer    | 1        | viewer@asd.com  |
     And the following ucla "sites" exist:
       | fullname | shortname | type |
-      | Course 1 | C1 | srs |
+      | Course 1 | C1        | srs  |
     And the following ucla "enrollments" exist:
-      | user | course | role |
-      | teacher | C1 | editingteacher |
-      | student | C1 | student |
+      | user    | course | role           |
+      | teacher | C1     | editingteacher |
+      | student | C1     | student        |
     And I log in as "teacher"
     And I am on "Course 1" course homepage
     And I turn editing mode on
@@ -28,9 +29,9 @@ Background:
     And I set the field "Display name" to "Test Syllabus"
     And I set the field "UCLA community (login required)" to "1"
     And I press "Save changes"
-    Then I should see "Successfully added syllabus" in the "region-main" "region"
+    And I should see "Successfully added syllabus" in the "region-main" "region"
     And I log out
-    Given I log in as "student"
+    When I log in as "student"
     And I am on "Course 1" course homepage
     And I follow "Test Syllabus"
     Then I should see "Test Syllabus" in the "region-main" "region"
@@ -41,9 +42,9 @@ Background:
     And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
     And I set the field "Display name" to "Test Syllabus"
     And I press "Save changes"
-    Then I should see "Successfully added syllabus" in the "region-main" "region"
+    And I should see "Successfully added syllabus" in the "region-main" "region"
     And I log out
-    Given I log in as "student"
+    When I log in as "student"
     And I am on "Course 1" course homepage
     And I follow "Test Syllabus"
     Then I should see "Test Syllabus" in the "region-main" "region"
@@ -62,4 +63,26 @@ Background:
     And I log out
     When I log in as "student"
     And I view syllabus for "Course 1"
-    And I should see "Download: Syllabus"
+    Then I should see "Download: Syllabus"
+
+  Scenario: Viewing a past public syllabus
+    Given I follow "Add syllabus"
+    And I upload "lib/tests/fixtures/empty.txt" file to "File" filemanager
+    And I set the field "Display name" to "Test Syllabus"
+    And I set the field "UCLA community (login required)" to "1"
+    And I press "Save changes"
+    And I should see "Successfully added syllabus" in the "region-main" "region"
+    And I am on "Course 1" course homepage
+    # Calendar block caused problems viewing syllabi for hidden courses.
+    # Cannot use i_add_the_block step because Boost overrode it.
+    And I set the field "bui_addblock" to "Calendar"
+    # Now hide course to simulate past course.
+    And I follow "Admin panel"
+    And I follow "Course visibility"
+    And I set the field "Visibility" to "Hidden from students"
+    And I press "Save"
+    And I should see "Course is now hidden from students"
+    And I log out
+    When I log in as "viewer"
+    And I view syllabus for "Course 1"
+    Then I should see "Download: Test Syllabus" in the "region-main" "region"
