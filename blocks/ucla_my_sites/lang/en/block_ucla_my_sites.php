@@ -25,6 +25,7 @@
 $string['changeemail'] = 'You have set an alternative email ({$a}). To change it, please go to "My profile settings > Messaging".';
 $string['dismiss'] = 'Dismiss';
 $string['dismissed'] = 'You have successfully dismissed the notification.';
+$string['dupemail_warning'] = 'You\'ve changed your official UCLA email address to {$a->dupemail}. That email address already exists in CCLE. Your email address in CCLE remains {$a->currentemail}.<br><br>Please <a target="_blank" href="{$a->docurl}">change your official UCLA email address</a> to another email address.<br><br>If the email address {$a->dupemail} belongs to you, you might have a duplicate account in CCLE. Please contact <a target="_blank" href="https://ccle.ucla.edu/mod/page/view.php?id=209487">your local support</a> to merge these CCLE accounts.';
 $string['loginrequired'] = 'Please login to view My sites';
 $string['noclasssitesatall'] = 'You are currently not assigned to any sites on this system.';
 $string['noclassforterm'] = 'You are not enrolled in any class sites for {$a}';
