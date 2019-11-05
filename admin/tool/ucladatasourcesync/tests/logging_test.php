@@ -39,7 +39,7 @@ class logging_test extends advanced_testcase {
      * Test the new logging event.
      */
     public function test_new_logging() {
-        global $DB, $SITE;
+        global $DB;
         
         // Setup logging.
         $this->resetAfterTest();
@@ -60,13 +60,13 @@ class logging_test extends advanced_testcase {
         log_ucla_data('library reserves', 'write', 'Inserting library reserve data', 
                 get_string('errbcinsert', 'tool_ucladatasourcesync') );
         $logs = $DB->get_records('logstore_standard_log', array());
-        
+
         // Verify that 3 logs were logged.
         $this->assertCount(3, $logs);
         
         // Verify if the logs are correctly logged.
         // Get the 1st log.
-        $log1 = $DB->get_record('logstore_standard_log', array('id' => '1'));
+        $log1 = array_shift($logs);
         
         // Recreate the log message.
         $notice = 'Initializing cfg variables';
@@ -81,7 +81,7 @@ class logging_test extends advanced_testcase {
         $this->assertEquals(1 , preg_match("/".$logmessage."/", $log1->other));
         
         // Get the 3rd log.
-        $log3 = $DB->get_record('logstore_standard_log', array('id' => '3'));
+        $log3 = array_pop($logs);
         
         // Recreate the log message.
         $notice = 'Inserting library reserve data';

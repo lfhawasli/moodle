@@ -243,13 +243,13 @@ class rolemapping_test extends advanced_testcase {
             $this->assertEquals('waitlisted', $result);
         }
 
-        $shouldreturnstudent = array('E', 'A');
+        $shouldreturnstudent = array('E', 'A', 'C');
         foreach ($shouldreturnstudent as $code) {
             $result = get_student_pseudorole($code);
             $this->assertEquals('student', $result);
         }
 
-        $shouldreturnfalse = array('D', 'C');
+        $shouldreturnfalse = array('D');
         foreach ($shouldreturnfalse as $code) {
             $result = get_student_pseudorole($code);
             $this->assertFalse($result);
@@ -283,8 +283,8 @@ class rolemapping_test extends advanced_testcase {
     /********* HELPER FUNCTIONS FOR UNIT TESTING  ********/
 
     /**
-     * Provides a multitude of role combinations for primary and secondary
-     * sections with all possible mixes of 01, 02, and 03.
+     * Provides 10 random role combinations for primary and secondary sections
+     * with possible mixes of 01, 02, and 03.
      */
     public function role_combo_provider() {
         $retval = array();
@@ -293,10 +293,15 @@ class rolemapping_test extends advanced_testcase {
         // Get all the role combos (also include empty sets).
         $primaryrolecombos = $this->getDataGenerator()->get_plugin_generator('local_ucla')->power_set($rolecodes, 0);
         $secondaryrolecombos = $primaryrolecombos;
+        shuffle($primaryrolecombos);
+        shuffle($secondaryrolecombos);
 
-        $index = 0;
+        $index = 0; $maxcombos = 5;
         foreach ($primaryrolecombos as $primary) {
             foreach ($secondaryrolecombos as $secondary) {
+                if ($maxcombos < $index) {
+                    break;
+                }
                 if (empty($primary) && empty($secondary)) {
                     continue;
                 }
@@ -305,7 +310,6 @@ class rolemapping_test extends advanced_testcase {
                 ++$index;
             }
         }
-
         return $retval;
     }
 

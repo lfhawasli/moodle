@@ -1,13 +1,14 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
 // Copyright (c) 2011-2019 Respondus, Inc.  All Rights Reserved.
-// Date: February 14, 2019.
+// Date: October 02, 2019.
 
 // production flags
 // - should all default to false or 0
 // - change only for exceptional environments
 define("LOCKDOWNBROWSER_IGNORE_HTTPS_LOGIN", false); // set true to ignore $CFG->loginhttps
 define("LOCKDOWNBROWSER_SCRIPT_TIME_LIMIT", 0); // set > 0 to override default set in php.ini
+define("LOCKDOWNBROWSER_MONITOR_ENABLE_4851", false); // set true to enable changes for Trac #4851
 
 // debug-only flags
 // - should always be false for production environments
@@ -711,9 +712,13 @@ function lockdownbrowser_monitorredeemtoken($parameters) {
 
     $result = curl_exec($ch);
     $info   = curl_getinfo($ch);
+    $error     = curl_error($ch); // Trac #4977
     curl_close($ch);
 
-    if ($result == false || ($info["http_code"] != 200)) {
+    if ($result == false) { // Trac #4977
+        lockdownbrowser_monitorserviceerror(2059, $error);
+    }
+    if ($info["http_code"] != 200) {
         lockdownbrowser_monitorserviceerror(2021, "Could not redeem login token");
     }
 
@@ -930,11 +935,13 @@ function lockdownbrowser_monitoractionchangesettings($parameters) {
     $quiz->name = str_replace($monitor_decoration, "", $quiz->name);
     $quiz->name = str_replace($ldb_decoration, "", $quiz->name);
 
-    if ($enable_ldb) {
-        if ($enable_monitor) {
-            $quiz->name .= $monitor_decoration;
-        } else {
-            $quiz->name .= $ldb_decoration;
+    if (!LOCKDOWNBROWSER_MONITOR_ENABLE_4851) {
+        if ($enable_ldb) {
+            if ($enable_monitor) {
+                $quiz->name .= $monitor_decoration;
+            } else {
+                $quiz->name .= $ldb_decoration;
+            }
         }
     }
 
@@ -970,6 +977,7 @@ function lockdownbrowser_monitoractionchangesettings($parameters) {
     rebuild_course_cache($course_id);
     lockdownbrowser_monitorservicestatus(1003, "Quiz settings changes succeeded");
 }
+
 
 function lockdownbrowser_monitoractionexamroster($parameters) {
 
@@ -1393,6 +1401,12 @@ function lockdownbrowser_monitoractionversioninfo($parameters) {
     $block_version = $plugin->version;
 
     $body = $moodle_release . "\$%\$" . $moodle_version . "\$%\$" . $block_version;
+
+    if (LOCKDOWNBROWSER_MONITOR_ENABLE_4851) {
+        $body .= "\$%\$true";
+    } else {
+        $body .= "\$%\$false";
+    }
 
     lockdownbrowser_monitorserviceresponse("text/plain", $body, true);
 }

@@ -83,9 +83,10 @@ class local_ucla_syllabus_generator extends component_generator_base {
             $draftitemid = file_get_unused_draft_itemid();
 
             // Add actual file there.
+            $filename = 'syllabus' . ($this->instancecount + 1) . '.txt';
             $filerecord = array('component' => 'user', 'filearea' => 'draft',
                     'contextid' => $usercontext->id, 'itemid' => $draftitemid,
-                    'filename' => 'syllabus' . ($this->instancecount + 1) . '.txt', 'filepath' => '/');
+                    'filename' => $filename, 'filepath' => '/', 'source' => $filename);
             $fs = get_file_storage();
             $fs->create_file_from_string($filerecord, 'Test syllabus ' . ($this->instancecount + 1) . ' file');
 

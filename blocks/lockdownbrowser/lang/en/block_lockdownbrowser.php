@@ -1,7 +1,9 @@
 <?php
 // Respondus LockDown Browser Extension for Moodle
 // Copyright (c) 2011-2019 Respondus, Inc.  All Rights Reserved.
-// Date: February 14, 2019.
+// Date: October 02, 2019.
+
+// English (en) translations
 
 $string['pluginname']      = 'Respondus LockDown Browser';
 $string['lockdownbrowser'] = 'Respondus LockDown Browser';
@@ -91,7 +93,7 @@ $string['noruleversion'] = 'The Respondus LockDown Browser Extension for Moodle 
 $string['invalidversion'] = 'The Respondus LockDown Browser Extension for Moodle is not properly installed. The block plugin version does not match the quiz access rule plugin version.';
 
 $string['nosessionparm'] = 'No session parameter specified.';
-$string['noexamidparm'] = 'No examid parameter specified.';
+$string['noexamidparm'] = 'No exam id parameter specified.';
 $string['nochallengeparm'] = 'No challenge parameter specified.';
 $string['nolmsrooturl'] = 'No LMS root URL found in Moodle configuration.';
 $string['errsetsession'] = 'Failed to set session cookie.';
@@ -122,8 +124,8 @@ $string['errprofilesecret'] = 'Server profile secret not configured';
 $string['errsdk2015secret1'] = 'Auto-launch secret 1 not configured';
 $string['errsdk2015index'] = 'Auto-launch index not configured';
 $string['errsdk2015secret2'] = 'Auto-launch secret 2 not configured';
-$string['errsdk2015monitorcheck'] = 'Respondus Monitor check url not configured';
-$string['errsdk2015ldbonlycheck'] = 'Lockdown Browser check url not configured';
+$string['errsdk2015monitorcheck'] = 'Respondus Monitor check URL not configured';
+$string['errsdk2015ldbonlycheck'] = 'Lockdown Browser check URL not configured';
 $string['errsdk2015launchscheme'] = 'Auto-launch scheme not configured';
 $string['errstandardclientidname'] = 'Standard client id cookie name not configured';
 $string['errsdk2015clientidname'] = 'SDK client id cookie name not configured';
@@ -139,7 +141,7 @@ $string['errldbexamtypeldbonly'] = 'Exam type LDB-ONLY not configured';
 $string['errldbexamtypemonitor'] = 'Exam type MONITOR not configured';
 $string['errldbsessionnotactive'] = 'LockDown Browser session not active';
 $string['errsdk2015prestartfn'] = 'SDK prestart function name not configured';
-$string['errldbmonitorexitreopen'] = 'LDB Monitor exit and reopen url not configured';
+$string['errldbmonitorexitreopen'] = 'LDB Monitor exit and reopen URL not configured';
 
 // Trac #4402
 $string['privacy:metadata'] = 'The Respondus LockDown Browser Extension for Moodle block plugin does not store any personal data.';

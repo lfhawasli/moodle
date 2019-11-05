@@ -176,7 +176,10 @@ abstract class restore_search_base implements renderable {
      * @return int The number of results
      */
     final public function search() {
-        global $DB;
+        // START UCLA MOD: CCLE-8561 - Course import form shows wrong instructors list.
+        // global $DB;
+        global $DB, $USER;
+        // END UCLA MOD: CCLE-8561.
         if (!is_null($this->results)) {
             return $this->results;
         }
@@ -191,7 +194,10 @@ abstract class restore_search_base implements renderable {
         if ($totalcourses > 0) {
             // User to be checked is always the same (usually null, get it from first element).
             $firstcap = reset($this->requiredcapabilities);
-            $userid = isset($firstcap['user']) ? $firstcap['user'] : null;
+            // START UCLA MOD: CCLE-8561 - Course import form shows wrong instructors list.
+            // $userid = isset($firstcap['user']) ? $firstcap['user'] : null;
+            $userid = isset($firstcap['user']) ? $firstcap['user'] : $USER->id;
+            // END UCLA MOD: CCLE-8561.
             // Extract caps to check, this saves us a bunch of iterations.
             $requiredcaps = array();
             foreach ($this->requiredcapabilities as $cap) {
@@ -204,7 +210,10 @@ abstract class restore_search_base implements renderable {
                 $classname = context_helper::get_class_for_level($contextlevel);
                 $context = $classname::instance($result->id);
                 if (count($requiredcaps) > 0) {
-                    if (!has_all_capabilities($requiredcaps, $context, $userid)) {
+                    // START UCLA MOD: CCLE-8561 - Course import form shows wrong instructors list.
+                    // if (!has_all_capabilities($requiredcaps, $context, $userid)) {
+                    if (in_array($userid, get_suspended_userids($context, true)) || !has_all_capabilities($requiredcaps, $context, $userid)) {
+                    // END UCLA MOD: CCLE-8561.
                         continue;
                     }
                 }

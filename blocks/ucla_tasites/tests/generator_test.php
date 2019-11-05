@@ -27,6 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot . '/blocks/ucla_group_manager/lib.php');
 require_once($CFG->dirroot . '/blocks/ucla_tasites/tests/generator/lib.php');
+require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
 
 /**
  * PHPUnit data generator testcase.
@@ -150,7 +151,7 @@ class block_ucla_tasites_generator_testcase extends advanced_testcase {
     public function test_create_instance_twotas() {
 
         // Create course site with two TAs.
-        $class = $this->tasitegen->ucladatagen->create_class();
+        $class = $this->tasitegen->ucladatagen->create_class(array());
         $class = array_pop($class);
         $parentcourse = get_course($class->courseid);
         $ta1 = $this->tasitegen->ucladatagen->create_user();
@@ -176,7 +177,7 @@ class block_ucla_tasites_generator_testcase extends advanced_testcase {
      */
     public function test_create_instance_ta_section() {
         $ta = $class = $this->tasitegen->ucladatagen->create_user();
-        $class = $this->tasitegen->ucladatagen->create_class();
+        $class = $this->tasitegen->ucladatagen->create_class(array());
         $class = array_pop($class);
         $parentcourse = get_course($class->courseid);
 
@@ -276,7 +277,7 @@ class block_ucla_tasites_generator_testcase extends advanced_testcase {
      */
     public function test_create_instance_ta_user() {
         $ta = $class = $this->tasitegen->ucladatagen->create_user();
-        $class = $this->tasitegen->ucladatagen->create_class();
+        $class = $this->tasitegen->ucladatagen->create_class(array());
         $class = array_pop($class);
         $parentcourse = get_course($class->courseid);
 
@@ -365,6 +366,29 @@ class block_ucla_tasites_generator_testcase extends advanced_testcase {
             }
         }
         $this->assertTrue($found1a && $found1b);
+
+        // Run PublicPrivate detect_problems and make sure tasitegrouping does 
+        // not have Course members group.
+        $groups = groups_get_all_groups($tasite->id, null, $defaultgrouping->id);
+        $foundppgroup = false;
+        $ppgroup = get_string('publicprivategroupname', 'local_publicprivate');
+        foreach ($groups as $group) {
+            if ($group->name == $ppgroup) {
+                $foundppgroup = true;
+                break;
+            }
+        }
+        $this->assertFalse($foundppgroup);
+        $ppcourse = new \PublicPrivate_Course($tasite);
+        $ppcourse->detect_problems(true);
+        $groups = groups_get_all_groups($tasite->id, null, $defaultgrouping->id);
+        foreach ($groups as $group) {
+            if ($group->name == $ppgroup) {
+                $foundppgroup = true;
+                break;
+            }
+        }
+        $this->assertFalse($foundppgroup);
 
         // Now, make the TA site public and make sure the default grouping
         // changed to the public/private grouping.
