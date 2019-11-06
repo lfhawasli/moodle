@@ -83,7 +83,6 @@ class behat_ucla_syllabus extends behat_base {
      * @When /^I view syllabus for "([^"]*)"$/
      */
     public function i_view_syllabus($fullname) {
-        print_object($fullname);
         global $DB;
         // Try to find course fullname.
         $course = $DB->get_record('course', array('fullname' => $fullname));
