@@ -366,12 +366,21 @@ abstract class registrar_query {
         /*
         $extdb->curmode = SQL_CUR_USE_ODBC;
          */
-        $status = $extdb->Connect(
-            get_config('', 'registrar_dbhost'),
-            get_config('', 'registrar_dbuser'),
-            get_config('', 'registrar_dbpass'),
-            get_config('', 'registrar_dbname')
-        );
+        if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+            // Need to specify database name for PHPunit tests.
+            $status = $extdb->Connect(
+                get_config('', 'registrar_dbhost'),
+                get_config('', 'registrar_dbuser'),
+                get_config('', 'registrar_dbpass'),
+                get_config('', 'registrar_dbname')
+            );
+        } else {
+            $status = $extdb->Connect(
+                get_config('', 'registrar_dbhost'),
+                get_config('', 'registrar_dbuser'),
+                get_config('', 'registrar_dbpass')
+            );
+        }
 
         if ($status == false) {
             throw new registrar_query_exception(
