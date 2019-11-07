@@ -210,12 +210,15 @@ abstract class restore_search_base implements renderable {
                 $classname = context_helper::get_class_for_level($contextlevel);
                 $context = $classname::instance($result->id);
                 if (count($requiredcaps) > 0) {
-                    // START UCLA MOD: CCLE-8561 - Course import form shows wrong instructors list.
-                    // if (!has_all_capabilities($requiredcaps, $context, $userid)) {
-                    if (in_array($userid, get_suspended_userids($context, true)) || !has_all_capabilities($requiredcaps, $context, $userid)) {
-                    // END UCLA MOD: CCLE-8561.
+                    if (!has_all_capabilities($requiredcaps, $context, $userid)) {
                         continue;
                     }
+                    // START UCLA MOD: CCLE-8561 - Course import form shows wrong instructors list.
+                    $coursecontext = $context->get_course_context(false);
+                    if ($coursecontext && in_array($userid, get_suspended_userids($coursecontext, true))) {
+                        continue;
+                    }
+                    // END UCLA MOD: CCLE-8561.
                 }
                 // Check if we are over the limit.
                 if ($this->totalcount + 1 > $this->maxresults) {
