@@ -1,5 +1,4 @@
 FROM: CCLE <ccle@ucla.edu>
-bcc: Bruin, Jane (jbruintest@g.ucla.edu)
 SUBJECT: #=nameterm=# #=coursenum-sect=# class site created
 Dear Prof. #=lastname=# (#=to=#)
 

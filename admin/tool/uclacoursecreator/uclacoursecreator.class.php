@@ -2052,22 +2052,27 @@ class uclacoursecreator {
             return;
         }
 
-        // First 2 lines are headers.
-        for ($x = 0; $x < 2; $x++) {
+        $emailparams['body'] = '';
+
+        // First 2 or 3 lines are headers.
+        for ($x = 0; $x < 3; $x++) {
             $line = fgets($fp);
             if (preg_match('/'.'^FROM:(.*)'.'/i', $line, $matches)) {
                 $emailparams['from'] = trim($matches[1]);
+            } else if (preg_match('/'.'^BCC:(.*)'.'/i', $line, $matches)) {
+                $emailparams['bcc'] = trim($matches[1]);
             } else if (preg_match('/'.'^SUBJECT:(.*)'.'/i', $line, $matches)) {
                 $emailparams['subject'] = trim($matches[1]);
-            }
+            } else {
+                $emailparams['body'] .= $line;
+                break;
+            } 
         }
 
-        if (count($emailparams) != 2) {
+        if (!isset($emailparams['from']) || !isset($emailparams['subject'])) {
             $this->debugln("ERROR: failed to parse headers in $file \n");
             return false;
         }
-
-        $emailparams['body'] = '';
 
         while (!feof($fp)) { // The rest of the file is the body.
             $emailparams['body'] .= fread($fp, 8192);
