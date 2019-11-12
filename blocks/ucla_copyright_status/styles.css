@@ -45,19 +45,9 @@ span#block_ucla_copyright_status_t1 {
     margin: 0;
 }
 
-#checkall,
-#checknone {
-    margin-right: 2px;
-}
-
 /* CCLE-4127 limit copyright select's width in moodle filepicker */
 .fp-setlicense select {
     width: 100%;
-}
-
-/* CCLE-7689 Fix UI for Manage Copyright */
-.btn.btn-primary {
-    margin-right: 2px;
 }
 
 legend {

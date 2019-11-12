@@ -380,23 +380,27 @@ function display_copyright_status_contents($courseid, $filter) {
     if (count($coursecopyrightstatuslist) > 0) {
         $selectall = html_writer::tag('button', get_string('selectall'),
                                        array('id' => 'checkall',
-                                             'class' => 'btn btn-default',
+                                             'class' => 'btn btn-default form-group',
                                              'type' => 'button'));
         $selectnone = html_writer::tag('button', get_string('deselectall'),
                                         array('id' => 'checknone',
-                                              'class' => 'btn btn-default',
+                                              'class' => 'btn btn-default form-group',
                                               'type' => 'button'));
         $label = get_string('withselected', 'block_ucla_copyright_status') . "&nbsp;&nbsp;";
         $bulkassign = html_writer::select($licenseoptions, 'bulkassign');
         $savebtn = html_writer::tag('button', get_string('savechanges'),
-                                     array('class' => 'btn btn-primary',
+                                     array('class' => 'btn btn-primary form-group',
                                            'name' => 'action_edit',
                                            'type' => 'submit'));
         $cancelbtn = html_writer::tag('button', get_string('cancel'),
-                                      array('class' => 'btn btn-secondary',
+                                      array('class' => 'btn btn-secondary form-group',
                                             'name' => 'action_cancel',
                                             'type' => 'submit'));
-        echo html_writer::tag('div', $selectall . $selectnone . $label . $bulkassign . $savebtn . $cancelbtn,
+        $selectdiv = html_writer::tag('div', $selectall . $selectnone . $label . $bulkassign,
+                              array('class' => 'form-inline'));
+        $savediv = html_writer::tag('div', $savebtn . $cancelbtn,
+                              array('class' => 'form-inline mt-3'));
+        echo html_writer::tag('div', $selectdiv . $savediv,
                               array('class' => 'mform'));
     }
     // End display save changes button.
