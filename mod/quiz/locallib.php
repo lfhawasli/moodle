@@ -1413,7 +1413,10 @@ function quiz_attempt_state($quiz, $attempt) {
         return mod_quiz_display_options::DURING;
     } else if ($quiz->timeclose && time() >= $quiz->timeclose) {
         return mod_quiz_display_options::AFTER_CLOSE;
-    } else if (time() < $attempt->timefinish + 120) {
+    // START UCLA MOD: CCLE-8872 - Quiz: Change time for review to 30 seconds.
+    //} else if (time() < $attempt->timefinish + 120) {
+    } else if (time() < $attempt->timefinish + 30) {
+    // END UCLA MOD: CCLE-8872.
         return mod_quiz_display_options::IMMEDIATELY_AFTER;
     } else {
         return mod_quiz_display_options::LATER_WHILE_OPEN;
