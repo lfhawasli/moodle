@@ -830,10 +830,15 @@ abstract class ucla_syllabus {
             } else {
                 $errstring = 'err_syllabus_corrupted';
             }
-            redirect("$CFG->wwwroot/course/view.php?id=" . $this->properties->courseid,
-                get_string($errstring, 'local_ucla_syllabus',
-                    "$CFG->wwwroot/local/ucla_syllabus/index.php?id=" . $this->properties->courseid),
-                null, \core\output\notification::NOTIFY_ERROR);
+            $redirecturl = "$CFG->wwwroot/course/view.php?id=" . $this->properties->courseid;
+            $errmsg = get_string($errstring, 'local_ucla_syllabus', $errstring);
+            if (CLI_SCRIPT) {
+                // If indexing or on CLI script, cannot do redirect.
+                mtrace($errmsg);
+                return $retval;
+            } else {
+                redirect($redirecturl, $errmsg, null, \core\output\notification::NOTIFY_ERROR);
+            }
         } else {
             if (count($files) > 1) {
                  throw new moodle_exception('Warning, more than one syllabus file uploaded for given ucla_syllabus entry for course '
