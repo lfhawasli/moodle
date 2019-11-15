@@ -100,17 +100,26 @@ class uclacoursecreator_test extends advanced_testcase {
      * Try parse a valid email template.
      */
     public function test_valid_email_template() {
-        $validtemplatefile = dirname(__FILE__) . '/fixtures/valid_email_template.txt';
-        $this->expectOutputRegex('/Parsing .* successful/');
-        $result = $this->uclacoursecreator->email_parse_file($validtemplatefile);
+        $validEmailTemplates[] = dirname(__FILE__) . '/fixtures/valid_email_template.txt';
+        $validEmailTemplates[] = dirname(__FILE__) . '/fixtures/valid_email_template_without_bcc.txt';
 
-        $this->assertTrue(is_array($result));
-        $this->assertEquals($result['from'], 'CCLE <ccle@ucla.edu>');
-        $this->assertEquals($result['bcc'],
-                'Kearney, Deborah (dkearney@oid.ucla.edu)');
-        $this->assertEquals($result['subject'],
-                '#=nameterm=# #=coursenum-sect=# class site created');
-        $this->assertFalse(empty($result['subject']));
+        foreach ($validEmailTemplates as $validtemplatefile) {
+            $this->expectOutputRegex('/Parsing .* successful/');
+            $result = $this->uclacoursecreator->email_parse_file($validtemplatefile);
+
+            $this->assertTrue(is_array($result));
+            $this->assertEquals($result['from'], 'CCLE <ccle@ucla.edu>');
+            if (isset($result['bcc'])) { 
+                $this->assertEquals($result['bcc'],
+                    'Bruin, Jane (jbruintest@g.ucla.edu)');
+            }
+            $this->assertEquals($result['subject'],
+                    '#=nameterm=# #=coursenum-sect=# class site created');
+            $this->assertFalse(empty($result['subject']));
+
+            $startBody = 'Dear Prof.';
+            $this->assertFalse(substr($result['body'], 0, strlen($startBody)-1) === $startBody);
+        }
     }
 
     /**
