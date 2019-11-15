@@ -194,7 +194,9 @@ class syllabus extends \core_search\base {
         }
 
         $file = $syllabus->locate_syllabus_file();
-        $document->add_stored_file($file);
+        if (!empty($file)) {
+            $document->add_stored_file($file);
+        }
     }
 
     /**
