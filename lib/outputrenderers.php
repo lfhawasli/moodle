@@ -2830,12 +2830,12 @@ EOD;
 
         // START UCLA MOD: CCLE-6370 - Improve wording of section restriction.
         // Commented out "More info about this error" becuase the link provided is usually not relevant
-        /* $message = '<p class="errormessage">' . $message . '</p>'.
-           '<p class="errorcode"><a href="' . $moreinfourl . '">' .
+        /* $message = '<p class="errormessage">' . s($message) . '</p>'.
+           '<p class="errorcode"><a href="' . s($moreinfourl) . '">' .
            get_string('moreinformation') . '</a></p>';*/ 
         $message = '<p class="errormessage">' . $message . '</p>';
         // END UCLA MOD: CCLE-6370.
-        
+
         if (empty($CFG->rolesactive)) {
             $message .= '<p class="errormessage">' . get_string('installproblem', 'error') . '</p>';
             //It is usually not possible to recover from errors triggered during installation, you may need to create a new database or use a different database prefix for new installation.
