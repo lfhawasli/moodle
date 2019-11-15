@@ -2833,7 +2833,7 @@ EOD;
         /* $message = '<p class="errormessage">' . s($message) . '</p>'.
            '<p class="errorcode"><a href="' . s($moreinfourl) . '">' .
            get_string('moreinformation') . '</a></p>';*/ 
-        $message = '<p class="errormessage">' . $message . '</p>';
+        $message = '<p class="errormessage">' . s($message) . '</p>';
         // END UCLA MOD: CCLE-6370.
 
         if (empty($CFG->rolesactive)) {
