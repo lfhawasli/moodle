@@ -20,6 +20,11 @@ function xmldb_local_lae_install() {
     global $CFG, $DB;
     $dbman = $DB->get_manager();
 
+    // Do not create anonymous user in PHPunit tests, since it causes problems.
+    if (defined('PHPUNIT_TEST') && PHPUNIT_TEST) {
+        return true;
+    }
+    
     // Extend forum tables.
     $table = new xmldb_table('forum');
     $field = new xmldb_field('anonymous');

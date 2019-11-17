@@ -345,6 +345,22 @@ class block_ucla_my_sites extends block_base {
             }
         }
 
+        // Notification if user tried to change email address to something already existing.
+        if ($dupemail = get_user_preferences('show_dupemail_warning', false, $USER)) {
+            $warningobj = new stdClass();
+            $warningobj->currentemail = $USER->email;
+            $warningobj->dupemail = $dupemail;
+            $warningobj->docurl = get_config('block_ucla_help', 'docs_wiki_url') .
+                    '/index.php?title=Change_your_official_CCLE_email_address';
+            $dupemailnotice = new \core\output\notification(
+                    get_string('dupemail_warning', 'block_ucla_my_sites', $warningobj),
+                    core\output\notification::NOTIFY_WARNING);
+            if (!isset($templatecontext['alerts'])) {
+                $templatecontext['alerts'] = '';
+            }
+            $templatecontext['alerts'] .= $PAGE->get_renderer('core')->render($dupemailnotice);
+        }
+
         $params = $this->get_params();
 
         // Get Moodle courses enrolled in.

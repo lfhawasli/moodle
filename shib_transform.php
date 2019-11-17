@@ -26,6 +26,8 @@
 require_once(dirname(__FILE__) . '/config.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
 
+global $DB;
+
 $pnaction = $tempdispname = '';
 $displayname = array();
 if (isset($_SERVER['SHIBDISPLAYNAME'])) {
@@ -93,6 +95,29 @@ if (!empty($result['alternatename'])) {
     $result['lastname'] = $lastname;
 }
 
+// CCLE-8913 - Notify when user changes email to existing email address.
+if (!empty($result['email'])) {    
+    $currentuser = $DB->get_record('user', ['username' => $result['username']]);
+    if ($currentuser && $currentuser->email != $result['email']) {
+        $exists = $DB->record_exists('user', ['email' => $result['email']]);
+        if ($exists) {
+            $emailaction = sprintf('Email %s was duplicated; keeping %s', $result['email'], $currentuser->email);
+            // Set alert.
+            set_user_preference('show_dupemail_warning', $result['email'], $currentuser);
+            // Set email back to current.
+            $result['email'] = $currentuser->email;
+        } else {
+            // Remove any previous warning.
+            unset_user_preference('show_dupemail_warning', $currentuser);
+            $emailaction = sprintf('Email changing from %s to %s', $currentuser->email, $result['email']);
+        }
+    } else {
+        $emailaction = 'Email unchanged from ' . $result['email'];
+    }
+} else {
+    $emailaction = 'Email was empty';
+}
+
 if (!empty($CFG->namingdebugging)) {
     $filename = $CFG->dataroot . "/namingdebugging.log";
     $time = @date('[d/M/Y:H:i:s]');
@@ -107,6 +132,7 @@ if (!empty($CFG->namingdebugging)) {
             . "\n tempdn = " . (!empty($tempdispname) ? $tempdispname : 'N/A')
             . "\n result (ln,fn,mn) = " . trim('|' . $result['lastname'] . '|' . $result['firstname'] . '|' . $result['middlename'] . '|')
             . "\n Action = " . $pnaction
+            . "\n Email action = " . $emailaction
             . "\n", FILE_APPEND);
 }
 
