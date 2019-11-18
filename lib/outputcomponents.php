@@ -3825,6 +3825,10 @@ class tabobject implements renderable, templatable {
     var $subtree = array();
     /** @var int level of tab in the tree, 0 for root (instance of tabtree), 1 for the first row of tabs */
     var $level = 1;
+    // START UCLA MOD: CCLE-8862-Add "Virtual Library Hour" tab to Library Resources for GE Clusters.
+    /** @var bool whether to open a new window from this tab. */
+    var $newwindow = false;
+    // END UCLA MOD: CCLE-8862.
 
     /**
      * Constructor
@@ -3835,12 +3839,15 @@ class tabobject implements renderable, templatable {
      * @param string $title title under the link, by defaul equals to text
      * @param bool $linkedwhenselected whether to display a link under the tab name when it's selected
      */
-    public function __construct($id, $link = null, $text = '', $title = '', $linkedwhenselected = false) {
+    public function __construct($id, $link = null, $text = '', $title = '', $linkedwhenselected = false, $newwindow = false) {
         $this->id = $id;
         $this->link = $link;
         $this->text = $text;
         $this->title = $title ? $title : $text;
         $this->linkedwhenselected = $linkedwhenselected;
+        // START UCLA MOD: CCLE-8862-Add "Virtual Library Hour" tab to Library Resources for GE Clusters.
+        $this->newwindow = $newwindow;
+        // END UCLA MOD: CCLE-8862.
     }
 
     /**
@@ -3918,6 +3925,7 @@ class tabobject implements renderable, templatable {
             'inactive' => !$active && $this->inactive,
             'active' => $active,
             'level' => $this->level,
+            'newwindow' => $this->newwindow
         ];
     }
 
