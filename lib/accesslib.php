@@ -3539,13 +3539,11 @@ function get_users_by_capability(context $context, $capability, $fields = '', $s
     $wherecond[] = "u.deleted = 0 AND u.id <> :guestid";
     $params['guestid'] = $CFG->siteguest;
 
-    // START UCLA MOD: CCLE-6223-Restrict course member for grader dropdown list.
-    // If one of these capabilities, then get the pp group, otherwise, just use 
+    // START UCLA MOD: CCLE-6223 - Restrict course member for grader dropdown list.
+    // If looking at grading capabilities, then get the pp group, otherwise, just use
     // the groups that was passed in.
-    $capabilities = array('mod/assign:grade', 'mod/turnitintool:grade', 
-        'mod/turnitintooltwo:grade', 'mod/kalvidassign:gradesubmission');
     if (get_class($context) == 'context_module' && empty($groups) && 
-            in_array($capability, $capabilities)) {
+            strpos($capability, ':grade') !== false) {
         require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
         $contextcourse = $context->get_course_context(false);
         $course = get_course($contextcourse->instanceid);

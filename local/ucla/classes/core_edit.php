@@ -63,28 +63,6 @@ class local_ucla_core_edit {
     public static $profileviewmore = '';
 
     /**
-     * Returns an array of users who only the ability to grade only at the course
-     * context. Moodle normally displays all users who have the ability to grade,
-     * even those inherited from the category or site context.
-     *
-     * @param object $course
-     * @param string $sort          Optional.
-     * @param string $capability    Defaults to 'mod/assign:grade'.
-     * @return array
-     */
-    public static function get_course_graders($course, $sort = '', $capability = 'mod/assign:grade') {
-        global $CFG;
-        require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
-        $ppcourse = PublicPrivate_Course::build($course);
-        $groupid = 0;
-        if ($ppcourse->is_activated()) {
-            $groupid = $ppcourse->get_group();
-        }
-        return get_users_by_capability(context_course::instance($course->id),
-                $capability, '', $sort, '', '', $groupid, '', false);
-    }
-
-    /**
      * Handles logic of how to display 'alternativename' as preferred name.
      *
      * See CCLE-4521 - Handle "preferred name"
