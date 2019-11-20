@@ -58,6 +58,12 @@ $event->trigger();
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
 
+// START UCLA MOD: CCLE-8870 - Implement warning and turn on Kaltura Media Gallery.
+if (!isset($SESSION) || !isset($SESSION->notifications)) {
+    \core\notification::warning(get_string('warningsubmissionviewable', 'mod_kalvidassign'));
+}
+// END UCLA MOD: CCLE-8870.
+
 $PAGE->requires->css('/mod/kalvidassign/styles.css');
 $PAGE->requires->css('/local/kaltura/styles.css');
 echo $OUTPUT->header();

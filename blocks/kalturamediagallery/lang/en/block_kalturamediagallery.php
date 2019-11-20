@@ -17,7 +17,7 @@
 //$string['pluginname'] = 'Kaltura Media Gallery';
 //$string['kalturamediagallery:addinstance'] = 'Add a new Kaltura Media Gallery block';
 //$string['kalturamediagallery:myaddinstance'] = 'Add a new Kaltura Media Gallery block to Dashboard';
-$string['pluginname'] = 'Media Gallery';
-$string['kalturamediagallery:addinstance'] = 'Add a new Media Gallery block';
-$string['kalturamediagallery:myaddinstance'] = 'Add a new Media Gallery block to Dashboard';
+$string['pluginname'] = 'Media gallery';
+$string['kalturamediagallery:addinstance'] = 'Add a new Media gallery block';
+$string['kalturamediagallery:myaddinstance'] = 'Add a new Media gallery block to Dashboard';
 // END UCLA MOD: CCLE-6269
