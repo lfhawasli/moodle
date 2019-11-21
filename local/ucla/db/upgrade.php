@@ -662,6 +662,11 @@ function xmldb_local_ucla_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2019050600, 'local', 'ucla');
     }
 
+    // CCLE-8890 - Remove code for handling preferred name.
+    if ($oldversion < 2019102600) {
+        set_config('handlepreferredname', null, 'local_ucla');
+        upgrade_plugin_savepoint(true, 2019102600, 'local', 'ucla');
+    }
+
     return $result;
 }
-

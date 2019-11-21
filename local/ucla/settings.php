@@ -45,12 +45,6 @@ if ($hassiteconfig) {
         get_string('maxcrosslistshowndesc', 'local_ucla'),
         6, PARAM_INT));
 
-    // CCLE-4521 - Handle "preferred name".
-    $settings->add(new admin_setting_configcheckbox('local_ucla/handlepreferredname',
-        get_string('handlepreferredname', 'local_ucla'),
-        get_string('handlepreferrednamedesc', 'local_ucla'),
-        0));
-
     $settings->add(new admin_setting_configtext(
         'local_ucla/registrarurl',
         get_string('registrarurlconfig', 'local_ucla'),

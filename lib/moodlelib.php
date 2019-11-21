@@ -3451,13 +3451,6 @@ function fullname($user, $override=false) {
     if (isset($CFG->fullnamedisplay)) {
         $template = $CFG->fullnamedisplay;
     }
-
-    // START UCLA MOD: CCLE-4521 - Handle "preferred name"
-    $customtemplate = local_ucla_core_edit::get_fullnamedisplay($user, $override);
-    if ($customtemplate !== false) {
-        $template = $customtemplate;
-    }
-    // END UCLA MOD: CCLE-4521
     
     // If the template is empty, or set to language, return the language string.
     if ((empty($template) || $template == 'language') && !$override) {

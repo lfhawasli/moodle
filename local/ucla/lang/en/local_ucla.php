@@ -183,8 +183,6 @@ $string['overrideenroldatabase'] = 'Override database enrollment plugin';
 $string['overrideenroldatabasedesc'] = 'Override the database enrollment plugin to use UCLA specific customizations.';
 $string['minuserupdatewaitdays'] = 'User information update delay';
 $string['minuserupdatewaitdays_desc'] = 'Number of days since a user last used the site before updating their first name, last name and/or email from the external database.';
-$string['handlepreferredname'] = 'Enable preferred name';
-$string['handlepreferrednamedesc'] = 'If enabled, will use alternatename field as preferred name and change fullname display depending on course context for user.';
 $string['registrarurlconfig'] = 'Registrar URL';
 $string['registrarurlconfighelp'] = 'Set the URL for UCLA Registrar.';
 
