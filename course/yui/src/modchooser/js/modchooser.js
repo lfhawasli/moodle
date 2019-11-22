@@ -152,6 +152,13 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
         });
         chooserspan.insertBefore(chooserlink);
         chooserlink.on('click', this.display_mod_chooser, this);
+        // START UCLA MOD: CCLE-7487 - Add an activity or resource broken.
+        var activityspan = section.one('span.section-activity-link');
+        if (!activityspan) {
+            return;
+        }
+        activityspan.on('click', this.display_mod_chooser, this);
+        // END UCLA MOD: CCLE-7487.
     },
     /**
      * Display the module chooser
@@ -336,7 +343,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
         maxheight: {
             value: 800
         }
-    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.    
+    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
     },
 
     /**
@@ -364,7 +371,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             star.setAttribute('src', M.util.image_url('i/star_empty'));
     // END UCLA MOD: CCLE-7143.
         }
-    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.    
+    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
     }
     // END UCLA MOD: CCLE-7143.
 });

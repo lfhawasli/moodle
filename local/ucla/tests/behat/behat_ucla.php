@@ -134,31 +134,16 @@ class behat_ucla extends behat_files {
             case 'enrollments':
             case 'enrolments':
             case 'course enrolments':
-
-                if (empty($this->courses)) {
-                    throw new ExpectationException('There are no UCLA sites generated',
-                    $this->getSession());
-                }
-
-                // Create table node to pass to Moodle's Behat step.
-                $table = array();
-                $table[] = array('user', 'course', 'role');
-
+                // Make sure that the proper UCLA roles exists.
                 $roles = array();
                 foreach ($data->getHash() as $elementdata) {
                     $roles[] = $elementdata['role'];
-                    $table[] = array($elementdata['user'],
-                        $this->courses[$elementdata['course']]->shortname,
-                        $elementdata['role']);
                 }
-
-                // Make sure that the proper UCLA roles exists.
                 $this->get_data_generator()->create_ucla_roles($roles);
 
                 // Forward the work to Moodle's Behat data generators.
                 $this->execute('behat_data_generators::the_following_exist',
-                        array('course enrolments', new TableNode($table)));
-
+                        array('course enrolments', $data));
                 break;
 
             case 'roles':
@@ -242,7 +227,7 @@ class behat_ucla extends behat_files {
      * @throws PendingException
      */
     protected function generate_ucla_sites(TableNode $data) {
-
+        global $CFG;
         $datagenerator = self::get_data_generator();
 
         foreach ($data->getHash() as $elementdata) {
@@ -258,6 +243,10 @@ class behat_ucla extends behat_files {
             switch ($sitetype) {
                 case 'class':
                 case 'srs':
+                    // Make sure that currentterm exists.
+                    if (empty($CFG->currentterm)) {
+                        set_config('currentterm', $this->currentterm);
+                    }
                     // Create a random UCLA SRS site.
                     // See if term was specified.
                     $term = $this->currentterm;

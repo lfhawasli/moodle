@@ -835,8 +835,8 @@ class format_ucla_renderer extends format_topics_renderer {
             $newcontrols['activity'] = array(
                 'name' => get_string('activity', 'format_'.$course->format),
                 'icon' => '',
-                'textattr' => array('class' => 'section-modchooser-text center-action-link'),
-                'linkattr' => array('class' => 'section-modchooser-link')
+                'textattr' => array('class' => 'section-activity-text center-action-link'),
+                'linkattr' => array('class' => 'section-activity-link')
             );
         }
 

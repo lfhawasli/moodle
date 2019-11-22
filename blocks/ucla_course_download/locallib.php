@@ -29,7 +29,7 @@ function student_zip_requestable($course) {
 
     // See if the instructor has disabled downloading for this specific course.
     $formatoptions = course_get_format($course->id)->get_format_options();
-    if ($formatoptions['coursedownload'] != 1) {
+    if (empty($formatoptions['coursedownload'])) {
         return false;
     }
 

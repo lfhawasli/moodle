@@ -1,4 +1,4 @@
-@mod @mod_assign @ucla @local_ucla @core_edit @CCLE-4770
+@mod @mod_assign @ucla @local_ucla @core_edit @CCLE-6223
 Feature: Restrict grader drop down list to course members with grading permissions
   In order to be able to properly assign graders
   As an instructor
@@ -6,9 +6,9 @@ Feature: Restrict grader drop down list to course members with grading permissio
 
   @javascript
   Scenario: Check drop down list for course graders.
-    Given the following ucla "sites" exist:
-      | fullname | shortname | term | type |
-      | course 1 | C1        | 12W  | srs  |
+    Given the following "courses" exist:
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1        | 0        | 1         |
     And the following "users" exist:
       | username | firstname | lastname | email            |
       | teacher1 | Teacher   | 1        | teacher1@asd.com |
@@ -24,9 +24,8 @@ Feature: Restrict grader drop down list to course members with grading permissio
       | grader   | C1     | grader         |
       | student  | C1     | student        |
     When I log in as "teacher1"
-    And I follow "course 1"
-    And I turn editing mode on
-    And I add a "Assignment" to section "0" and I fill the form with:
+    And I am on "Course 1" course homepage with editing mode on
+    And I add a "Assignment" to section "1" and I fill the form with:
       | Assignment name   | Test assignment name |
       | Description       | Test description     |
       | markingworkflow   | 1                    |
@@ -34,7 +33,7 @@ Feature: Restrict grader drop down list to course members with grading permissio
     # Log in as a student and submit an assignment.
     And I log out
     And I log in as "student"
-    And I follow "course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
     And I press "Add submission"
     And I upload "lib/tests/fixtures/empty.txt" file to "File submissions" filemanager
@@ -42,9 +41,9 @@ Feature: Restrict grader drop down list to course members with grading permissio
     # Log in as a teacher and make sure that the grader list is restricted.
     And I log out
     And I log in as "teacher1"
-    And I follow "course 1"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I follow "View all submissions"
+    And I navigate to "View all submissions" in current page administration
     # Make sure filter dropdown only shows local graders.
     Then "Grader" "text" should exist in the "markerfilter" "select"
     And "Teacher" "text" should exist in the "markerfilter" "select"
