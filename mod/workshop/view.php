@@ -661,7 +661,7 @@ case workshop::PHASE_CLOSED:
         // END UCLA MOD: CCLE-8740.
     }
 
-    // START UCLA MOD: CCLE-8790 - Add example assessments to evaluation and closed phase. 
+    // START UCLA MOD: CCLE-8790 - Add example assessments to evaluation and closed phase.
     $workshop->print_example_assessments($userplan, $output);
     // END UCLA MOD: CCLE-8790.
 

@@ -175,7 +175,7 @@ class workshop {
     /** @var bool optional feature: students can see other students\' assessments */
     public $viewotherassessments;
     // END UCLA MOD: CCLE-8786.
-    
+
     /**
      * @var workshop_strategy grading strategy instance
      * Do not use directly, get the instance using {@link workshop::grading_strategy_instance()}
@@ -2207,6 +2207,9 @@ class workshop {
         $data->totalcount = $numofparticipants;
         $data->maxgrade = $this->real_grade(100);
         $data->maxgradinggrade = $this->real_grading_grade(100);
+        // START UCLA MOD: CCLE-8784 - Label late submissions.
+        $data->submissionend = $this->submissionend;
+        // END UCLA MOD: CCLE-8784.
         return $data;
     }
 
