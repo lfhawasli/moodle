@@ -182,8 +182,6 @@ case workshop::PHASE_SUBMISSION:
     //     echo $output->box_end();
     //     print_collapsible_region_end();
     // }
-
-    $workshop->print_example_assessments($userplan, $output, $examplesdone);
     // END UCLA MOD: CCLE-8790.
 
     if (has_capability('mod/workshop:submit', $PAGE->context) and (!$examplesmust or $examplesdone)) {
@@ -661,7 +659,7 @@ case workshop::PHASE_CLOSED:
         // END UCLA MOD: CCLE-8740.
     }
 
-    // START UCLA MOD: CCLE-8790 - Add example assessments to evaluation and closed phase. 
+    // START UCLA MOD: CCLE-8790 - Add example assessments to evaluation and closed phase.
     $workshop->print_example_assessments($userplan, $output);
     // END UCLA MOD: CCLE-8790.
 
