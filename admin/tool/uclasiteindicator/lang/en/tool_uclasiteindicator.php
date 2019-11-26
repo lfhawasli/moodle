@@ -11,6 +11,7 @@ $string['description'] = 'Description';
 $string['pluginname'] = 'UCLA site indicator';
 $string['type'] = 'Site type';
 $string['roles'] = 'Assignable roles';
+$string['roles_description'] = 'The Other, Research, Test, and Private site types include both Student and Project Participant roles. Project Participants can see the Participants list, but Students cannot see the list.';
 $string['del_msg'] = 'Site indicator entry';
 $string['change'] = 'Change site type';
 $string['sitecreate'] = 'Create site indicator';
