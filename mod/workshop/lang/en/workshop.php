@@ -332,6 +332,9 @@ $string['submissiongrade'] = 'Grade for submission';
 $string['submissiongrade_help'] = 'This setting specifies the maximum grade that may be obtained for submitted work.';
 $string['submissiongradeof'] = 'Grade for submission (of {$a})';
 $string['submissionlastmodified'] = 'Last modified';
+// START UCLA MOD: CCLE-8784 - Label late submissions.
+$string['submissionlate'] = '{$a} late';
+// END UCLA MOD: CCLE-8784.
 $string['submissionrequiredcontent'] = 'You need to enter some text or add a file.';
 $string['submissionrequiredfile'] = 'You need to add a file or enter some text.';
 $string['submissionsettings'] = 'Submission settings';

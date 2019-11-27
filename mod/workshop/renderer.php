@@ -502,6 +502,9 @@ class mod_workshop_renderer extends plugin_renderer_base {
                 // column #2 - submission - spans over all rows
                 if ($tr == 0) {
                     $cell = new html_table_cell();
+                    // START UCLA MOD: CCLE-8784 - Label late submissions.
+                    $participant->submissionend = $data->submissionend;
+                    // END UCLA MOD: CCLE-8784.                    
                     $cell->text = $this->helper_grading_report_submission($participant);
                     $cell->rowspan = $numoftrs;
                     $cell->attributes['class'] = 'submission';
@@ -1048,6 +1051,13 @@ class mod_workshop_renderer extends plugin_renderer_base {
 
             $lastmodified = get_string('userdatemodified', 'workshop', userdate($participant->submissionmodified));
             $out .= html_writer::tag('div', $lastmodified, array('class' => 'lastmodified'));
+            // START UCLA MOD: CCLE-8784 - Label late submissions.
+            if ($participant->submissionmodified > $participant->submissionend) {
+                $latesubmission = get_string('submissionlate', 'workshop', format_time($participant->submissionmodified - $participant->submissionend));
+                $out .= html_writer::tag('span', $latesubmission,
+                        array('class' => 'badge-important badge badge-danger mt-2 latesubmission'));
+            }
+            // END UCLA MOD: CCLE-8784.
         }
 
         return $out;
