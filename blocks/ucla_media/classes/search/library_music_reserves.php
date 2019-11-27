@@ -103,6 +103,9 @@ class library_music_reserves extends \core_search\base {
      */
     public function get_document($record, $options = array()) {
         try {
+            if (is_null($record->courseid)) {
+                return false;
+            }
             $context = \context_course::instance($record->courseid);
         } catch (\dml_missing_record_exception $ex) {
             debugging('Error retrieving ' . $this->areaid . ' ' . $record->id . ' document, not all required data is available: ' .
