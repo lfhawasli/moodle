@@ -26,9 +26,9 @@ $string['activity_not_migrated'] = 'This activity has not yet been migrated to u
 //$string['modulenameplural'] = 'Kaltura Media Assignments';
 //$string['modulename'] = 'Kaltura Media Assignment';
 //$string['modulename_help'] = 'The Kaltura Media Assignment enables a teacher to create assignments that require students to upload and submit Kaltura videos. Teachers can grade student submissions and provide feedback.';
-$string['modulenameplural'] = 'Media Assignments';
-$string['modulename'] = 'Media Assignment';
-$string['modulename_help'] = 'The Media Assignment enables a teacher to create assignments that require students to upload and submit Kaltura videos. Teachers can grade student submissions and provide feedback.';
+$string['modulenameplural'] = 'Media assignments';
+$string['modulename'] = 'Media assignment';
+$string['modulename_help'] = 'The Media assignment enables a teacher to create assignments that require students to upload and submit Kaltura videos. Teachers can grade student submissions and provide feedback.';
 // END UCLA MOD: CCLE-6269
 $string['name'] = 'Name';
 $string['availabledate'] = 'Available from';
@@ -42,7 +42,7 @@ $string['invalidid'] = 'Invalid ID';
 $string['invalid_launch_parameters'] = 'Invalid launch parameters';
 // START UCLA MOD: CCLE-6269 - Remove Kaltura branding from Add/Resource Activity
 //$string['pluginadministration'] = 'Kaltura Media Assignment';
-$string['pluginadministration'] = 'Media Assignment';
+$string['pluginadministration'] = 'Media assignment';
 // END UCLA MOD: CCLE-6269
 $string['addvideo'] = 'Add media submission';
 $string['submitvideo'] = 'Submit media';
@@ -117,7 +117,7 @@ $string['javanotenabled'] = 'Failed to detect Java, please make sure you have th
 $string['cannotdisplaythumbnail'] = 'Unable to display thumbnail';
 // START UCLA MOD: CCLE-6269 - Remove Kaltura branding from Add/Resource Activity
 //$string['noassignments'] = 'No Kaltura video assignments found in the course';
-$string['noassignments'] = 'No video assignments found in the course';
+$string['noassignments'] = 'No Media assignments found in the course';
 // END UCLA MOD: CCLE-6269
 $string['submitted'] = 'Submitted';
 $string['nosubmission'] = 'No submission';
@@ -133,3 +133,6 @@ $string['eventgrades_updated'] = 'Assignment grades updated';
 $string['eventassignment_submitted'] = 'Assignment submitted';
 $string['eventassignment_details_viewed'] = 'Assignment details viewed';
 $string['nosubmissionsforgrading'] = 'There are no submissions available for grading';
+// START UCLA MOD: CCLE-8870 - Implement warning and turn on Kaltura Media Gallery.
+$string['warningsubmissionviewable'] = 'Submissions to the "Media assignment" will be viewable to other course participants in the "Media gallery" under "Media resources". Each person will see only their own grade in the "Media assignment".';
+// END UCLA MOD: CCLE-8870.
