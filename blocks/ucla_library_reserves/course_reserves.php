@@ -29,11 +29,12 @@ require_login();
 $course = get_course(required_param('courseid', PARAM_INT));
 $url = new moodle_url('/blocks/ucla_library_reserves/course_reserves.php', array('courseid' => $course->id));
 $context = context_course::instance($course->id, MUST_EXIST);
+$printlibtour = (strpos($course->shortname,'CLUSTER') !== false);
 
 init_pagex($course, $context, $url, BLOCK_UCLA_LIBRARY_RESERVES_LIB_RESERVES);
 
 echo $OUTPUT->header();
-print_library_tabs(get_string('coursereserves', 'block_ucla_library_reserves'), $course->id);
+print_library_tabs(get_string('coursereserves', 'block_ucla_library_reserves'), $course->id, $printlibtour);
 $hostcourseurl = get_hostcourseurl($course->id);
 if (can_request_course_reserves($course->id)) {
     if ($hostcourseurl) {
