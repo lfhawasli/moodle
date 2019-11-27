@@ -73,8 +73,14 @@ $string['assessmentweight'] = 'Assessment weight';
 $string['assignedassessments'] = 'Assigned submissions to assess';
 $string['assignedassessmentsnone'] = 'You have no assigned submission to assess';
 $string['backtoeditform'] = 'Back to editing form';
+// START UCLA MOD: CCLE-8778 - Side by side view of assessments.
+$string['byaspect'] = 'By aspect';
+// END UCLA MOD: CCLE-8778.
 $string['byfullname'] = 'by <a href="{$a->url}">{$a->name}</a>';
 $string['byfullnamewithoutlink'] = 'by {$a}';
+// START UCLA MOD: CCLE-8778 - Side by side view of assessments.
+$string['byreviewer'] = 'By reviewer';
+// END UCLA MOD: CCLE-8778.
 $string['calculategradinggrades'] = 'Calculate assessment grades';
 $string['calculategradinggradesdetails'] = 'expected: {$a->expected}<br />calculated: {$a->calculated}';
 $string['calculatesubmissiongrades'] = 'Calculate submission grades';
@@ -232,6 +238,9 @@ $string['page-mod-workshop-x'] = 'Any workshop module page';
 $string['participant'] = 'Participant';
 $string['participantrevierof'] = 'Participant is reviewer of';
 $string['participantreviewedby'] = 'Participant is reviewed by';
+// START UCLA MOD: CCLE-8778 - Side by side view of assessments.
+$string['peer'] = 'Peer';
+// END UCLA MOD: CCLE-8778.
 $string['phaseassessment'] = 'Assessment phase';
 $string['phaseclosed'] = 'Closed';
 $string['phaseevaluation'] = 'Grading evaluation phase';
@@ -295,6 +304,9 @@ $string['resetsubmissions'] = 'Delete all submissions';
 $string['resetsubmissions_help'] = 'All the submissions and their assessments will be deleted. This does not affect example submissions.';
 $string['resetphase'] = 'Switch to the setup phase';
 $string['resetphase_help'] = 'If enabled, all workshops will be put into the initial setup phase.';
+// START UCLA MOD: CCLE-8778 - Side by side view of assessments.
+$string['rubric'] = 'Rubric';
+// END UCLA MOD: CCLE-8778.
 $string['saveandclose'] = 'Save and close';
 $string['saveandcontinue'] = 'Save and continue editing';
 $string['saveandpreview'] = 'Save and preview';

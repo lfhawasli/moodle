@@ -3550,6 +3550,128 @@ class workshop {
         $DB->set_field('workshop', 'phase', self::PHASE_SETUP, array('id' => $this->id));
         $this->phase = self::PHASE_SETUP;
     }
+
+    // START UCLA MOD: CCLE-8778 - Side by side view of assessments.
+    /**
+     * Prints the assessment tabs and change the url params accordingly.
+     *
+     * @param int $cmid The cmid parameter.
+     * @param int $id The id parameter.
+     * @param int $view The view parameter.
+     */
+    public function print_assessment_tabs($cmid, $id, $view) {
+        $tabs = [];
+        $tabs[] = new tabobject(get_string('byreviewer', 'workshop'),
+            new moodle_url('/mod/workshop/submission.php',
+                array('cmid' => $cmid, 'id' => $id, 'view' => 'byreviewer')),
+                    get_string('byreviewer', 'workshop'));
+        $tabs[] = new tabobject(get_string('byaspect', 'workshop'),
+            new moodle_url('/mod/workshop/submission.php',
+                array('cmid' => $cmid, 'id' => $id, 'view' => 'byaspect')),
+                    get_string('byaspect', 'workshop'));
+
+        echo '<br>';
+        print_tabs(array($tabs),
+            strcasecmp($view, 'byaspect') == 0 ? get_string('byaspect', 'workshop') : get_string('byreviewer', 'workshop'));
+    }
+
+    /**
+     * Prints the assessment table.
+     *
+     * @param int $submissionid The submission id of the submission.
+     * @param int $workshopid The workshop id of the workshop.
+     */
+    public function print_assessment_table($submissionid, $workshopid) {
+        $aspects = $this->query_aspects($workshopid);
+        $studentcount = -1;
+        $rownum = 1;
+
+        $table = new html_table();
+        $table->head = ['#', get_string('rubric', 'workshop')];
+
+        foreach ($aspects as $dimensionid => $aspect) {
+            $grademap = make_grades_menu($aspect->grade);
+            $responses = $this->query_responses($submissionid, $dimensionid);
+            if ($studentcount < 0) {
+                $studentcount = count($responses);
+            }
+            $toprow = new html_table_row();
+            $bottomrow = new html_table_row();
+
+            $cellrownum = new html_table_cell();
+            $cellrownum->attributes['scope'] = 'row';
+            $cellrownum->rowspan = 2;
+            $cellrownum->text = $rownum++;
+            $cellrownum->header = true;
+
+            $celldesc = new html_table_cell();
+            $celldesc->attributes['scope'] = 'row';
+            $celldesc->rowspan = 2;
+            $celldesc->text = $aspect->description;
+
+            $toprow->cells[] = $cellrownum;
+            $toprow->cells[] = $celldesc;
+
+            foreach ($responses as $reviewerid => $response) {
+                $grade = (int)$response->grade;
+                $cellgrade = new html_table_cell();
+                if (array_key_exists($grade, $grademap)) {
+                    if ($aspect->grade < 0) {
+                        $cellgrade->attributes['class'] = 'g-' . $grade;
+                    }
+                    $cellgrade->text = $grademap[$grade];
+                } else {
+                    $cellgrade->text = '-';
+                }
+
+                $cellcomment = new html_table_cell();
+                if ($response->peercomment) {
+                    $cellcomment->text = $response->peercomment;
+                } else {
+                    $cellcomment->text = '-';
+                }
+
+                $toprow->cells[] = $cellgrade;
+                $bottomrow->cells[] = $cellcomment;
+            }
+            array_push($table->data, $toprow, $bottomrow);
+        }
+        for ($i = 1; $i <= $studentcount; $i++) {
+            $table->head[] = get_string('peer', 'workshop') . ' ' . $i;
+        }
+
+        echo html_writer::table($table);
+    }
+
+    /**
+     * Queries the database for the aspects evaluated for this workshop.
+     *
+     * @param int $workshopid The workshop id of the workshop.
+     * @return Array of aspects.
+     */
+    protected function query_aspects($workshopid) {
+        global $DB;
+        return $DB->get_records('workshopform_accumulative',
+            array('workshopid' => $workshopid), 'sort ASC', 'id, description, grade');
+    }
+
+    /**
+     * Queries the database for the responses of each student on an aspect.
+     *
+     * @param int $submissionid The submission id of the submission.
+     * @param int $dimensionid The dimension id is the id of each aspect.
+     * @return Array of responses to an aspect.
+     */
+    protected function query_responses($submissionid, $dimensionid) {
+        global $DB;
+        return $DB->get_records_sql('
+            SELECT wa.reviewerid, wg.id, wg.assessmentid, wg.strategy, wg.dimensionid, wg.grade as grade, wg.peercomment
+              FROM {workshop_assessments} wa
+              JOIN {workshop_grades} wg
+                ON wa.id=wg.assessmentid
+             WHERE wa.submissionid=? AND wg.dimensionid=?', [$submissionid, $dimensionid]);
+    }
+    // END UCLA MOD: CCLE-8778.
 }
 
 ////////////////////////////////////////////////////////////////////////////////
