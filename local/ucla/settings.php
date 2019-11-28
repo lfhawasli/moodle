@@ -71,6 +71,13 @@ if ($hassiteconfig) {
         get_string('purgefromcoursesdesc', 'local_ucla'),
         'japanese-diagnostic-test', PARAM_RAW));
 
+    // CCLE-8886 - Make Separate groups default for certain modules.
+    $settings->add(new admin_setting_configtext(
+        'local_ucla/groupmodeoverride',
+        get_string('groupmodeoverride', 'local_ucla'),
+        get_string('groupmodeoverridehelp', 'local_ucla'),
+        'assign,quiz,turnitintooltwo,workshop,questionnaire', PARAM_TEXT));
+
     $ADMIN->add('localucla', $settings);
 
     // CCLE-6644 - Registrar web service connection settings.
