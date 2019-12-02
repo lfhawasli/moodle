@@ -103,6 +103,8 @@ class course_edit_form extends moodleform {
                 }
                 $mform->addElement('static', 'indicator_roles', get_string('roles', 'tool_uclasiteindicator'), 
                         '<strong>' . implode('</strong>, <strong>', $rolenames) . '</strong>');
+                $mform->addElement('static', 'indicator_roles_desc', "", 
+                        get_string('roles_description', 'tool_uclasiteindicator')); 
             }
                                 
             // Change the site type.
