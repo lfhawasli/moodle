@@ -214,7 +214,14 @@ class quiz_override_form extends moodleform {
                 get_string('attemptsallowed', 'quiz'), $attemptoptions);
         $mform->addHelpButton('attempts', 'attempts', 'quiz');
         $mform->setDefault('attempts', $this->quiz->attempts);
-
+        // START UCLA MOD: CCLE-8134 - Quiz override help text.
+        $overridehelp = new \core\output\notification(
+                    get_string('overridehelp', 'quiz', '<i class="fa fa-arrow-right" aria-hidden="true"></i>'),
+                    core\output\notification::NOTIFY_INFO);
+        global $PAGE;
+        $overridehelptext = $PAGE->get_renderer('core')->render($overridehelp);
+        // END UCLA MOD: CCLE-8134.
+        $mform->addElement('static', 'overridehelptext', '', $overridehelptext);
         // Submit buttons.
         $mform->addElement('submit', 'resetbutton',
                 get_string('reverttodefaults', 'quiz'));

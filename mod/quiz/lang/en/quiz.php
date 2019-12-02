@@ -597,6 +597,10 @@ $string['overduemustbesubmittedby'] = 'This attempt is now overdue. It should al
 $string['override'] = 'Override';
 $string['overridedeletegroupsure'] = 'Are you sure you want to delete the override for group {$a}?';
 $string['overridedeleteusersure'] = 'Are you sure you want to delete the override for user {$a}?';
+// START UCLA MOD: CCLE-8134 - Quiz override help text.
+$string['overridehelp'] = 'For each additional quiz attempt (one or more times) to contain the results of the previous attempt, the “Each attempt builds on the last” setting must be set to Yes.<br /><br />
+To change this setting, go to Edit settings {$a} Question behavior {$a} click on “Show more…” {$a} Each attempt builds on the last. Choose “Yes” and click on “Save”.';
+// END UCLA MOD: CCLE-8134.
 $string['overridegroup'] = 'Override group';
 $string['overridegroupeventname'] = '{$a->quiz} - {$a->group}';
 $string['overrides'] = 'Overrides';
