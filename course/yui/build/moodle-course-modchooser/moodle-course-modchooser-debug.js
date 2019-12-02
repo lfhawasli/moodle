@@ -144,21 +144,22 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
      * @param baseselector The selector to limit scope to
      */
     _setup_for_section: function(section) {
-        // START UCLA MOD: CCLE-7487 - Add an activity or resource broken.
-        //var chooserspan = section.one(CSS.SECTIONMODCHOOSER);
-        var chooserspan = section.all(CSS.SECTIONMODCHOOSER);
-        // END UCLA MOD: CCLE-7487.
+        var chooserspan = section.one(CSS.SECTIONMODCHOOSER);
         if (!chooserspan) {
             return;
         }
-        // START UCLA MOD: CCLE-7487 - Add an activity or resource broken.
-        /*var chooserlink = Y.Node.create("<a href='#' />");
+        var chooserlink = Y.Node.create("<a href='#' />");
         chooserspan.get('children').each(function(node) {
             chooserlink.appendChild(node);
         });
         chooserspan.insertBefore(chooserlink);
-        chooserlink.on('click', this.display_mod_chooser, this);*/
-        chooserspan.on('click', this.display_mod_chooser, this);
+        chooserlink.on('click', this.display_mod_chooser, this);
+        // START UCLA MOD: CCLE-7487 - Add an activity or resource broken.
+        var activityspan = section.one('span.section-activity-link');
+        if (!activityspan) {
+            return;
+        }
+        activityspan.on('click', this.display_mod_chooser, this);
         // END UCLA MOD: CCLE-7487.
     },
     /**
@@ -344,7 +345,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
         maxheight: {
             value: 800
         }
-    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.    
+    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
     },
 
     /**
@@ -372,7 +373,7 @@ Y.extend(MODCHOOSER, M.core.chooserdialogue, {
             star.setAttribute('src', M.util.image_url('i/star_empty'));
     // END UCLA MOD: CCLE-7143.
         }
-    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.    
+    // START UCLA MOD: CCLE-7143 - Reimplement CCLE-5967 Simplify activity chooser.
     }
     // END UCLA MOD: CCLE-7143.
 });

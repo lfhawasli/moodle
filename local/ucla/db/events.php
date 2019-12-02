@@ -64,6 +64,10 @@ $observers = array(
         'callback'    => 'local_ucla_turnitintwo::sync_assignments',
     ),
     array(
+        'eventname'   => '\core\event\course_module_updated',
+        'callback'    => 'local_ucla_turnitintwo::sync_assignments',
+    ),
+    array(
         'eventname'   => '\core\event\role_assigned',
         'callback'    => 'local_ucla_turnitintwo::sync_assignments',
     ),

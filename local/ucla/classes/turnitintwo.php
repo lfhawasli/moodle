@@ -70,17 +70,19 @@ class local_ucla_turnitintwo {
     }
 
     /**
-     * When a TurnItInTwo assignment is created or a role is added to the
-     * course or module, synchronize the tutors listing.
+     * When a TurnItInTwo assignment is created/updated or a role is added to
+     * the course or module, synchronize the tutors listing.
      *
      * @param \core\event\base $event   Only expecting course_module_created,
-     *                                  role_assigned, role_unassigned events.
+     *                                  course_module_updated, role_assigned,
+     *                                  role_unassigned events.
      */
     public static function sync_assignments(\core\event\base $event) {
         // Make sure we should process this event.
         $context = $event->get_context();
         switch ($event->eventname) {
             case '\core\event\course_module_created':
+            case '\core\event\course_module_updated':
                 // Make sure module is TurnItInTwo assignment.
                 if ($event->other['modulename'] != 'turnitintooltwo') {
                     return;
@@ -134,12 +136,17 @@ class local_ucla_turnitintwo {
         $members = $tiiassign->get_tii_users_by_role('Instructor', 'mdl');
         $course = $tiiassign->get_course_data($tiiassign->turnitintooltwo->course);
         // Get current Tutors.
-        $moodleusers = get_users_by_capability(context_module::instance($cm->id),
-                'mod/turnitintooltwo:grade', 'u.id', '', '', '',
-                groups_get_activity_group($cm));
+        $context = context_module::instance($cm->id);
+        $moodleusers = get_users_by_capability($context,
+                'mod/turnitintooltwo:grade', 'u.id');
+        // Remove suspended users.
+        $suspendedids = get_suspended_userids($context->get_course_context(), true);
 
         // Register new user with TII with new membership.
         foreach ($moodleusers as $userid => $moodleuser) {
+            if (in_array($userid, $suspendedids)) {                
+                continue;
+            }
             if (!array_key_exists($userid, $members)) {
                 $user = new turnitintooltwo_user($userid, 'Instructor');
                 $user->join_user_to_class($course->turnitin_cid);
