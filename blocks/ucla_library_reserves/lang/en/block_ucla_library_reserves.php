@@ -69,3 +69,4 @@ $string['researchguidegeneral'] = 'Research guides compile useful databases, dig
 $string['reserachguidecrosslistedcourse'] = 'Cross-listed courses are offered by more than one department. Check out the tabs below for resources related to each cross-listed department.';
 // Library tour.
 $string['librarytour'] = 'Library tour';
+$string['researchtutorials'] = 'Research tutorials';

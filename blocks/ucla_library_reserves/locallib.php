@@ -100,6 +100,12 @@ function print_library_tabs($activetab, $courseid, $printlibtour = false, $print
         false,
         true);
     }
+    $tabs[] = new tabobject(get_string('researchtutorials', 'block_ucla_library_reserves'),
+        new moodle_url('https://uclalibrary.github.io/research-tips/workshops'),
+            get_string('researchtutorials', 'block_ucla_library_reserves'),
+        '',
+        false,
+        true);
     print_tabs(array($tabs), $activetab);
 }
 
