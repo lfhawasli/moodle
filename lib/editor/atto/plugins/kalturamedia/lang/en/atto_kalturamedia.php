@@ -27,7 +27,7 @@ require_once($CFG->dirroot.'/local/kaltura/locallib.php');
 
 // START UCLA MOD: CCLE-6269 - Remove Kaltura branding from Add/Resource Activity
 //$string['pluginname'] = 'Kaltura Media';
-$string['pluginname'] = 'CCLE Media Server';
+$string['pluginname'] = 'Insert an video/audio file';
 // END UCLA MOD: CCLE-6269
 $string['popuptitle'] = 'Select Media';
 $string['embedbuttontext'] = 'Embed';
