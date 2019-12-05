@@ -15,11 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Contains callbacks for plugin.
+ *
  * @package   tool_myucla_url
  * @copyright 2018 UC Regents
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Adds MyUCLA links to admin panel.
  *

@@ -389,7 +389,7 @@ if ($processrequests) {
                                             );
 
                                         $urlupdater = new myucla_urlupdater();
-                                        $results = $urlupdater->send_MyUCLA_urls($idtermsrs, false);
+                                        $results = $urlupdater->send_myucla_urls($idtermsrs, false);
                                         $classurl = array_pop($results);
 
                                         // Check host url to make sure it is on

@@ -116,7 +116,7 @@ if ($rs->valid()) {
                 continue;
             }
 
-            $urlupdater->sync_MyUCLA_urls(array(
+            $urlupdater->sync_myucla_urls(array(
                 make_idnumber($crosslist) => array('term' => $crosslist->term,
                                                    'srs' => $crosslist->srs,
                                                    'url' => $courseurl)));
