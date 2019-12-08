@@ -106,6 +106,7 @@ $CFG->forced_plugin_settings['format_ucla']['disable_tasite_news_forum'] = true;
 $CFG->forced_plugin_settings['tool_myucla_url']['url_service'] = 'http://cis.ucla.edu/ieiWebMap/update.asp';
 $CFG->forced_plugin_settings['tool_myucla_url']['user_name'] = 'SSC Admin';
 $CFG->forced_plugin_settings['tool_myucla_url']['user_email'] = 'ssc@ucla.edu';
+$CFG->forced_plugin_settings['tool_myucla_url']['override_debugging'] = true;   // Send MyUCLA urls even if debuggins is on.
 
 // turn off messaging (CCLE-2318 - MESSAGING)
 $CFG->messaging = false;
