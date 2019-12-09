@@ -104,19 +104,6 @@ $CFG->forced_plugin_settings['tool_uclacoursecreator']['make_division_categories
 $CFG->forced_plugin_settings['tool_myucla_url']['url_service'] = 'https://test.ccle.ucla.edu/myucla_url_updater/update.php';  // test server
 $CFG->forced_plugin_settings['tool_myucla_url']['user_name'] = 'CCLE Admin';   // name for registering URL with My.UCLA
 $CFG->forced_plugin_settings['tool_myucla_url']['user_email'] = 'ccle@ucla.edu';  // email for registering URL with My.UCLA
-$CFG->forced_plugin_settings['tool_myucla_url']['override_debugging'] = true;   // test sending MyUCLA urls
-
-// For MyUCLA url updater phpunit tests.
-define('MYUCLA_URL_UPDATER_TEST_CONFIG_URL',
-        $CFG->forced_plugin_settings['tool_myucla_url']['url_service']);
-define('MYUCLA_URL_UPDATER_TEST_CONFIG_NAME',
-        $CFG->forced_plugin_settings['tool_myucla_url']['user_name']);
-define('MYUCLA_URL_UPDATER_TEST_CONFIG_EMAIL',
-        $CFG->forced_plugin_settings['tool_myucla_url']['user_email']);
-define('MYUCLA_URL_UPDATER_TEST_CONFIG_OVERRIDE_DEBUGGING',
-        $CFG->forced_plugin_settings['tool_myucla_url']['override_debugging']);
-define('MYUCLA_URL_UPDATER_TEST_CONFIG_ACCESSDENIED_URL',
-        'https://test.ccle.ucla.edu/myucla_url_updater/accessdenied.php');
 
 // turn off messaging (CCLE-2318 - MESSAGING)
 $CFG->messaging = false;

@@ -1543,5 +1543,5 @@ function update_myucla_urls($term, $srs, $url) {
         )
     );
 
-    $urlupdater->send_MyUCLA_urls($updatecourse, true);
+    $urlupdater->send_myucla_urls($updatecourse, true);
 }

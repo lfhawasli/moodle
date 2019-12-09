@@ -1458,9 +1458,9 @@ class uclacoursecreator {
 
             if ($urlupdater) {
                 if ($request->nourlupdate == 1) {
-                    $urlobj['flag'] = myucla_urlupdater::neverflag;
+                    $urlobj['flag'] = myucla_urlupdater::NEVERFLAG;
                 } else {
-                    $urlobj['flag'] = myucla_urlupdater::nooverwriteflag;
+                    $urlobj['flag'] = myucla_urlupdater::NOOVERWRITEFLAG;
                 }
             }
 
@@ -1471,7 +1471,7 @@ class uclacoursecreator {
         }
 
         if ($urlupdater) {
-            $urlupdater->sync_MyUCLA_urls($urlarr);
+            $urlupdater->sync_myucla_urls($urlarr);
             $skipreasoncounter = array();
 
             $ks = array('failed', 'successful');

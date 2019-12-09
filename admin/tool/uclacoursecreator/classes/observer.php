@@ -73,8 +73,8 @@ class tool_uclacoursecreator_observer {
         $haserror = false;
         foreach ($uclarequestclasses as $request) {
             $result = $myuclaurlupdater->set_url_if_same_server($request->term, $request->srs, '');
-            if (!($result == $myuclaurlupdater::url_set || // Url cleared.
-                    $result == $myuclaurlupdater::url_notset)) { // Url didn't belong to current server.
+            if (!($result == $myuclaurlupdater::URL_SET || // Url cleared.
+                    $result == $myuclaurlupdater::URL_NOTSET)) { // Url didn't belong to current server.
                 $haserror = true;
             }
 

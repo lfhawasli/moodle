@@ -104,6 +104,7 @@ $CFG->forced_plugin_settings['tool_uclacoursecreator']['make_division_categories
 $CFG->forced_plugin_settings['tool_myucla_url']['url_service'] = 'http://cis.ucla.edu/ieiWebMap/update.asp';
 $CFG->forced_plugin_settings['tool_myucla_url']['user_name'] = 'CCLE Admin';
 $CFG->forced_plugin_settings['tool_myucla_url']['user_email'] = 'ccle@ucla.edu';
+$CFG->forced_plugin_settings['tool_myucla_url']['override_debugging'] = true;   // Send MyUCLA urls even if debugging is on.
 
 // turn off messaging (CCLE-2318 - MESSAGING)
 $CFG->messaging = false;
