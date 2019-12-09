@@ -478,6 +478,12 @@ abstract class moodleform_mod extends moodleform {
             $default_values = (array)$default_values;
         }
 
+        // START UCLA MOD: CCLE-8886 - Make Separate groups default for certain modules.
+        if (empty($this->_cm) && in_array($this->_modname, explode(',', get_config('local_ucla', 'groupmodeoverride')))) {
+            $default_values['groupmode'] = SEPARATEGROUPS;
+        }
+        // END UCLA MOD: CCLE-8886.
+
         $this->data_preprocessing($default_values);
         parent::set_data($default_values);
     }

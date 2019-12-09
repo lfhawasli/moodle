@@ -375,3 +375,7 @@ $string['purgefromcoursesdesc'] = 'Purge users\' quiz attempts from this comma s
 
 // SSC-4063 - Deactivate duplicate iClicker registrations.
 $string['deactivateduplicateiclickers'] = 'Check for duplicate iClicker registrations and keep latest registration';
+
+// CCLE-8886 - Make Separate groups default for certain modules.
+$string['groupmodeoverride'] = 'Group mode override';
+$string['groupmodeoverridehelp'] = 'These course modules will default to "Separate group mode" by default.';
