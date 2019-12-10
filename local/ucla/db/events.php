@@ -75,4 +75,8 @@ $observers = array(
         'eventname'   => '\core\event\course_restored',
         'callback'    => 'local_ucla_turnitintwo::sync_assignments',
     ),
+    array(
+        'eventname'  => '\block_ucla_weeksdisplay\event\week_changed',
+        'callback'    => 'local_ucla_copyright_enrollment::sync',
+    ),
 );

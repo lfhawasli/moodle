@@ -377,3 +377,6 @@ $string['purgefromcoursesdesc'] = 'Purge users\' quiz attempts from this comma s
 
 // SSC-4063 - Deactivate duplicate iClicker registrations.
 $string['deactivateduplicateiclickers'] = 'Check for duplicate iClicker registrations and keep latest registration';
+
+// CCLE-6765 - Automate Copyright site Enrollment on regular basis.
+$string['noselfenrolplugin'] = 'No self enrollment plugin found for courseid {$a}';

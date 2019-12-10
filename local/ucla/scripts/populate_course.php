@@ -16,7 +16,7 @@
 
 /**
  * Script to automatically populate a course for the given term with users with the roles:
- * 
+ *
  *      * editinginstructor
  *      * ta_instructor
  *
@@ -36,18 +36,22 @@ define('CLI_SCRIPT', true);
 require_once(dirname(__FILE__) . '/../../../config.php');
 require_once($CFG->dirroot . '/lib/enrollib.php');
 require_once($CFG->dirroot . '/local/ucla/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
 
 // SET ROLE FOR ENROLLED USERS.
 $role = 'participant';
 
-// Needs two arguments, courseid and term.
-if ($argc != 3) {
-    exit ('Usage: populate_course.php <courseid> <term>' . "\n");
+// Needs two arguments, courseid and term. Unenroll is optional.
+if ($argc != 3 && $argc != 4) {
+    exit ('Usage: populate_course.php <courseid> <term> <unenroll|optional>' . "\n");
 }
 
-$courseid = $argv[1];
-$courseid = (int) $courseid;
+$courseid = (int) $argv[1];
 $term = $argv[2];
+$dounenroll = false;
+if (isset($argv[3])) {
+    $dounenroll = true;
+}
 
 // Validate arguments.
 if (!ucla_validator('term', $term)) {
@@ -56,74 +60,23 @@ if (!ucla_validator('term', $term)) {
 if (!is_int($courseid) || $courseid == 0 || $courseid == $SITE->id) {
     exit ('The courseid parameter is incorrectly formatted.' . "\n");
 }
+$course = get_course($courseid);  // Verify course exists.
+echo "Processing " . $course->shortname . "\n";
 
 // Check if course has "self-enrollment" plugin enabled.
-$selfenrol = enrol_selfenrol_available($courseid);
+$selfenrol = local_ucla_copyright_enrollment::get_self_enrol($courseid);
 
-if ($selfenrol == false) {
-    exit ('Self-enrollment is not enabled.' . "\n");
+$roleid = local_ucla_copyright_enrollment::get_roleid($role);
+
+if ($dounenroll) {
+    $usersremoved = local_ucla_copyright_enrollment::unenroll_all($courseid, $roleid, $selfenrol);
+    echo($usersremoved . ' users were removed.' . "\n");
 }
 
-// Get 'self' enrollment instance for function 'enrol_user'.
-$enrolinstances = enrol_get_instances($courseid, true);
-
-foreach ($enrolinstances as $enrolinstance) {
-    if ($enrolinstance->enrol === 'self') {
-        break;
-    }
-}
-
-// Get enrollment plugin.
-$enrolplugin = enrol_get_plugin('self');
-
-// Get roleid from mdl_role.id, given $role.
-$roleid = $DB->get_record('role', array('shortname' => $role), 'id');
-if (empty($roleid)) {
-    exit ('Unable to find role to enroll users.' . "\n");
-}
-$roleid = $roleid->id;
-
-// Find roleid's for roles with instructor privileges.
-$ideditinginstructor = $DB->get_record('role', array('shortname' => 'editinginstructor'), 'id');
-$idtainstructor = $DB->get_record('role', array('shortname' => 'ta_instructor'), 'id');
-$ideditinginstructor = $ideditinginstructor->id;
-$idtainstructor = $idtainstructor->id;
-
-// Find the users with instructor priveledges in course.
-$sqlfindusers = "SELECT DISTINCT mdl_role_assignments.userid
-                   FROM {role_assignments} ra
-                   JOIN {context} cxt ON ra.contextid = cxt.id
-                   JOIN {ucla_request_classes} urc ON cxt.instanceid = urc.courseid
-                  WHERE ra.roleid IN (:ideditinginstructor, :idtainstructor)
-                    AND urc.term = :term
-                    AND cxt.contextlevel = 50";
-
-$params = array('ideditinginstructor' => $ideditinginstructor,
-    'idtainstructor' => $idtainstructor,
-    'term' => $term);
-
-$coursecontext = context_course::instance($courseid);
-
-$a = $DB->get_recordset_sql($sqlfindusers, $params);
-
-$usersadded = 0;
-if ($a->valid()) {
-    foreach ($a as $userid) {
-        // For each user, add to course using "self-enrollment" plugin.
-        $userid = $userid->userid;
-
-        // If user is already in course, then don't enrol.
-        if (!is_enrolled($coursecontext, $userid, '', true)) {
-            $enrolplugin->enrol_user($enrolinstance, $userid, $roleid);
-            $usersadded++;
-        }
-    }
-}
-
-$a->close();
-
+$usersadded = local_ucla_copyright_enrollment::enroll_all($term, $courseid, $roleid, $selfenrol);
 if ($usersadded == 1) {
     echo($usersadded . ' user was added.' . "\n");
 } else {
     echo($usersadded . ' users were added.' . "\n");
 }
+echo "DONE!\n";
