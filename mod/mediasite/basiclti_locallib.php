@@ -158,7 +158,8 @@ function mediasite_basiclti_build_request($instance, $typeconfig, $course, $arra
     // The LTI app will look for the following specific custom_mediasite_integration_* attributes
     // in the LTI POST and configure the LTI Search app accordingly.
     $mediasiteintegration = array();
-    $mediasiteintegration['custom_mediasite_integration_callback'] = mediasite_get_current_url();
+    $mediasiteintegration['custom_mediasite_integration_callback']
+        = mediasite_get_current_url($typeconfig->custom_integration_callback);
 
     $mediasiteembedformats = array();
     $site = new Sonicfoundry\MediasiteSite($typeconfig);
@@ -494,8 +495,7 @@ function mediasite_copyof_lti_get_ims_role($user, $cmid, $courseid, $islti2) {
     return join(',', $roles);
 }
 
-function mediasite_get_current_url() {
-
+function mediasite_get_current_url($customintegrationcallback) {
     $protocol = 'http';
     if ($_SERVER['SERVER_PORT'] == 443 || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')) {
         $protocol .= 's';
@@ -508,6 +508,14 @@ function mediasite_get_current_url() {
     $port = $_SERVER['SERVER_PORT'];
     $request = $_SERVER['PHP_SELF'];
     $query = isset($_SERVER['argv']) ? substr($_SERVER['argv'][0], strpos($_SERVER['argv'][0], ';') + 1) : '';
+
+    // If settings "custom_integration_callback" is not null or empty.
+    if (isset($customintegrationcallback) && trim($customintegrationcallback) !== '') {
+        $customcallbackurl = $_SERVER[$customintegrationcallback];
+        if (strlen($customcallbackurl) > 0) {
+            $host = $customcallbackurl;
+        }
+    }
 
     $toret = $protocol . '://' . $host .
         ($port == $protocolport ? '' : ':' . $port) .

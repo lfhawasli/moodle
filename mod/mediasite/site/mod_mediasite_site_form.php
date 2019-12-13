@@ -64,6 +64,7 @@ class mod_mediasite_site_form extends \moodleform {
                 3 => get_string('Always', 'mediasite')
             );
         }
+
         $mform->addElement('html', '<h2>'.get_string('mediasite_server_list', 'mediasite').'</h2>');
 
         $mform->addElement('text', 'sitename', get_string('sitename', 'mediasite'), array('class' => 'sofo-site-name'));
@@ -278,7 +279,7 @@ class mod_mediasite_site_form extends \moodleform {
             );
         }
 
-        $mform->closeHeaderBefore('lti_debug_launch');
+        $mform->addElement('header', 'advanced_header', get_string('advanced_header', 'mediasite'));
 
         $mform->addElement(
             'advcheckbox',
@@ -289,6 +290,21 @@ class mod_mediasite_site_form extends \moodleform {
             array(0, 1)
         );
         $mform->setType('lti_debug_launch', PARAM_INT);
+
+        $mform->addElement(
+            'text',
+            'sitecustom_integration_callback',
+            get_string('custom_integration_callback', 'mediasite'),
+            array('class' => 'sofo-custom_integration_callback')
+        );
+        $mform->setType('sitecustom_integration_callback', PARAM_TEXT);
+
+        $mform->addElement('static', 'custom_integration_callback_field_description',
+            '<a href="/phpinfo.php" target="_blank">Show PHP info</a>',
+            get_string('custom_integration_callback_field_description', 'mediasite'));
+        $mform->setType('custom_integration_callback_field_description', PARAM_TEXT);
+
+        // $mform->closeHeaderBefore('lti_debug_launch');
 
         if (is_null($this->sitetoedit)) {
             $mform->addElement('hidden', 'site', 0);
@@ -332,6 +348,7 @@ class mod_mediasite_site_form extends \moodleform {
             $mform->setDefault('lti_embed_type_embed', $this->sitetoedit->get_lti_embed_type_embed());
             $mform->setDefault('lti_embed_type_presentation_link', $this->sitetoedit->get_lti_embed_type_presentation_link());
             $mform->setDefault('lti_embed_type_player_only', $this->sitetoedit->get_lti_embed_type_player_only());
+            $mform->setDefault('sitecustom_integration_callback', $this->sitetoedit->get_custom_integration_callback());
 
             $mform->addElement('hidden', 'site', $this->sitetoedit->get_siteid());
             $mform->setType('site', PARAM_INT);

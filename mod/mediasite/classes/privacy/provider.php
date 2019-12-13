@@ -22,12 +22,20 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+namespace mod_mediasite\privacy;
+defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_mediasite';
-$plugin->version = 2019093000;
-$plugin->release = 'v7.0';
-$plugin->requires = 2016052308.00;
-$plugin->maturity = MATURITY_STABLE; // MATURITY_ALPHA, MATURITY_BETA, MATURITY_RC or MATURITY_STABLE.
-$plugin->cron = 0;
-$plugin->dependencies = array();
+class provider implements
+    // This plugin does not store any personal user data.
+    \core_privacy\local\metadata\null_provider {
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason() : string {
+        return 'privacy:metadata';
+    }
+}
