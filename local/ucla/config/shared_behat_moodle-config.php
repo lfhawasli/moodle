@@ -131,7 +131,6 @@ $CFG->forced_plugin_settings['block_ucla_course_menu']['trimlength'] = 22;
 // UCLA Theme settings.
 $CFG->forced_plugin_settings['theme_uclashared']['running_environment'] = 'behat';
 $CFG->forced_plugin_settings['theme_uclashared']['frontpage_image'] = 'frontpage-image-shared';
-$CFG->cachejs = false;
 
 // Enable conditional activities.
 $CFG->enableavailability = true;
@@ -206,9 +205,6 @@ $CFG->recovergradesdefault = 1;
 $CFG->gradepointmax = 300;
 // CCLE-8470 - Show tabs instead of dropdown for grader report
 $CFG->grade_navmethod = 1;
-
-// Site administration > Language > Language settings
-$CFG->langstringcache = false;
 
 // Site administration > Plugins > Activity modules > Book
 $CFG->forced_plugin_settings['book']['requiremodintro'] = 0;
@@ -389,9 +385,6 @@ $CFG->cronclionly = true;
 // Site administration > Security > HTTP security
 $CFG->allowframembedding = 1; // CCLE-3021 - enabled because some collab sites need to be embedded
 $CFG->cookiehttponly = 1;
-
-// Site administration > Appearance > Themes
-//$CFG->theme = 'clean';
 
 // Site administration > Appearance > Themes > Theme settings
 $CFG->themedesignermode = 0;    // Need to be fast.

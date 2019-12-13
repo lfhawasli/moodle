@@ -106,6 +106,7 @@ $CFG->forced_plugin_settings['format_ucla']['disable_tasite_news_forum'] = true;
 $CFG->forced_plugin_settings['tool_myucla_url']['url_service'] = 'http://cis.ucla.edu/ieiWebMap/update.asp';
 $CFG->forced_plugin_settings['tool_myucla_url']['user_name'] = 'SSC Admin';
 $CFG->forced_plugin_settings['tool_myucla_url']['user_email'] = 'ssc@ucla.edu';
+$CFG->forced_plugin_settings['tool_myucla_url']['override_debugging'] = true;   // Send MyUCLA urls even if debuggins is on.
 
 // turn off messaging (CCLE-2318 - MESSAGING)
 $CFG->messaging = false;
@@ -449,10 +450,10 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     pastespecial = pastespecial, clear
     style1 = fontfamily, title, bold, italic, underline, backcolor, fontcolor
     insert1 = charmap, count
+    files1 = image, managefiles, kalturamedia
     list = unorderedlist, orderedlist
     indent = indent
     align = align, table, bsgrid
-    files1 = image, media, managefiles, kalturamedia
     style2 = strike, subscript, superscript
     insert2 = chemrender, chemistry, computing, equation
     files2 = mediagallery, panoptobutton
@@ -498,7 +499,6 @@ $CFG->forced_plugin_settings['local_mobile']['typeoflogin'] = 2;    // Via a bro
 // Site administration > Plugins > Local plugins > UCLA customizations.
 $CFG->forced_plugin_settings['local_ucla']['registrar_cache_ttl'] = 3600;   // 1 hour
 $CFG->forced_plugin_settings['local_ucla']['regsyllabustable'] = 'ucla_syllabus';
-$CFG->forced_plugin_settings['local_ucla']['handlepreferredname'] = 0; // CCLE-8086 - Remove (Legal name) from being displayed across the site.
 
 // SSC-2050 - Sets limit to number of crosslisted course displayed in forum email header
 $CFG->forced_plugin_settings['local_ucla']['limitcrosslistemail'] = 2;

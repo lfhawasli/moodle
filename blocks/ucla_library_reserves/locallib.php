@@ -80,7 +80,7 @@ function init_pagex($course, $context, $url, $mode = null, $title = null) {
  * @param int $courseid courseid of the active tab
  * @param boolean $printreserves courseid of the active tab
  */
-function print_library_tabs($activetab, $courseid, $printreserves = true) {
+function print_library_tabs($activetab, $courseid, $printlibtour = false, $printreserves = true) {
     $tabs = [];
     $tabs[] = new tabobject(get_string('researchguide', 'block_ucla_library_reserves'),
         new moodle_url('/blocks/ucla_library_reserves/index.php',
@@ -92,6 +92,20 @@ function print_library_tabs($activetab, $courseid, $printreserves = true) {
             array('courseid' => $courseid)),
             get_string('coursereserves', 'block_ucla_library_reserves'));
     }
+    if ($printlibtour) {
+        $tabs[] = new tabobject(get_string('librarytour', 'block_ucla_library_reserves'),
+        new moodle_url('https://spark.adobe.com/page/uJnBMHgK6VMHA/'),
+        get_string('librarytour', 'block_ucla_library_reserves'),
+        '',
+        false,
+        true);
+    }
+    $tabs[] = new tabobject(get_string('researchtutorials', 'block_ucla_library_reserves'),
+        new moodle_url('https://uclalibrary.github.io/research-tips/workshops'),
+            get_string('researchtutorials', 'block_ucla_library_reserves'),
+        '',
+        false,
+        true);
     print_tabs(array($tabs), $activetab);
 }
 

@@ -57,6 +57,10 @@ $PAGE->navbar->add($currentcrumb);
 $renderer = $PAGE->get_renderer('mod_kalvidassign');
 $courseid = $PAGE->context->get_course_context(false);
 
+// START UCLA MOD: CCLE-8870 - Implement warning and turn on Kaltura Media Gallery.
+\core\notification::warning(get_string('warningsubmissionviewable', 'mod_kalvidassign'));
+// END UCLA MOD: CCLE-8870.
+
 echo $OUTPUT->header();
 
 require_capability('mod/kalvidassign:gradesubmission', context_module::instance($cm->id));

@@ -183,8 +183,6 @@ $string['overrideenroldatabase'] = 'Override database enrollment plugin';
 $string['overrideenroldatabasedesc'] = 'Override the database enrollment plugin to use UCLA specific customizations.';
 $string['minuserupdatewaitdays'] = 'User information update delay';
 $string['minuserupdatewaitdays_desc'] = 'Number of days since a user last used the site before updating their first name, last name and/or email from the external database.';
-$string['handlepreferredname'] = 'Enable preferred name';
-$string['handlepreferrednamedesc'] = 'If enabled, will use alternatename field as preferred name and change fullname display depending on course context for user.';
 $string['registrarurlconfig'] = 'Registrar URL';
 $string['registrarurlconfighelp'] = 'Set the URL for UCLA Registrar.';
 
@@ -377,3 +375,9 @@ $string['purgefromcoursesdesc'] = 'Purge users\' quiz attempts from this comma s
 
 // SSC-4063 - Deactivate duplicate iClicker registrations.
 $string['deactivateduplicateiclickers'] = 'Check for duplicate iClicker registrations and keep latest registration';
+
+// CCLE-6765 - Automate Copyright site Enrollment on regular basis.
+$string['noselfenrolplugin'] = 'No self enrollment plugin found for courseid {$a}';
+// CCLE-8886 - Make Separate groups default for certain modules.
+$string['groupmodeoverride'] = 'Group mode override';
+$string['groupmodeoverridehelp'] = 'These course modules will default to "Separate group mode" by default.';

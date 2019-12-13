@@ -33,12 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  */
 class local_ucla_core_edit {
     /**
-     * Caches setting for local_ucla|handlepreferredname.
-     * @var boolean
-     */
-    public static $handlepreferredname = null;
-
-    /**
      * Caches subject area lookups.
      * @var array
      */
@@ -61,75 +55,6 @@ class local_ucla_core_edit {
      * @var string
      */
     public static $profileviewmore = '';
-
-    /**
-     * Returns an array of users who only the ability to grade only at the course
-     * context. Moodle normally displays all users who have the ability to grade,
-     * even those inherited from the category or site context.
-     *
-     * @param object $course
-     * @param string $sort          Optional.
-     * @param string $capability    Defaults to 'mod/assign:grade'.
-     * @return array
-     */
-    public static function get_course_graders($course, $sort = '', $capability = 'mod/assign:grade') {
-        global $CFG;
-        require_once($CFG->dirroot . '/local/publicprivate/lib/course.class.php');
-        $ppcourse = PublicPrivate_Course::build($course);
-        $groupid = 0;
-        if ($ppcourse->is_activated()) {
-            $groupid = $ppcourse->get_group();
-        }
-        return get_users_by_capability(context_course::instance($course->id),
-                $capability, '', $sort, '', '', $groupid, '', false);
-    }
-
-    /**
-     * Handles logic of how to display 'alternativename' as preferred name.
-     *
-     * See CCLE-4521 - Handle "preferred name"
-     *
-     * Note, in CCLE-6594 we are now storing preferred name in firstname if set
-     * and legal first name in alternatename.
-     *
-     * @param object $user
-     * @param boolean $override  If true, will return name formatting for hybrid
-     *                           display. By reference, because if we are
-     *                           handling preferred name, then need to turn off
-     *                           override flag from fullname function.
-     * @return string            Returns name string to use in template.
-     */
-    public static function get_fullnamedisplay($user, &$override) {
-
-        // Be quick to exit, so that Behat tests aren't slowed down.
-        if (!isset(self::$handlepreferredname)) {
-            self::$handlepreferredname = get_config('local_ucla', 'handlepreferredname');
-        }
-        if (empty(self::$handlepreferredname)) {
-            return false;
-        }
-
-        $forcehybridmode = $override;
-        $override = false;   // Setting is on, so disable override handling.
-
-        // See if we even need to handle the logic of figuring out preferred name.
-        if (empty($user->alternatename) && !empty($user->middlename) && !empty($forcehybridmode)) {
-            return 'lastname, firstname middlename';
-        } else if (empty($user->alternatename)) {
-            return false;
-        }
-
-        // User has alternative name, so see if viewer should see it.
-        $fullnamedisplay = 'lastname, firstname';
-        // Do we need to display legal first name?
-        if (!empty($forcehybridmode)) {
-            // Display middle name, if needed.
-            $firstname = empty($user->middlename) ? 'alternatename' : 'alternatename middlename';
-            $fullnamedisplay .= " ($firstname)";
-        }
-
-        return $fullnamedisplay;
-    }
 
     /**
      * Add the course that we're currently on to the list.
@@ -201,7 +126,8 @@ class local_ucla_core_edit {
         }
     }
 
-    /** Initialize report log user
+    /**
+     * Initialize report log user
      *
      * @param $user the user object
      * @param $course the course object
@@ -307,6 +233,7 @@ class local_ucla_core_edit {
                                 AND u.id = $user->id";
         return $DB->record_exists_sql($sql, $params);
     }
+ 
     /**
      * Display complete use details on profile pages.
      *

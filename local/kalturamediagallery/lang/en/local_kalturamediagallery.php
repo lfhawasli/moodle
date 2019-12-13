@@ -33,3 +33,8 @@ $string['link_location'] = 'Link location';
 $string['link_location_desc'] = 'Choose where mediagallery link is displayed';
 $string['link_location_navigation'] = 'Navigation block';
 $string['link_location_course_settings'] = 'Course settings';
+// START UCLA MOD: CCLE-8870 - Implement warning and turn on Kaltura Media Gallery.
+// Rename some strings to use sentance casing.
+$string['heading_mediagallery'] = 'Media gallery';
+$string['nav_mediagallery'] = 'Media gallery';
+// END UCLA MOD: CCLE-8870.

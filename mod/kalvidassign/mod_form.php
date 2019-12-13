@@ -34,6 +34,10 @@ class mod_kalvidassign_mod_form extends moodleform_mod {
     public function definition() {
         global $CFG, $COURSE;
 
+        // START UCLA MOD: CCLE-8870 - Implement warning and turn on Kaltura Media Gallery.
+        \core\notification::warning(get_string('warningsubmissionviewable', 'mod_kalvidassign'));
+        // END UCLA MOD: CCLE-8870.
+
         $mform =& $this->_form;
 
         $mform->addElement('hidden', 'course', $COURSE->id);

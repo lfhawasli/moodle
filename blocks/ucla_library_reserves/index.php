@@ -40,11 +40,12 @@ echo $OUTPUT->header();
 
 $cache = cache::make('block_ucla_library_reserves', 'hostcourseurl');
 $hostcourseurl = get_hostcourseurl($course->id);
+$printlibtour = (strpos($course->shortname,'CLUSTER') !== false);
 // Don't print the reserves tab if you're a student and there are no reserves.
 if (!can_request_course_reserves($course->id) && !$hostcourseurl) {
-    print_library_tabs(get_string('researchguide', 'block_ucla_library_reserves'), $course->id, false);
+    print_library_tabs(get_string('researchguide', 'block_ucla_library_reserves'), $course->id, $printlibtour, false);
 } else {
-    print_library_tabs(get_string('researchguide', 'block_ucla_library_reserves'), $course->id);
+    print_library_tabs(get_string('researchguide', 'block_ucla_library_reserves'), $course->id, $printlibtour);
 }
 
 $PAGE->set_pagelayout('incourse');

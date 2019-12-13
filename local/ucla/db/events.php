@@ -64,6 +64,10 @@ $observers = array(
         'callback'    => 'local_ucla_turnitintwo::sync_assignments',
     ),
     array(
+        'eventname'   => '\core\event\course_module_updated',
+        'callback'    => 'local_ucla_turnitintwo::sync_assignments',
+    ),
+    array(
         'eventname'   => '\core\event\role_assigned',
         'callback'    => 'local_ucla_turnitintwo::sync_assignments',
     ),
@@ -74,5 +78,9 @@ $observers = array(
     array(
         'eventname'   => '\core\event\course_restored',
         'callback'    => 'local_ucla_turnitintwo::sync_assignments',
+    ),
+    array(
+        'eventname'  => '\block_ucla_weeksdisplay\event\week_changed',
+        'callback'    => 'local_ucla_copyright_enrollment::sync',
     ),
 );

@@ -67,3 +67,6 @@ $string['nopermissionmsg'] = 'You do not have permission to access this tab.';
 // Research guide explanations.
 $string['researchguidegeneral'] = 'Research guides compile useful databases, digital library collections, and research strategies.';
 $string['reserachguidecrosslistedcourse'] = 'Cross-listed courses are offered by more than one department. Check out the tabs below for resources related to each cross-listed department.';
+// Library tour.
+$string['librarytour'] = 'Library tour';
+$string['researchtutorials'] = 'Research tutorials';

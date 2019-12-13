@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/' . $CFG->admin . '/tool/myucla_url/myucla_urlupd
 
 /**
  * PHPunit testcase class.
- * 
+ *
  * @copyright  2014 UC Regents
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @group ucla
@@ -62,7 +62,7 @@ class myucla_urlupdater_test extends advanced_testcase {
 
         // Try to set URL at MyUCLA. Expecting result to only contain failures.
         $this->assertEmpty($this->urlupdater->failed);
-        $this->urlupdater->sync_MyUCLA_urls(array('12W-123456789' => $course));
+        $this->urlupdater->sync_myucla_urls(array('12W-123456789' => $course));
         $this->assertEmpty($this->urlupdater->successful);
         $this->assertNotEmpty($this->urlupdater->skipped);
         $this->assertNotEmpty($this->urlupdater->failed);
@@ -91,7 +91,7 @@ class myucla_urlupdater_test extends advanced_testcase {
     }
 
     /**
-     * Try to set a complex URL to test encoding/decoding. 
+     * Try to set a complex URL to test encoding/decoding.
      */
     public function test_setting_complex_url() {
         $testurl = 'http://ucla.edu/index.php?id=something&id2=somewhere';
@@ -157,7 +157,7 @@ class myucla_urlupdater_test extends advanced_testcase {
     }
 
     /**
-     * Try syncing a variety of course urls (both set and unset) and an invalid 
+     * Try syncing a variety of course urls (both set and unset) and an invalid
      * course.
      */
     public function test_sync() {
@@ -185,45 +185,45 @@ class myucla_urlupdater_test extends advanced_testcase {
         $courses['set'] = $setcourse;
         $courses['unset'] = $unsetcourse;
         $courses['invalid'] = $invalidcourse;
-        $this->urlupdater->sync_MyUCLA_urls($courses);
+        $this->urlupdater->sync_myucla_urls($courses);
 
         // Make sure that $unsetcourse has a success message.
         $success = $this->urlupdater->successful;
         // Make sure that $setcourse's url was returned (meaning if existed already).
         $this->assertTrue($success['set'] == $setcourse['url']);
         $this->assertTrue(false !== strpos($success['unset'],
-                        myucla_urlupdater::expected_success_message));
+                        myucla_urlupdater::EXPECTED_SUCCESS_MESSAGE));
 
         // Make sure that $invalidcourse has an error message.
         $failed = $this->urlupdater->failed;
         $this->assertTrue(false === strpos($failed['invalid'],
-                        myucla_urlupdater::expected_success_message));
+                        myucla_urlupdater::EXPECTED_SUCCESS_MESSAGE));
     }
 
     /**
      * Helper method. Gets url from MyUCLA for given course.
-     * 
+     *
      * @param mixed $course Expects course to be a multi-dimensonal array with
      *                      following keys: term, srs, url
-     * @return string       Returns url from MyUCLA service call 
+     * @return string       Returns url from MyUCLA service call
      */
     protected function get_url($course) {
-        $result = $this->urlupdater->send_MyUCLA_urls(array($course));
+        $result = $this->urlupdater->send_myucla_urls(array($course));
         return array_pop($result);  // Returns indexed array.
     }
 
     /**
      * Helper method. Sends given course and url to MyUCLA.
-     * 
+     *
      * @param mixed $course Expects course to be a multi-dimensonal array with
      *                      following keys: term, srs, url
-     * @return boolean      Returns true if URL was set, otherwise false. 
+     * @return boolean      Returns true if URL was set, otherwise false.
      */
     protected function set_url($course) {
-        $result = $this->urlupdater->send_MyUCLA_urls(array($course),
+        $result = $this->urlupdater->send_myucla_urls(array($course),
                 true);
         return false !== strpos(array_pop($result),
-                        myucla_urlupdater::expected_success_message);
+                        myucla_urlupdater::EXPECTED_SUCCESS_MESSAGE);
     }
 
     /**

@@ -941,29 +941,27 @@ function ucla_send_mail($to, $subj, $body = '', $header = '') {
         $header = '';
     }
 
-    if (debugging() && empty($CFG->divertallemailsto)) {
+    // Support email testing in unit tests.
+    if (PHPUNIT_TEST) {
+        if (!phpunit_util::is_redirecting_phpmailer()) {
+            debugging('Unit tests must not send real emails! Use $this->redirectEmails()');
+            return true;
+        }
+        $mail = new stdClass();
+        $mail->header = $header;
+        $mail->body = $body;
+        $mail->subject = $subj;
+        $mail->from = 'ccle-email-test@lists.ucla.edu';
+        $mail->to = $to;
+        phpunit_util::phpmailer_sent($mail);
+        return true;
+    } else if (debugging() && empty($CFG->divertallemailsto)) {
         // If divertallemailsto is set, then send out email even if debugging is
         // enabled.
         debugging("TO: $to\nSUBJ: $subj\nBODY: $body\nHEADER: $header");
     } else {
-        // Support email testing in unit tests.
-        if (PHPUNIT_TEST) {
-            if (!phpunit_util::is_redirecting_phpmailer()) {
-                debugging('Unit tests must not send real emails! Use $this->redirectEmails()');
-                return true;
-            }
-            $mail = new stdClass();
-            $mail->header = $header;
-            $mail->body = $body;
-            $mail->subject = $subj;
-            $mail->from = 'ccle-email-test@lists.ucla.edu';
-            $mail->to = $to;
-            phpunit_util::phpmailer_sent($mail);
-            return true;
-        } else {
-            debugging("Sending real email to " . $to);
-            return @mail($to, $subj, $body, $header);
-        }
+        debugging("Sending real email to " . $to);
+        return @mail($to, $subj, $body, $header);
     }
 
     return true;

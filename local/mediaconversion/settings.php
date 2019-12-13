@@ -47,4 +47,11 @@ if ($hassiteconfig) {
             PARAM_NUMBER
     );
     $settings->add($adminsetting);
+    $adminsetting = new admin_setting_configcheckbox (
+            'local_mediaconversion/useshortname',
+            get_string('useshortname', 'local_mediaconversion'),
+            get_string('useshortnamehelper', 'local_mediaconversion'),
+            0
+    );
+    $settings->add($adminsetting);
 }

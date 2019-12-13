@@ -144,7 +144,7 @@ class event_test extends advanced_testcase {
         $courseurl = array('term' => $course->term,
             'srs' => $course->srs,
             'url' => $CFG->wwwroot . '/course/view.php?id=' . $course->courseid);
-        $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl), true);
+        $result = $myuclarlupdater->send_myucla_urls(array($courseurl), true);
         $pos = strpos(array_pop($result),
                 $myuclarlupdater::expected_success_message);
         $this->assertTrue($pos !== false);
@@ -155,7 +155,7 @@ class event_test extends advanced_testcase {
         $this->resetDebugging();
 
         // Verify that myucla url is deleted.
-        $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl));
+        $result = $myuclarlupdater->send_myucla_urls(array($courseurl));
         $result = array_pop($result);
         $this->assertTrue(empty($result));
     }
@@ -179,7 +179,7 @@ class event_test extends advanced_testcase {
             $courseurl = array('term' => $crosslist->term,
                 'srs' => $crosslist->srs,
                 'url' => $CFG->wwwroot . '/course/view.php?id=' . $crosslist->courseid);
-            $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl), true);
+            $result = $myuclarlupdater->send_myucla_urls(array($courseurl), true);
             $pos = strpos(array_pop($result),
                     $myuclarlupdater::expected_success_message);
             $this->assertTrue($pos !== false);
@@ -194,7 +194,7 @@ class event_test extends advanced_testcase {
         foreach ($class as $crosslist) {
             $courseurl = array('term' => $crosslist->term,
                 'srs' => $crosslist->srs);
-            $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl));
+            $result = $myuclarlupdater->send_myucla_urls(array($courseurl));
             $result = array_pop($result);
             $this->assertTrue(empty($result));
         }
@@ -216,7 +216,7 @@ class event_test extends advanced_testcase {
         $courseurl = array('term' => $course->term,
             'srs' => $course->srs,
             'url' => 'http://ucla.edu');
-        $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl), true);
+        $result = $myuclarlupdater->send_myucla_urls(array($courseurl), true);
         $pos = strpos(array_pop($result),
                 $myuclarlupdater::expected_success_message);
         $this->assertTrue($pos !== false);
@@ -227,7 +227,7 @@ class event_test extends advanced_testcase {
         $this->resetDebugging();
 
         // Verify that myucla url is not deleted.
-        $result = $myuclarlupdater->send_MyUCLA_urls(array($courseurl));
+        $result = $myuclarlupdater->send_myucla_urls(array($courseurl));
         $result = array_pop($result);
         $this->assertEquals($result, $courseurl['url']);
     }

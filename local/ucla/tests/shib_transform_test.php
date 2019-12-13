@@ -17,8 +17,6 @@
 /**
  * Tests the shib_transform.php formatting.
  *
- * CCLE-4521 - Handle "preferred name"
- *
  * @package    local_ucla
  * @category   test
  * @copyright  2013 UC Regents
