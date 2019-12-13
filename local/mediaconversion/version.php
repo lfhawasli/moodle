@@ -24,8 +24,11 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version = 2019042600;
+$plugin->version = 2019120300;
 $plugin->component = 'local_mediaconversion';
 $plugin->release = 'Media conversion';
 $plugin->requires = 2014050800;
-$plugin->maturity = MATURITY_ALPHA;
+$plugin->maturity = MATURITY_STABLE;
+$plugin->dependencies = array(
+    'local_kaltura' => 2019111435   // KAF version that supports shortnames.
+);

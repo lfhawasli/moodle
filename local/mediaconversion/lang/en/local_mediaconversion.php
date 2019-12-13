@@ -42,3 +42,5 @@ $string['taskmediaconversion_convert'] = 'Media conversion task for new file upl
 $string['taskmediaconversion_convert_restored'] = 'Media conversion task for restored course';
 $string['taskmediaconversion_convert_text'] = 'Media conversion task for module text';
 $string['taskmediaconversion_add_collaborators'] = 'Media conversion task for adding course admins to Kaltura resources';
+$string['useshortname'] = 'Use shortname';
+$string['useshortnamehelper'] = 'If enabled, will use shortname for the category name when converting media instead of courseid.';

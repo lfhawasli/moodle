@@ -74,9 +74,9 @@ function local_cm_get_kaltura_client($configsettings) {
  *                 collaborators and publishers on all videos uploaded for a course.
  */
 function local_cm_get_course_admin_usernames($course) {
-    // Gets the users who can manage activities at the course context.
-    $courseadmins = local_ucla_core_edit::get_course_graders($course, '',
-            'moodle/course:manageactivities');
+     // Anyone who can grade Kaltura assignment is a course admin.
+    $courseadmins = get_users_by_capability(context_course::instance($course->id),
+            'mod/kalvidassign:gradesubmission');
     // Put the emails in a comma-separated string.
     $emails = array_map(function($admin) {
         return $admin->email;
@@ -162,13 +162,19 @@ function local_cm_update_entry_collaborators(\KalturaClient $client, $entryid, $
  * exist, it creates the category (and its parent category).
  *
  * @param KalturaClient $client
- * @param string $courseid
+ * @param stdClass $course
  * @param string $basecategorypath
  * @return KalturaCategory|null
  */
-function local_cm_get_kaltura_category(\KalturaClient $client, $courseid, $basecategorypath) {
+function local_cm_get_kaltura_category(\KalturaClient $client, $course, $basecategorypath) {
+    // Set coursepath to either be course.id or shortname.
+    $coursepath = $course->id;
+    if (get_config('local_mediaconversion', 'useshortname')) {
+        $coursepath = $course->shortname;
+    }
+
     $filter = new KalturaCategoryFilter();
-    $filter->fullNameEqual = $basecategorypath . '>' . $courseid . '>' . CATEGORY_PATH_END;
+    $filter->fullNameEqual = $basecategorypath . '>' . $coursepath . '>' . CATEGORY_PATH_END;
     try {
         $result = $client->category->listAction($filter, new KalturaFilterPager());
     } catch (Exception $ex) {
@@ -200,7 +206,7 @@ function local_cm_get_kaltura_category(\KalturaClient $client, $courseid, $basec
 
         // Set the course properties.
         $category->parentId = $parentcategory->id;
-        $category->name = "$courseid";
+        $category->name = "$coursepath";
         // Now upload the course category.
         try {
             $category = $client->category->add($category);
@@ -399,8 +405,7 @@ function local_cm_package_argsinfo($courseandmodinfo, $name, $modname = 'resourc
     $argsinfo->groupingid = $groupcourse->defaultgroupingid;
     $argsinfo->availabilityconditionsjson = $modinfo->availability;
     $argsinfo->course = $groupcourse->id;
-    // Save the course object as a property of the argsinfo to save DB calls
-    // later even though we technically don't need it here.
+    // Save course object as a property of the argsinfo to save DB calls later.
     $argsinfo->courseobject = $groupcourse;
     $argsinfo->coursemodule = 0;
     $argsinfo->section = $modinfo->sectionnum;
@@ -452,7 +457,7 @@ function local_cm_convert_video(stored_file $file, $argsinfo, $userid, $cmid) {
     }
     // Get/make the appropriate category in the KMC for the video.
     if (!$category = local_cm_get_kaltura_category($client,
-            $argsinfo->course, $localconfigsettings->base_category_path)) {
+            $argsinfo->courseobject, $localconfigsettings->base_category_path)) {
         return null;
     }
     // Put the video in the category.
