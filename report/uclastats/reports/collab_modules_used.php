@@ -47,6 +47,29 @@ class collab_modules_used extends uclastats_base {
         foreach ($results as &$result) {
            $result->module=get_string('pluginname', 'mod_' . $result->module);  
         }
+
+        // Find how many assignments are using TurnItIn.
+        $sql = "SELECT count(ptc.id)
+                  FROM {course} AS c
+                  JOIN {course_modules} cm ON c.id = cm.course
+                  JOIN {plagiarism_turnitin_config} ptc ON (ptc.cm=cm.id)
+             LEFT JOIN {ucla_siteindicator} AS si ON (c.id = si.courseid)
+             LEFT JOIN {ucla_request_classes} AS urc ON (c.id=urc.courseid)
+                 WHERE urc.id IS NULL 
+                   AND si.type!='test'
+                   AND ptc.name='use_turnitin' 
+                   AND ptc.value=1";
+        $assignturnitin = $DB->get_field_sql($sql, $params);
+
+        // Add in Turnitin plagiarism.
+        if (!empty($assignturnitin) && isset($results['assign'])) {
+            $results['assign']->count -= $assignturnitin;
+            $turnitinobj = new stdClass();
+            $turnitinobj->module = get_string('assignturnitin', 'report_uclastats');
+            $turnitinobj->count = $assignturnitin;
+            $results['assignturnitin'] = $turnitinobj;
+        }
+
         array_alphasort($results, 'module');
         return $results;
     }

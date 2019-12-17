@@ -26,10 +26,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-// START UCLA MOD: CCLE-4061 - Reimplement pre-pop enrollment
-require_once($CFG->dirroot . '/local/ucla/classes/local_ucla_enrollment_helper.php');
-// END UCLA MOD: CCLE-4061
-
 /**
  * Database enrolment plugin implementation.
  * @author  Petr Skoda - based on code by Martin Dougiamas, Martin Langhoff and others
