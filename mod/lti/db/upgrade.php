@@ -139,6 +139,58 @@ function xmldb_lti_upgrade($oldversion) {
 
     // Automatically generated Moodle v3.5.0 release upgrade line.
     // Put any upgrade step following this.
+    
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    if ($oldversion < 2017111302) {
+        $table = new xmldb_table('lti_types');
+
+        $fields = [];
+        $fields[] = new xmldb_field('asactivity', XMLDB_TYPE_INTEGER, 1, null, null, null, 1, 'secureicon');
+        $fields[] = new xmldb_field('asassignment', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'asactivity');
+        $fields[] = new xmldb_field('assignmenturl', XMLDB_TYPE_TEXT, 255, null, false, null, null, 'asassignment');
+        $fields[] = new xmldb_field('asmenulink', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'assignmenturl');
+        $fields[] = new xmldb_field('menulinkurl', XMLDB_TYPE_TEXT, 255, null, false, null, null, 'asmenulink');
+        $fields[] = new xmldb_field('asrichtexteditorplugin', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'menulinkurl');
+        $fields[] = new xmldb_field('richtexteditorurl', XMLDB_TYPE_TEXT, 255, null, false, null, null, 'asrichtexteditorplugin');
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2017111302, 'lti');
+    }
+    // END UCLA MOD: CCLE-6956.
+
+    // START UCLA MOD: CCLE-6955 - LTI Apps in Course Menu Links.
+    if ($oldversion < 2018051401) {
+        $placementstablename = 'lti_course_menu_placements';
+        $table = new xmldb_table($placementstablename);
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, 11, true, true, XMLDB_SEQUENCE, null);
+        $table->add_field('course', XMLDB_TYPE_INTEGER, 11, true, true, false, null, 'id');
+        $table->add_field('typeid', XMLDB_TYPE_INTEGER, 11, true, true, false, null, 'course');
+
+        // Adding keys to table lti_course_menu_placements.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+
+        if (!$dbman->table_exists($placementstablename)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_mod_savepoint(true, 2018051401, 'lti');
+    }
+    if ($oldversion < 2018051402) {
+        // Add missing keys.
+        $table = new xmldb_table('lti_course_menu_placements');
+        $key = new xmldb_key('typeid', XMLDB_KEY_FOREIGN, array('typeid'), 'lti_types', array('id'));
+        $dbman->add_key($table, $key);
+        $key = new xmldb_key('course', XMLDB_KEY_FOREIGN, array('course'), 'course', array('id'));
+        $dbman->add_key($table, $key);
+
+        upgrade_mod_savepoint(true, 2018051402, 'lti');
+    }
+    // END UCLA MOD: CCLE-6955.
 
     return true;
 

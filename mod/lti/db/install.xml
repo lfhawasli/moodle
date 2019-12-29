@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/lti/db" VERSION="20151204" COMMENT="XMLDB file for Moodle mod/lti"
+<!-- START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor. -->
+<!-- <XMLDB PATH="mod/lti/db" VERSION="20151204" COMMENT="XMLDB file for Moodle mod/lti" -->
+<!--    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" -->
+<!--    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd" -->
+<!-- > -->
+<XMLDB PATH="mod/lti/db" VERSION="20190926" COMMENT="XMLDB file for Moodle mod/lti"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
+<!-- END UCLA MOD: CCLE-6956. -->
   <TABLES>
     <TABLE NAME="lti" COMMENT="This table contains Basic LTI activities instances">
       <FIELDS>
@@ -81,6 +87,15 @@
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="A description of what this LTI module is."/>
+        <!-- START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor. -->
+        <FIELD NAME="asactivity" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Can the type be used as an activity?"/>
+        <FIELD NAME="asassignment" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Can the type be used as an assignment?"/>
+        <FIELD NAME="assignmenturl" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="asmenulink" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Can the type be used as an menu link?"/>
+        <FIELD NAME="menulinkurl" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="asrichtexteditorplugin" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Can the type be used as a rich text editor plugin?"/>
+        <FIELD NAME="richtexteditorurl" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <!-- END UCLA MOD: CCLE-6956. -->
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -140,5 +155,19 @@
         <INDEX NAME="ltiid" UNIQUE="false" FIELDS="ltiid"/>
       </INDEXES>
     </TABLE>
+    <!-- START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor. -->
+    <TABLE NAME="lti_course_menu_placements" COMMENT="Course menu link placements">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Primary key of course (null for system-wide settings)"/>
+        <FIELD NAME="typeid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Primary key of course"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="typeid" TYPE="foreign" FIELDS="typeid" REFTABLE="lti_types" REFFIELDS="id" COMMENT="The tool referenced"/>
+        <KEY NAME="course" TYPE="foreign" FIELDS="course" REFTABLE="course" REFFIELDS="id" COMMENT="The course for which the setting exists"/>
+      </KEYS>
+    </TABLE>
+    <!-- END UCLA MOD: CCLE-6956. -->
   </TABLES>
 </XMLDB>

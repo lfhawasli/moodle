@@ -107,6 +107,13 @@ $string['confirmtoolactivation'] = 'Are you sure you would like to activate this
 $string['contentitem'] = 'Content-Item Message';
 $string['contentitem_help'] = 'If ticked, the option \'Select content\' will be available when adding an external tool.';
 $string['course_tool_types'] = 'Course tools';
+// START UCLA MOD: CCLE-6955 - LTI Apps in Course Menu Links.
+$string['courseapps'] = 'Course apps';
+$string['courseappselectionmessage'] = 'Select app(s) to launch from side navigation bar';
+// END UCLA MOD: CCLE-6955.
+// START UCLA MOD: CCLE-8402 - Add text indication no tools available.
+$string['courseappselectionmissingmessage'] = 'No apps are currently available. Contact your site administrator for more information.';
+// END UCLA MOD: CCLE-8402.
 $string['courseactivitiesorresources'] = 'Course activities or resources';
 $string['courseid'] = 'Course ID number';
 $string['courseinformation'] = 'Course information';
@@ -349,6 +356,16 @@ along with the consumer key from the tool provider.
 Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
 may not require a shared secret.';
 $string['pending'] = 'Pending';
+// START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+$string['placements'] = 'Placements';
+$string['placementactivityurl'] = 'Activity URL';
+$string['placementasassignment'] = 'As Assignment';
+$string['placementasmenulink'] = 'As Menu Link';
+$string['placementasrichtexteditorplugin'] = 'As Rich Text Editor Plugin';
+$string['placementassignmenturl'] = 'Assignment URL';
+$string['placementmenulinkurl'] = 'Menu Link URL';
+$string['placementrichtexteditorurl'] = 'Rich Text Editor URL';
+// END UCLA MOD: CCLE-6956.
 $string['pluginadministration'] = 'External tool administration';
 $string['pluginname'] = 'External tool';
 $string['preferheight'] = 'Preferred height';
@@ -423,6 +440,9 @@ may not require a resource key.';
 $string['resourceurl'] = 'Resource URL';
 $string['return_to_course'] = 'Click <a href="{$a->link}" target="_top">here</a> to return to the course.';
 $string['saveallfeedback'] = 'Save all my feedback';
+// START UCLA MOD: CCLE-8401 - Add text when tool is added to the course app menu.
+$string['changessaved'] = 'Course apps selections have been saved.';
+// END UCLA MOD: CCLE-8401.
 $string['search:activity'] = 'External tool - activity information';
 $string['secure_icon_url'] = 'Secure icon URL';
 $string['secure_icon_url_help'] = 'Similar to the icon URL, but used when the site is accessed securely through SSL. This field is to prevent the browser from displaying a warning about an insecure image.';
@@ -431,6 +451,9 @@ $string['secure_launch_url_help'] = 'Similar to the tool URL, but used instead o
 
 The tool URL may also be set to an https address to force launching through SSL, and this field may be left blank.';
 $string['selectcontent'] = 'Select content';
+// START UCLA MOD: CCLE-6955 - LTI Apps in Course Menu Links.
+$string['selectcourseapptitle'] = 'Select course apps';
+// END UCLA MOD: CCLE-6955.
 $string['send'] = 'Send';
 $string['services'] = 'Services';
 $string['services_help'] = 'Select those services which you wish to offer to the tool provider.  More than one service can be selected.';
@@ -510,6 +533,10 @@ $string['tooltypenotdeleted'] = 'Could not delete preconfigured tool';
 $string['tooltypeupdated'] = 'Preconfigured tool updated';
 $string['toolurl'] = 'Tool URL';
 $string['toolurlplaceholder'] = 'Tool URL...';
+// START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+$string['toolurl_contentitemselectionrequest'] = 'Content Selection URL';
+$string['toolurl_contentitemselectionrequest_help'] = 'The Content Selection URL will be used to launch the content selection page from the tool provider. If it is empty, the Tool URL will be used';
+// END UCLA MOD: CCLE-6956.
 $string['toolurl_help'] = 'The tool URL is used to match tool URLs to the correct tool configuration. Prefixing the URL with http(s) is optional.
 
 Additionally, the base URL is used as the tool URL if a tool URL is not specified in the external tool instance.

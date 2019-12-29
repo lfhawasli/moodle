@@ -96,7 +96,10 @@ define('LTI_VERSION_2', 'LTI-2p0');
  * @return array the endpoint URL and parameters (including the signature)
  * @since  Moodle 3.0
  */
-function lti_get_launch_data($instance) {
+// START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+//function lti_get_launch_data($instance) {
+function lti_get_launch_data($instance, $placement = 'activity') {
+// END UCLA MOD: CCLE-6956.
     global $PAGE, $CFG, $USER;
 
     if (empty($instance->typeid)) {
@@ -161,6 +164,14 @@ function lti_get_launch_data($instance) {
 
     $endpoint = !empty($instance->toolurl) ? $instance->toolurl : $typeconfig['toolurl'];
     $endpoint = trim($endpoint);
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    if ($placement !== 'activity') {
+        $desiredplacement = $placement . 'url';
+        if (!empty($instance->$desiredplacement)) {
+            $endpoint = $instance->$desiredplacement;
+        }
+    }
+    // END UCLA MOD: CCLE-6956.
 
     // If the current request is using SSL and a secure tool URL is specified, use it.
     if (lti_request_is_using_ssl() && !empty($instance->securetoolurl)) {
@@ -184,6 +195,11 @@ function lti_get_launch_data($instance) {
 
     $course = $PAGE->course;
     $islti2 = isset($tool->toolproxyid);
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    if (!property_exists($instance, 'course')) {
+        $instance->course = $course->id;
+    }
+    // END UCLA MOD: CCLE-6956.
     $allparams = lti_build_request($instance, $typeconfig, $course, $typeid, $islti2);
     if ($islti2) {
         $requestparams = lti_build_request_lti2($tool, $allparams);
@@ -284,9 +300,14 @@ function lti_get_launch_data($instance) {
  * @param  stdClass $instance the external tool activity settings
  * @return string The HTML code containing the javascript code for the launch
  */
-function lti_launch_tool($instance) {
-
-    list($endpoint, $parms) = lti_get_launch_data($instance);
+// START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+// Variable $placement is either 'activity', 'menulink', or 'richtexteditor'.
+//function lti_launch_tool($instance) {
+//
+//    list($endpoint, $parms) = lti_get_launch_data($instance);
+function lti_launch_tool($instance, $placement) {
+    list($endpoint, $parms) = lti_get_launch_data($instance, $placement);
+// END UCLA MOD: CCLE-6956.
     $debuglaunch = ( $instance->debuglaunch == 1 );
 
     $content = lti_post_launch_html($parms, $endpoint, $debuglaunch);
@@ -473,6 +494,13 @@ function lti_build_request($instance, $typeconfig, $course, $typeid = null, $isl
     ) {
         $requestparams['lis_person_contact_email_primary'] = $USER->email;
     }
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    if (property_exists($instance, 'custom')) {
+        foreach ($instance->custom as $key => $value) {
+            $requestparams['custom_' . $key] = $value;
+        }
+    }
+    // END UCLA MOD: CCLE-6956.
 
     return $requestparams;
 }
@@ -629,7 +657,10 @@ function lti_build_custom_parameters($toolproxy, $tool, $instance, $params, $cus
  */
 function lti_build_content_item_selection_request($id, $course, moodle_url $returnurl, $title = '', $text = '', $mediatypes = [],
                                                   $presentationtargets = [], $autocreate = false, $multiple = false,
-                                                  $unsigned = false, $canconfirm = false, $copyadvice = false) {
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+                                                  //$unsigned = false, $canconfirm = false, $copyadvice = false) {
+                                                    $unsigned = false, $canconfirm = false, $copyadvice = false, $placement = 'activity') {
+    // END UCLA MOD: CCLE-6956.
     global $USER;
 
     $tool = lti_get_type($id);
@@ -643,6 +674,11 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
     if (!is_array($presentationtargets)) {
         throw new coding_exception('The list of accepted presentation targets should be in an array');
     }
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    if (!in_array($placement, ['activity', 'assignment', 'menulink', 'richtexteditor'])) {
+        throw new Moodle_Exception("Invalid placement type: $placement");
+    }
+    // END UCLA MOD: CCLE-6956.
 
     // Check title. If empty, use the tool's name.
     if (empty($title)) {
@@ -678,10 +714,29 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
     }
 
     // Set the tool URL.
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    $placementurlkey = $placement . 'url';
+    // END UCLA MOD: CCLE-6956.
     if (!empty($typeconfig['toolurl_ContentItemSelectionRequest'])) {
-        $toolurl = new moodle_url($typeconfig['toolurl_ContentItemSelectionRequest']);
+        // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+        //$toolurl = new moodle_url($typeconfig['toolurl_ContentItemSelectionRequest']);
+        // Check tool overrides.
+        if (!empty($typeconfig[$placementurlkey])) {
+            $toolurl = new moodle_url($typeconfig[$placement.'url']);
+        } else {
+            $toolurl = new moodle_url($typeconfig['toolurl_ContentItemSelectionRequest']);
+        }
+        // END UCLA MOD: CCLE-6956.
     } else {
-        $toolurl = new moodle_url($typeconfig['toolurl']);
+        // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+        //$toolurl = new moodle_url($typeconfig['toolurl']);
+        // Check tool overrides.
+        if (!empty($typeconfig[$placementurlkey])) {
+            $toolurl = new moodle_url($typeconfig[$placement.'url']);
+        } else {
+            $toolurl = new moodle_url($typeconfig['toolurl']);
+        }
+        // END UCLA MOD: CCLE-6956.
     }
 
     // Check if SSL is forced.
@@ -722,7 +777,14 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
 
     // Get standard request parameters and merge to the request parameters.
     $orgid = !empty($typeconfig['organizationid']) ? $typeconfig['organizationid'] : '';
-    $standardparams = lti_build_standard_request(null, $orgid, $islti2, 'ContentItemSelectionRequest');
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    //$standardparams = lti_build_standard_request(null, $orgid, $islti2, 'ContentItemSelectionRequest');
+    $requesttype = 'ContentItemSelectionRequest';
+    if (!$typeconfig['contentitem']) {
+        $requesttype = 'basic-lti-launch-request';
+    }
+    $standardparams = lti_build_standard_request(null, $orgid, $islti2, $requesttype);
+    // END UCLA MOD: CCLE-6956.
     $requestparams = array_merge($requestparams, $standardparams);
 
     // Get custom request parameters and merge to the request parameters.
@@ -757,6 +819,9 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
             'frame',
             'iframe',
             'window',
+            // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+            'embed',
+            // END UCLA MOD: CCLE-6956.
         ];
     }
     $requestparams['accept_presentation_document_targets'] = implode(',', $presentationtargets);
@@ -1838,6 +1903,15 @@ function lti_get_type_type_config($id) {
 
     $type->lti_secureicon = $basicltitype->secureicon;
 
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    $type->lti_asassignment = $basicltitype->asassignment;
+    $type->lti_asmenulink = $basicltitype->asmenulink;
+    $type->lti_asrichtexteditorplugin = $basicltitype->asrichtexteditorplugin;
+    $type->lti_assignmenturl = $basicltitype->assignmenturl;
+    $type->lti_menulinkurl = $basicltitype->menulinkurl;
+    $type->lti_richtexteditorurl = $basicltitype->richtexteditorurl;
+    // END UCLA MOD: CCLE-6956.
+
     if (isset($config['resourcekey'])) {
         $type->lti_resourcekey = $config['resourcekey'];
     }
@@ -1924,6 +1998,11 @@ function lti_get_type_type_config($id) {
         }
     }
 
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    if (isset($config['toolurl_ContentItemSelectionRequest'])) {
+        $type->lti_toolurl_ContentItemSelectionRequest = $config['toolurl_ContentItemSelectionRequest'];
+    }
+    // END UCLA MOD: CCLE-6956.
     return $type;
 }
 
@@ -1963,6 +2042,53 @@ function lti_prepare_type_for_save($type, $config) {
         }
         $config->lti_toolurl_ContentItemSelectionRequest = $type->toolurl_ContentItemSelectionRequest;
     }
+
+    // START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+    $type->asassignment = false;
+    $type->asmenulink = false;
+    $type->asrichtexteditorplugin = false;
+
+    if (isset($config->lti_asassignment)) {
+        $type->asassignment = $config->lti_asassignment;
+    }
+    if (isset($config->lti_asmenulink)) {
+        $type->asmenulink = $config->lti_asmenulink;
+    }
+    if (isset($config->lti_asrichtexteditorplugin)) {
+        $type->asrichtexteditorplugin = $config->lti_asrichtexteditorplugin;
+    }
+
+    $type->assignmenturl = $config->lti_assignmenturl;
+    $type->menulinkurl = $config->lti_menulinkurl;
+    $type->richtexteditorurl = $config->lti_richtexteditorurl;
+
+    if (isset($config->lti_toolurl_ContentItemSelectionRequest)) {
+        if (!empty($config->lti_toolurl_ContentItemSelectionRequest)) {
+            $type->toolurl_ContentItemSelectionRequest = $config->lti_toolurl_ContentItemSelectionRequest;
+        } else {
+            $type->toolurl_ContentItemSelectionRequest = '';
+        }
+        $config->lti_toolurl_ContentItemSelectionRequest = $type->toolurl_ContentItemSelectionRequest;
+    }
+
+    $type->asassignment = false;
+    $type->asmenulink = false;
+    $type->asrichtexteditorplugin = false;
+
+    if (isset($config->lti_asassignment)) {
+        $type->asassignment = $config->lti_asassignment;
+    }
+    if (isset($config->lti_asmenulink)) {
+        $type->asmenulink = $config->lti_asmenulink;
+    }
+    if (isset($config->lti_asrichtexteditorplugin)) {
+        $type->asrichtexteditorplugin = $config->lti_asrichtexteditorplugin;
+    }
+
+    $type->assignmenturl = $config->lti_assignmenturl;
+    $type->menulinkurl = $config->lti_menulinkurl;
+    $type->richtexteditorurl = $config->lti_richtexteditorurl;
+    // END UCLA MOD: CCLE-6956.
 
     $type->timemodified = time();
 
@@ -2016,6 +2142,95 @@ function lti_update_type($type, $config) {
         }
     }
 }
+
+// START UCLA MOD: CCLE-6956 - LTI Apps in Rich Text Editor.
+/**
+ * Get all types that can be placed in a specific placement.
+ * 
+ * @param string $placementname Either'assignment', 'activity', 'menulink', or
+ * 'richtexteditorplugin'
+ * 
+ * @return array array of tools
+ */
+function lti_load_type_by_placement (string $placementname) {
+    global $DB;
+
+    $queryfield = [
+        'assignment' => 'asassignment',
+        'activity' => 'asactivity',
+        'menulink' => 'asmenulink',
+        'richtexteditorplugin' => 'asrichtexteditorplugin',
+    ][$placementname];
+
+    return $DB->get_records('lti_types', [$queryfield => 1], 'name');
+}
+// END UCLA MOD: CCLE-6956.
+
+// START UCLA MOD: CCLE-6955 - LTI Apps in Course Menu Links
+/**
+ * Returns LTI tools that can be placed in the course menu.
+ *
+ * @param int $courseid
+ * @param boolean $activeonly
+ * @return array
+ */
+function lti_load_course_menu_links(int $courseid, $activeonly=false) {
+    global $DB;
+
+    $join = '';
+    if (!$activeonly) {
+        $join = ' LEFT ';
+    }
+    $records = $DB->get_recordset_sql(
+        "SELECT l.id,
+                l.name,
+                l.description,
+                lc.course
+           FROM {lti_types} AS l
+     $join JOIN {lti_course_menu_placements} AS lc ON (lc.typeid=l.id AND lc.course=?)
+          WHERE l.asmenulink=1
+       ORDER BY l.name", [$courseid]
+    );
+
+    $types = [];
+    foreach ($records as $record) {
+        $type = new stdClass();
+        $type->id = $record->id;
+        $type->name = $record->name;
+        $type->description = trim($record->description);
+        $type->selected = $record->course != null;
+        $types[] = $type;
+    }
+    return $types;
+}
+
+/**
+ * For given course, set course menu links.
+ *
+ * @param int $courseid
+ * @param array $menulinks
+ */
+function lti_set_course_menu_links(int $courseid, array $menulinks) {
+    global $DB;
+    $transaction = $DB->start_delegated_transaction();
+    try {
+        $DB->delete_records('lti_course_menu_placements', ['course' => $courseid]);
+        foreach ($menulinks as $key => $_) {
+            $pieces = explode('-', $key);
+            if ($pieces[0] !== 'include') {
+                continue;
+            }
+            $DB->insert_record('lti_course_menu_placements', (object)[
+                'typeid' => $pieces[1],
+                'course' => $courseid,
+            ]);
+        }
+        $transaction->allow_commit();
+    } catch (Exception $e) {
+        $transaction->rollback($e);
+    }
+}
+// END UCLA MOD: CCLE-6955.
 
 function lti_add_type($type, $config) {
     global $USER, $SITE, $DB;
