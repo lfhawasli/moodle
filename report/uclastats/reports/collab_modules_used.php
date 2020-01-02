@@ -40,7 +40,8 @@ class collab_modules_used extends uclastats_base {
                 LEFT JOIN {ucla_siteindicator} AS si ON (c.id = si.courseid)
                 LEFT JOIN {ucla_request_classes} AS urc ON (c.id=urc.courseid)
                 WHERE   urc.id IS NULL AND
-                        si.type!='test'
+                        si.type!='test' AND 
+                        cm.deletioninprogress=0
                 GROUP BY m.id
                 ORDER BY m.name";
         $results = $DB->get_records_sql($sql, $params);
@@ -58,7 +59,8 @@ class collab_modules_used extends uclastats_base {
                  WHERE urc.id IS NULL 
                    AND si.type!='test'
                    AND ptc.name='use_turnitin' 
-                   AND ptc.value=1";
+                   AND ptc.value=1
+                   AND cm.deletioninprogress=0";
         $assignturnitin = $DB->get_field_sql($sql, $params);
 
         // Add in Turnitin plagiarism.

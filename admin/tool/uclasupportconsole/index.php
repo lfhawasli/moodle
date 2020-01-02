@@ -1276,7 +1276,7 @@ foreach ($qs as $query) {
                     break;
                 default:
                     $input_html .= get_string('unknownstoredprocparam',
-                        'tool_uclasupportconsole');
+                            'tool_uclasupportconsole');
                     break;
             }
         }
@@ -1748,6 +1748,7 @@ if ($displayforms) {
     // add filter for term/subject area, because this table can get very big
     // and the query get return a ton of data
     $input_html = get_term_selector($title);
+    $input_html .= get_division_selector($title);
     $input_html .= get_subject_area_selector($title);        
     
     $sectionhtml = supportconsole_simple_form($title, $input_html);
@@ -1757,7 +1758,8 @@ if ($displayforms) {
     $term = optional_param('term', null, PARAM_ALPHANUM);
     if (!ucla_validator('term', $term)) {
         $term = null;
-    }    
+    }
+    $division = optional_param('division', null, PARAM_NOTAGS);
     $subjarea = optional_param('subjarea', null, PARAM_NOTAGS);
     
     // Mapping of [course shortname, module name] => count of 
@@ -1780,12 +1782,21 @@ if ($displayforms) {
             JOIN    {course_modules} cm ON c.id = cm.course
             JOIN    {modules} m ON cm.module = m.id";
     
-    // Handle term/subject area filter.
+    // Handle term/division/subject area filter.
     $where = '';
-    if (!empty($term) || !empty($subjarea)) {
-        $where .= " JOIN  {ucla_request_classes} urc ON (urc.courseid=c.id AND urc.hostcourse=1)";
+    if (!empty($term) || !empty($division) || !empty($subjarea)) {
+        $where .= " JOIN {ucla_request_classes} urc ON (urc.courseid=c.id AND urc.hostcourse=1)";
     }
-    if (!empty($term) && !empty($subjarea)) {
+    if (!empty($division)) {
+        $where .= " JOIN {ucla_reg_classinfo} urci ON (urc.term=urci.term AND urc.srs=urci.srs)
+                    JOIN {ucla_reg_division} urd ON (urd.code=urci.division)";
+    }
+    if (!empty($term) && !empty($division)) {
+        $where .= " WHERE urc.term=:term AND
+                        urd.code=:division";
+        $params['term'] = $term;
+        $params['division'] = $division;
+    } else if (!empty($term) && !empty($subjarea)) {
         $where .= " WHERE urc.term=:term AND
                         urc.department=:subjarea";
         $params['term'] = $term;
@@ -1793,12 +1804,16 @@ if ($displayforms) {
     } else if (!empty($term)) {
         $where .= " WHERE urc.term=:term";
         $params['term'] = $term;    
-    } else if (!empty($subjarea)) {
+    } else if (!empty($division)) {
+        $where .= " WHERE urd.code=:division";
+        $params['division'] = $division;
+    }  else if (!empty($subjarea)) {
         $where .= " WHERE urc.department=:subjarea";
         $params['subjarea'] = $subjarea;    
-    }    
-    
-    $sql .= $where . " GROUP BY c.id, m.id
+    }
+    $where .= " AND cm.deletioninprogress=0 ";
+
+    $sql .= $where . "GROUP BY c.id, m.id
              ORDER BY c.shortname";
 
     $results = $DB->get_records_sql($sql, $params);
@@ -1810,7 +1825,9 @@ if ($displayforms) {
             JOIN   {course_modules} cm ON c.id = cm.course
             JOIN   {plagiarism_turnitin_config} ptc ON (ptc.cm=cm.id)";
     $sql .= $where;
-    $sql .= " AND ptc.name='use_turnitin' AND ptc.value=1";
+    $sql .= " AND ptc.name='use_turnitin' 
+              AND ptc.value=1
+         GROUP BY c.id";
     $assignturnitin = $DB->get_records_sql_menu($sql, $params);
 
     $courseshortnames = array();
@@ -1906,6 +1923,7 @@ if ($displayforms) {
     // Add filter for term/subject area, because this table can get very big
     // and the query get return a ton of data.
     $input_html = get_term_selector($title);
+    $input_html .= get_division_selector($title);
     $input_html .= get_subject_area_selector($title);
 
     $sectionhtml = supportconsole_simple_form($title, $input_html);
@@ -1916,6 +1934,7 @@ if ($displayforms) {
     if (!ucla_validator('term', $term)) {
         $term = null;
     }
+    $division = optional_param('division', null, PARAM_NOTAGS);
     $subjarea = optional_param('subjarea', null, PARAM_NOTAGS);
 
     // Mapping of [course shortname, module name] => count of
@@ -1941,16 +1960,25 @@ if ($displayforms) {
             JOIN    {course_modules} cm ON tasite.id = cm.course
             JOIN    {modules} m ON cm.module = m.id";
 
-    // Handle term/subject area filter on parent course for TA site.
+    // Handle term/division/subject area filter on parent course for TA site.
     $where = '';
-    if (!empty($term) || !empty($subjarea)) {
+    if (!empty($term) || !empty($division) || !empty($subjarea)) {
         // Need to join on meta enrollment plugin specific for TA sites.
         $where .= " JOIN {enrol} metaenrol ON
                 (metaenrol.enrol='meta' AND metaenrol.courseid=tasite.id)";
         $where .= " JOIN {course} parentsite ON (metaenrol.customint1=parentsite.id)";
         $where .= " JOIN  {ucla_request_classes} urc ON (urc.courseid=parentsite.id AND urc.hostcourse=1)";
     }
-    if (!empty($term) && !empty($subjarea)) {
+    if (!empty($division)) {
+        $where .= " JOIN {ucla_reg_classinfo} urci ON (urc.term=urci.term AND urc.srs=urci.srs)
+                    JOIN {ucla_reg_division} urd ON (urd.code=urci.division)";
+    }
+    if (!empty($term) && !empty($division)) {
+        $where .= " WHERE urc.term=:term AND
+                        urd.code=:division";
+        $params['term'] = $term;
+        $params['division'] = $division;
+    } else if (!empty($term) && !empty($subjarea)) {
         $where .= " WHERE urc.term=:term AND
                         urc.department=:subjarea";
         $params['term'] = $term;
@@ -1958,13 +1986,17 @@ if ($displayforms) {
     } else if (!empty($term)) {
         $where .= " WHERE urc.term=:term";
         $params['term'] = $term;
+    } else if (!empty($division)) {
+        $where .= " WHERE urd.code=:division";
+        $params['division'] = $division;
     } else if (!empty($subjarea)) {
         $where .= " WHERE urc.department=:subjarea";
         $params['subjarea'] = $subjarea;
     }
+    $where .= " AND cm.deletioninprogress=0 ";
 
-    $sql .= $where . " GROUP BY tasite.id, m.id
-             ORDER BY tasite.shortname";
+    $sql .= $where . "GROUP BY tasite.id, m.id
+            ORDER BY tasite.shortname";
 
     $results = $DB->get_records_sql($sql, $params);
 
@@ -1977,7 +2009,9 @@ if ($displayforms) {
             JOIN   {course_modules} cm ON tasite.id = cm.course
             JOIN   {plagiarism_turnitin_config} ptc ON (ptc.cm=cm.id)";
     $sql .= $where;
-    $sql .= " AND ptc.name='use_turnitin' AND ptc.value=1";
+    $sql .= " AND ptc.name='use_turnitin' 
+              AND ptc.value=1
+         GROUP BY tasite.id";
     $assignturnitin = $DB->get_records_sql_menu($sql, $params);
 
     $courseshortnames = array();
