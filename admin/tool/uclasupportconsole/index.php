@@ -1780,30 +1780,40 @@ if ($displayforms) {
             JOIN    {course_modules} cm ON c.id = cm.course
             JOIN    {modules} m ON cm.module = m.id";
     
-    // handle term/subject area filter
+    // Handle term/subject area filter.
+    $where = '';
     if (!empty($term) || !empty($subjarea)) {
-        $sql .= " JOIN  {ucla_request_classes} urc ON (urc.courseid=c.id)";
-    }        
+        $where .= " JOIN  {ucla_request_classes} urc ON (urc.courseid=c.id AND urc.hostcourse=1)";
+    }
     if (!empty($term) && !empty($subjarea)) {
-        $sql .= " WHERE urc.term=:term AND
+        $where .= " WHERE urc.term=:term AND
                         urc.department=:subjarea";
         $params['term'] = $term;
         $params['subjarea'] = $subjarea;        
     } else if (!empty($term)) {
-        $sql .= " WHERE urc.term=:term";
+        $where .= " WHERE urc.term=:term";
         $params['term'] = $term;    
     } else if (!empty($subjarea)) {
-        $sql .= " WHERE urc.department=:subjarea";
+        $where .= " WHERE urc.department=:subjarea";
         $params['subjarea'] = $subjarea;    
     }    
     
-    $sql .= " GROUP BY c.id, m.id
+    $sql .= $where . " GROUP BY c.id, m.id
              ORDER BY c.shortname";
-    
-    $results = $DB->get_records_sql($sql, $params);
-    
-    $courseshortnames = array();
 
+    $results = $DB->get_records_sql($sql, $params);
+
+    // Find how many assignments are using TurnItIn.
+    $sql = "SELECT cm.course AS courseid,
+                   count(ptc.id) AS cnt
+            FROM   {course} c
+            JOIN   {course_modules} cm ON c.id = cm.course
+            JOIN   {plagiarism_turnitin_config} ptc ON (ptc.cm=cm.id)";
+    $sql .= $where;
+    $sql .= " AND ptc.name='use_turnitin' AND ptc.value=1";
+    $assignturnitin = $DB->get_records_sql_menu($sql, $params);
+
+    $courseshortnames = array();
     foreach ($results as $result) {
         $sn = $result->courseid;
         $mn = $result->modulename;
@@ -1811,6 +1821,20 @@ if ($displayforms) {
 
         if (!isset($courseindivmodulecounts[$sn][$mn])) {
             $courseindivmodulecounts[$sn][$mn] = 0;
+        }
+
+        // See if any assignments should be counted as assign-turnitin.
+        if ($mn == 'assign') {
+            if (isset($assignturnitin[$sn])) {
+                // Found TurnItIn plagiarism.
+                $courseindivmodulecounts[$sn]['assign-turnitin'] = $assignturnitin[$sn];
+                // Decrement regular assignment and if now 0, skip it.
+                $result->cnt -= $assignturnitin[$sn];
+                if (empty( $result->cnt) && empty($courseindivmodulecounts[$sn][$mn])) {
+                    unset($courseindivmodulecounts[$sn][$mn]);
+                    continue;
+                }
+            }
         }
 
         $courseindivmodulecounts[$sn][$mn] += $result->cnt;
@@ -1862,7 +1886,7 @@ if ($displayforms) {
         foreach ($courses as $module => & $count) {
             // If course does not have the module, make its count = 0.
             if ($module != 'course' && !is_numeric($count)) {
-                $count = NULL;
+                $count = 0;
             }   
         }    
     }
@@ -1918,33 +1942,45 @@ if ($displayforms) {
             JOIN    {modules} m ON cm.module = m.id";
 
     // Handle term/subject area filter on parent course for TA site.
+    $where = '';
     if (!empty($term) || !empty($subjarea)) {
         // Need to join on meta enrollment plugin specific for TA sites.
-        $sql .= " JOIN {enrol} metaenrol ON
+        $where .= " JOIN {enrol} metaenrol ON
                 (metaenrol.enrol='meta' AND metaenrol.courseid=tasite.id)";
-        $sql .= " JOIN {course} parentsite ON (metaenrol.customint1=parentsite.id)";
-        $sql .= " JOIN  {ucla_request_classes} urc ON (urc.courseid=parentsite.id)";
+        $where .= " JOIN {course} parentsite ON (metaenrol.customint1=parentsite.id)";
+        $where .= " JOIN  {ucla_request_classes} urc ON (urc.courseid=parentsite.id AND urc.hostcourse=1)";
     }
     if (!empty($term) && !empty($subjarea)) {
-        $sql .= " WHERE urc.term=:term AND
+        $where .= " WHERE urc.term=:term AND
                         urc.department=:subjarea";
         $params['term'] = $term;
         $params['subjarea'] = $subjarea;
     } else if (!empty($term)) {
-        $sql .= " WHERE urc.term=:term";
+        $where .= " WHERE urc.term=:term";
         $params['term'] = $term;
     } else if (!empty($subjarea)) {
-        $sql .= " WHERE urc.department=:subjarea";
+        $where .= " WHERE urc.department=:subjarea";
         $params['subjarea'] = $subjarea;
     }
 
-    $sql .= " GROUP BY tasite.id, m.id
+    $sql .= $where . " GROUP BY tasite.id, m.id
              ORDER BY tasite.shortname";
 
     $results = $DB->get_records_sql($sql, $params);
 
-    $courseshortnames = array();
+    // Find how many assignments are using TurnItIn.
+    $sql = "SELECT cm.course AS courseid,
+                   count(ptc.id) AS cnt
+            FROM   {course} tasite
+            JOIN    {ucla_siteindicator} si ON 
+                    (si.courseid=tasite.id AND si.type='tasite')
+            JOIN   {course_modules} cm ON tasite.id = cm.course
+            JOIN   {plagiarism_turnitin_config} ptc ON (ptc.cm=cm.id)";
+    $sql .= $where;
+    $sql .= " AND ptc.name='use_turnitin' AND ptc.value=1";
+    $assignturnitin = $DB->get_records_sql_menu($sql, $params);
 
+    $courseshortnames = array();
     foreach ($results as $result) {
         $sn = $result->courseid;
         $mn = $result->modulename;
@@ -1952,6 +1988,20 @@ if ($displayforms) {
 
         if (!isset($courseindivmodulecounts[$sn][$mn])) {
             $courseindivmodulecounts[$sn][$mn] = 0;
+        }
+
+        // See if any assignments should be counted as assign-turnitin.
+        if ($mn == 'assign') {
+            if (isset($assignturnitin[$sn])) {
+                // Found TurnItIn plagiarism.
+                $courseindivmodulecounts[$sn]['assign-turnitin'] = $assignturnitin[$sn];
+                // Decrement regular assignment and if now 0, skip it.
+                $result->cnt -= $assignturnitin[$sn];
+                if (empty( $result->cnt) && empty($courseindivmodulecounts[$sn][$mn])) {
+                    unset($courseindivmodulecounts[$sn][$mn]);
+                    continue;
+                }
+            }
         }
 
         $courseindivmodulecounts[$sn][$mn] += $result->cnt;
@@ -2003,7 +2053,7 @@ if ($displayforms) {
         foreach ($courses as $module => & $count) {
             // If course does not have the module, make its count = 0.
             if ($module != 'TA site' && !is_numeric($count)) {
-                $count = NULL;
+                $count = 0;
             }
         }
     }

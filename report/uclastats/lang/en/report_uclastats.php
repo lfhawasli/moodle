@@ -91,6 +91,7 @@ $string['course_modules_used'] = 'Total Activity/Resource modules by type (cours
 $string['course_modules_used_help'] = 'Returns name and number of course modules used by courses sites for a given term.';
 $string['module'] = 'Activity/Resource module';
 $string['count'] = 'Count';
+$string['assignturnitin'] = 'Assignment (Turnitin plagiarism)';
 
 // Strings for collab_modules_used.
 $string['collab_modules_used'] = 'Total Activity/Resource modules by type (collab)';
