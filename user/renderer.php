@@ -134,6 +134,11 @@ class core_user_renderer extends plugin_renderer_base {
             $roles += get_assignable_roles($context, ROLENAME_ALIAS);
         }
 
+        // START UCLA MOD: CLLE-8755 - Filter Participants roles.
+        $assignedroleids = $DB->get_fieldset_select('role_assignments', 'DISTINCT roleid', 'contextid = ?', array('contextid' => $context->id));
+        $roles = array_intersect_key($roles, array_flip($assignedroleids));
+        //END UCLA MOD: CCLE-8755 - Filter Participants roles.
+
         $criteria = get_string('role');
         $roleoptions = [];
         foreach ($roles as $id => $role) {
