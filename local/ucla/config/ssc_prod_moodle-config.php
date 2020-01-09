@@ -443,7 +443,6 @@ $CFG->legacyfilesinnewcourses = 1;  // enable new course to enable legacy course
 
 // Site administration > Plugins > Text editors > Atto HTML editor > Atto toolbar settings
 $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
-    collapse = collapse
     undo = undo
     other = htmlplus, fullscreen
     links = link
@@ -451,6 +450,7 @@ $CFG->forced_plugin_settings['editor_atto']['toolbar'] = '
     style1 = fontfamily, title, bold, italic, underline, backcolor, fontcolor
     insert1 = charmap, count
     files1 = image, managefiles, kalturamedia
+    collapse = collapse
     list = unorderedlist, orderedlist
     indent = indent
     align = align, table, bsgrid

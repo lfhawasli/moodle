@@ -30,7 +30,10 @@ defined('MOODLE_INTERNAL') || die();
 function atto_collapse_strings_for_js() {
     global $PAGE;
 
-    $PAGE->requires->strings_for_js(array('showmore', 'showfewer'), 'atto_collapse');
+    // START UCLA MOD: CCLE-9001 - Improve UI of "More" button in Atto.
+    //$PAGE->requires->strings_for_js(array('showmore', 'showfewer'), 'atto_collapse');
+    $PAGE->requires->strings_for_js(array('showmore', 'showfewer', 'buttontext_less', 'buttontext_more'), 'atto_collapse');
+    // END UCLA MOD: CCLE-9001.
 }
 
 /**
@@ -48,6 +51,9 @@ function atto_collapse_params_for_js($elementid, $options, $fpoptions) {
  */
 function atto_collapse_get_fontawesome_icon_map() {
     return [
-        'atto_collapse:icon' => 'fa-level-down'
+        // START UCLA MOD: CCLE-9001 - Improve UI of "More" button in Atto.
+        //'atto_collapse:icon' => 'fa-level-down'
+        'atto_collapse:icon' => 'fa-caret-right',
+        // END UCLA MOD: CCLE-9001.
     ];
 }
