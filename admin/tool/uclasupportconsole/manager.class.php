@@ -106,9 +106,7 @@ class tool_supportconsole_manager {
                         ));
 
                 // Add anchor tag to name attribute
-                $boxattrs = array('name'=>'#'.$titleid);
-                // $innercontent .= $OUTPUT->box($sectioncontent,
-                //     'generalbox supportconsole', $titleid);
+                $boxattrs = array('name' => '#'.$titleid);
                 $innercontent .= $OUTPUT->box($sectioncontent, 
                     'generalbox supportconsole', $titleid, $boxattrs);
 

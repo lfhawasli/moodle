@@ -182,6 +182,77 @@ class past_course_access_test extends advanced_testcase {
     }
 
     /**
+     * Make sure that summer gets weeks_changed trigger set.
+     *
+     * See CCLE-9000 - Week changed event not being triggered during summer sesssions.
+     */
+    public function test_summer_hiding() {
+        global $DB;
+
+        // Make sure config setting is set.
+        set_config('student_access_ends_week', 3, 'local_ucla');
+
+        $terms = array(
+            '131' => array(
+                array(
+                    'term' => '131',
+                    'session' => '1A',
+                    'session_start' => '2013-06-24',
+                    'session_end' => '2013-08-30',
+                    'instruction_start' => '2013-06-24',
+                    'term_start' => '2013-06-24',
+                    'term_end' => '2013-09-13',
+                ),
+                array(
+                    'term' => '131',
+                    'session' => '6A',
+                    'session_start' => '2013-06-24',
+                    'session_end' => '2013-08-02',
+                    'instruction_start' => '2013-06-24',
+                    'term_start' => '2013-06-24',
+                    'term_end' => '2013-09-13',
+                ),
+                array(
+                    'term' => '131',
+                    'session' => '6C',
+                    'session_start' => '2013-08-05',
+                    'session_end' => '2013-09-13',
+                    'instruction_start' => '2013-08-05',
+                    'term_start' => '2013-06-24',
+                    'term_end' => '2013-09-13',
+                ),
+                array(
+                    'term' => '131',
+                    'session' => '8A',
+                    'session_start' => '2013-06-24',
+                    'session_end' => '2013-08-16',
+                    'instruction_start' => '2013-06-24',
+                    'term_start' => '2013-06-24',
+                    'term_end' => '2013-09-13',
+                ),
+            ),
+        );
+
+        // Set to Summer week 3.
+        $summer = \block_ucla_weeksdisplay_session::create($terms['131']);
+        $today = new DateTime('2013-07-08');
+        $summer->set_today($today);
+
+        // Week changes event would trigger, calling hide_past_courses().
+        $summer->update_week_display();
+        $email = $this->getDebuggingMessages();
+        $this->assertContains('Hid 3 courses', $email[0]->message);
+        $this->assertDebuggingCalled();
+
+        $courses = ucla_get_courses_by_terms('131');
+        foreach ($courses as $courseid => $course) {
+            $ishidden = $DB->record_exists('course',
+                    array('id' => $courseid, 'visible' => 0));
+            $this->assertTrue($ishidden);
+        }
+    }
+
+    /**
      * Make sure that TA sites are hidden as well as course sites.
      */
     public function test_ta_site_hiding() {

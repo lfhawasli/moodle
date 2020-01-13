@@ -155,16 +155,30 @@ class block_ucla_weeksdisplay_summer_session extends block_ucla_weeksdisplay_ses
             }
         }
 
+        $oldweek = get_config('local_ucla', 'current_week');
+
         // CCLE-2307: "if weeks overlap, like in summer, choose highest number":
         // use session A until it is over.
+        $currentwk = null;
         if ($currentweek['A'] != \block_ucla_weeksdisplay_session::WEEK_ERR
                 && $currentweek['A'] != \block_ucla_weeksdisplay_session::WEEK_BETWEEN_SESSION) {
-            set_config('current_week', $currentweek['A'], 'local_ucla');
+            $currentwk = $currentweek['A'];
+            
         } else {
-            set_config('current_week', $currentweek['C'], 'local_ucla');
+            $currentwk = $currentweek['C'];
         }
-        set_config('current_week_summera', $currentweek['A'], 'local_ucla');
-        set_config('current_week_summerc', $currentweek['C'], 'local_ucla');
+
+        // If week changed, trigger event.
+        if ($oldweek != $currentwk) {
+            set_config('current_week', $currentwk, 'local_ucla');
+            set_config('current_week_summera', $currentweek['A'], 'local_ucla');
+            set_config('current_week_summerc', $currentweek['C'], 'local_ucla');
+            $event = block_ucla_weeksdisplay\event\week_changed::create(
+                    array (
+                        'other' => array('week' => $currentwk)
+                        ));
+            $event->trigger();
+        }
     }
 
     /**

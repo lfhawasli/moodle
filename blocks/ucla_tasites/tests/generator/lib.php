@@ -102,10 +102,9 @@ class block_ucla_tasites_generator extends testing_block_generator {
         $this->ucladatagen = $this->datagenerator->get_plugin_generator('local_ucla');
 
         // Create UCLA TA and TA admin roles.
-        $this->ucladatagen->create_ucla_roles(array('ta', 'ta_admin'));
-        $this->taadminid = $DB->get_field('role', 'id',
-                array('shortname' => 'ta_admin'));
-        $this->taid = $DB->get_field('role', 'id', array('shortname' => 'ta'));
+        $roles = $this->ucladatagen->create_ucla_roles(array('ta', 'ta_admin'));
+        $this->taadminid = $roles['ta_admin'];
+        $this->taid = $roles['ta'];
 
         // To enable meta enrollment plugin we are just going to enable
         // everything.

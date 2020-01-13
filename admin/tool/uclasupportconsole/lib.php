@@ -86,6 +86,39 @@ function get_browseby_link($type, $params) {
 }
 
 /**
+ * Either creates or returns a division selector dropdown.
+ *
+ * @param string $id                Id to use for label.
+ * @param string $selecteddivision  Default division selected.
+ * @param string $paramname         Default is 'division'.
+ *
+ * @return string           Returns HTML to render division dropdown.
+ */
+function get_division_selector($id, $selecteddivision = null, $paramname = 'division') {
+    global $DB;
+    static $_divisionselectordivs;  // To store cached copy of db record.
+    $retval = '';
+    $divisionstring = get_string('choose_division', 'tool_uclasupportconsole');
+
+    if (!isset($_divisionselectordivs)) {
+        $_divisionselectordivs = $DB->get_records_menu('ucla_reg_division',
+                null, 'fullname', 'code, fullname');
+    }
+
+    if (empty($_divisionselectordivs)) {
+        return '';
+    }
+
+    $retval .= html_writer::label(get_string('division',
+            'tool_uclasupportconsole'), $id.'_division_selector');
+    $retval .= html_writer::select($_divisionselectordivs,
+            $paramname, $selecteddivision, $divisionstring,
+            array('id' => $id.'_division_selector'));
+
+    return $retval;
+}
+
+/**
  * Generates input field for generic text type.
  *
  * @param string $id
