@@ -266,6 +266,29 @@ function display_video_reserves($course) {
 }
 
 /**
+ * Returns true if course has any Kaltura media resources or Kaltura embedded content in labels.
+ *
+ * @param int $courseid
+ * @boolean
+ */
+function has_kaltura_media($courseid) {
+    global $DB;
+    $result = false;
+    // Check if there are any Kaltura media resources.
+    $modinfo = get_fast_modinfo($courseid);
+    if (!empty($modinfo->get_instances_of('kalvidres'))) {
+        $result = true;
+    } else {
+        // Check if there are any Labels with Kaltura embedded videos.
+        if ($DB->count_records_select('label', 'course=? AND intro LIKE "%tinymce-kalturamedia-embed%"',
+                [$courseid], $countitem="COUNT(id)")) {
+            $result = true;
+        }
+    }
+    return $result;
+}
+
+/**
  * Initializes all $PAGE variables.
  *
  * @param object $course
@@ -445,8 +468,7 @@ function print_media_page_tabs($activetab, $courseid) {
                                 array('courseid' => $courseid)),
                                     get_string('libraryreserves_tab', 'block_ucla_media', $count));
     }
-    $modinfo = get_fast_modinfo($courseid);
-    if (!empty($modinfo->get_instances_of('kalvidres'))) {
+    if (has_kaltura_media($courseid)) {
         $tabs[] = new tabobject(get_string('title','block_ucla_media'),
                     new moodle_url('/blocks/ucla_media/kalvidres.php',
                         array('courseid' => $courseid)),

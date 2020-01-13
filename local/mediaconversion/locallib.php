@@ -36,7 +36,6 @@ require_once(__DIR__.'/../kaltura/migrationlib.php');
 require_once(__DIR__.'/../../mod/kalvidres/lib.php');
 require_once(__DIR__.'/../kaltura/locallib.php');
 
-define('CATEGORY_PATH_END', 'InContext');
 // Video height and width.
 define('MC_KALTURA_HEIGHT', 402);
 define('MC_KALTURA_WIDTH', 608);
@@ -174,7 +173,7 @@ function local_cm_get_kaltura_category(\KalturaClient $client, $course, $basecat
     }
 
     $filter = new KalturaCategoryFilter();
-    $filter->fullNameEqual = $basecategorypath . '>' . $coursepath . '>' . CATEGORY_PATH_END;
+    $filter->fullNameEqual = $basecategorypath . '>' . $coursepath;
     try {
         $result = $client->category->listAction($filter, new KalturaFilterPager());
     } catch (Exception $ex) {
@@ -212,18 +211,6 @@ function local_cm_get_kaltura_category(\KalturaClient $client, $course, $basecat
             $category = $client->category->add($category);
         } catch (Exception $ex) {
             echo get_string('failedcoursecaterror', 'local_mediaconversion');
-            return null;
-        }
-
-        // Surprise! We have to make yet another category underneath the other one.
-        $leafcategory = new KalturaCategory();
-        $leafcategory->name = CATEGORY_PATH_END;
-        $leafcategory->parentId = $category->id;
-        // Now upload the leaf category.
-        try {
-            $category = $client->category->add($leafcategory);
-        } catch (Exception $ex) {
-            echo get_string('failedleafcaterror', 'local_mediaconversion');
             return null;
         }
 
