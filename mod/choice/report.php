@@ -273,15 +273,12 @@
     }
     // END UCLA MOD: CCLE-7191.
 
-   //now give links for downloading spreadsheets.
+   // Now give links for downloading spreadsheets.
     // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
-    // Only show download links if results are not being published or results
-    // are not anonymous.
-    //if (!empty($users) && has_capability('mod/choice:downloadresponses',$context)) {
-    $showlinks = $results->showresults == CHOICE_SHOWRESULTS_NOT
-            || ($results->showresults != CHOICE_SHOWRESULTS_NOT
-            && $results->publish != CHOICE_PUBLISH_ANONYMOUS);
-    if (!empty($users) && has_capability('mod/choice:downloadresponses', $context) && $showlinks) {
+    // Only show download links if results are not anonymous.
+    // if (!empty($users) && has_capability('mod/choice:downloadresponses',$context)) {
+    if (!empty($users) && has_capability('mod/choice:downloadresponses', $context)
+        && $results->publish != CHOICE_PUBLISH_ANONYMOUS) {
     // END UCLA MOD: CCLE-7191.
         $downloadoptions = array();
         $options = array();
