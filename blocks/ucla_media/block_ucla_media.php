@@ -91,11 +91,10 @@ class block_ucla_media extends block_base {
                                     array('courseid' => $courseid)));
                     $retval = $node;
                 } else {
-                    $modinfo = get_fast_modinfo($courseid);
-                    if (!empty($modinfo->get_instances_of('kalvidres'))) {
+                    if (has_kaltura_media($courseid)) {
                         $node = navigation_node::create(get_string('title',
                                 'block_ucla_media'), new moodle_url('/blocks/ucla_media/kalvidres.php',
-                                        array('courseid' => $courseid)));
+                                array('courseid' => $courseid)));
                         $retval = $node;
                     }
                 }

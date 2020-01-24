@@ -22,12 +22,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_mediasite';
-$plugin->version = 2019093000;
-$plugin->release = 'v7.0';
-$plugin->requires = 2016052308.00;
-$plugin->maturity = MATURITY_STABLE; // MATURITY_ALPHA, MATURITY_BETA, MATURITY_RC or MATURITY_STABLE.
-$plugin->cron = 0;
-$plugin->dependencies = array();
+// Show all information, defaults to INFO_ALL.
+// INFO_ENVIRONMENT	16	Environment Variable information that's also available in $_ENV.
+// INFO_VARIABLES	32	Shows all predefined variables from EGPCS (Environment, GET, POST, Cookie, Server).
+// START UCLA MOD: CCLE-8942 - Update Mediasite Content to 2019093000.
+// phpinfo(INFO_VARIABLES);
+// END UCLA MOD: CCLE-8942.

@@ -83,6 +83,7 @@ if ($data) {
     $site->set_lti_embed_type_embed($data->lti_embed_type_embed);
     $site->set_lti_embed_type_presentation_link($data->lti_embed_type_presentation_link);
     $site->set_lti_embed_type_player_only($data->lti_embed_type_player_only);
+    $site->set_custom_integration_callback($data->sitecustom_integration_callback);
 
     $lastchar = substr($site->get_endpoint(), -1);
     if (strcmp($lastchar, '/') === 0) {

@@ -498,9 +498,13 @@ function choice_user_submit_response($formanswer, $choice, $userid, $course, $cm
 /**
  * @param array $user
  * @param object $cm
+ * @param bool $candownload
  * @return void Output is echo'd
  */
-function choice_show_reportlink($user, $cm) {
+// START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
+// function choice_show_reportlink($user, $cm) {
+function choice_show_reportlink($user, $cm, $candownload = true) {
+// END UCLA MOD: CCLE-7191.
     $userschosen = array();
     foreach($user as $optionid => $userlist) {
         if ($optionid) {
@@ -510,7 +514,15 @@ function choice_show_reportlink($user, $cm) {
     $responsecount = count(array_unique($userschosen));
 
     echo '<div class="reportlink">';
-    echo "<a href=\"report.php?id=$cm->id\">".get_string("viewallresponses", "choice", $responsecount)."</a>";
+    // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
+    // echo "<a href=\"report.php?id=$cm->id\">".get_string("viewallresponses", "choice", $responsecount)."</a>";
+    if ($responsecount == 1) {
+        $text = $candownload ? "viewdownloadresponse" : "viewresponse";
+    } else {
+        $text = $candownload ? "viewdownloadresponses" : "viewallresponses";
+    }
+    echo "<a href=\"report.php?id=$cm->id\">".get_string($text, "choice", $responsecount)."</a>";
+    // END UCLA MOD: CCLE-7191.
     echo '</div>';
 }
 
@@ -885,7 +897,11 @@ function choice_extend_settings_navigation(settings_navigation $settings, naviga
             }
         }
         $responsecount = count(array_unique($allusers));
-        $choicenode->add(get_string("viewallresponses", "choice", $responsecount), new moodle_url('/mod/choice/report.php', array('id'=>$PAGE->cm->id)));
+        // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous
+        // $choicenode->add(get_string("viewallresponses", "choice", $responsecount), new moodle_url('/mod/choice/report.php', array('id'=>$PAGE->cm->id)));
+        $text = ($responsecount == 1) ? "viewdownloadresponse" : "viewdownloadresponses";
+        $choicenode->add(get_string($text, "choice", $responsecount), new moodle_url('/mod/choice/report.php', array('id'=>$PAGE->cm->id)));
+        // END UCLA MOD: CCLE-7191.
     }
 }
 

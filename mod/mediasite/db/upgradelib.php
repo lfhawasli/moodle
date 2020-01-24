@@ -520,6 +520,19 @@ function mediasite_upgrade_from_2017020100($oldversion, $dbman, $plugin) {
 
     // Conditionally launch add field assignment_submission_enabled.
     conditionally_add_field_to_table($coursetable, $coursefield, $dbman);
+
+    // Add field custom_mediasite_integration_callback.
+    $sitesfield =
+        new \xmldb_field('custom_mediasite_integration_callback', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0', null);
+    conditionally_add_field_to_table($sitestable, $sitesfield, $dbman);
+}
+
+function mediasite_upgrade_from_2018062201($oldversion, $dbman, $plugin) {
+    $sitestable = new \xmldb_table('mediasite_sites');
+    $sitesfield = new \xmldb_field('custom_integration_callback', XMLDB_TYPE_CHAR, '255', null, null, null, null);
+
+    // Conditionally launch add field custom_integration_callback.
+    conditionally_add_field_to_table($sitestable, $sitesfield, $dbman);
 }
 
 function conditionally_add_field_to_table($table, $field, $dbman) {
