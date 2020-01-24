@@ -96,11 +96,22 @@ class mod_choice_mod_form extends moodleform_mod {
         $mform->addHelpButton('showresults', 'publish', 'choice');
         // END UCLA MOD: CCLE-7836.
 
+        // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
+        // $mform->addElement('select', 'publish', get_string("privacy", "choice"), $CHOICE_PUBLISH);
+        // $mform->disabledIf('publish', 'showresults', 'eq', 0);
+
+        $choicepublishlimited = array();
+        $choicepublishlimited[0] = $CHOICE_PUBLISH[0];
+        $choicepublishlimited[1] = $CHOICE_PUBLISH[1];
+
         $mform->addElement('select', 'publish', get_string("privacy", "choice"), $CHOICE_PUBLISH);
-        $mform->disabledIf('publish', 'showresults', 'eq', 0);
-        // START UCLA MOD: CCLE-7836 - Change default for Choice => Results, Add Help.
+        $mform->addElement('select', 'publishlimited', get_string("privacy", "choice"), $choicepublishlimited);
+        $mform->hideIf('publish', 'showresults', 'eq', 0);
+        $mform->hideIf('publishlimited', 'showresults', 'neq', 0);
+
         $mform->addHelpButton('publish', 'privacy', 'choice');
-        // END UCLA MOD: CCLE-7836.
+        $mform->addHelpButton('publishlimited', 'privacy', 'choice');
+        // END UCLA MOD: CCLE-7191.
 
         $mform->addElement('selectyesno', 'showunanswered', get_string("showunanswered", "choice"));
 
@@ -147,6 +158,12 @@ class mod_choice_mod_form extends moodleform_mod {
                 $data->completionsubmit = 0;
             }
         }
+        // START UCLA MOD: CCLE-7191 - Choice: Anonymous not truly anonymous.
+        // Override $data->publish with $data->publishlimited when publishlimited is the array for the dropdown.
+        if ($data->showresults == CHOICE_SHOWRESULTS_NOT) {
+            $data->publish = $data->publishlimited;
+        }
+        // END UCLA MOD: CCLE-7191.
     }
 
     /**
