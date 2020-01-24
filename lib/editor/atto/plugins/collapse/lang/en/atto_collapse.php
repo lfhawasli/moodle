@@ -29,3 +29,7 @@ $string['settings'] = 'Collapse toolbar settings';
 $string['showgroups'] = 'Show first (n) groups when collapsed.';
 $string['showgroups_desc'] = 'When the toolbar is collapsed (it is by default) only this many groups will be displayed at once.';
 $string['privacy:metadata'] = 'The atto_collapse plugin does not store any personal data.';
+// START UCLA MOD: CCLE-9001 - Improve UI of "More" button in Atto.
+$string['buttontext_more'] = 'More';
+$string['buttontext_less'] = 'Less';
+// END UCLA MOD: CCLE-9001.
