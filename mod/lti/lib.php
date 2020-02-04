@@ -47,9 +47,6 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
-// START UCLA MOD: CCLE-6955 - LTI Apps in Course Menu Links.
-require_once($CFG->dirroot.'/mod/lti/locallib.php');
-// END UCLA MOD: CCLE-6955.
 
 /**
  * List of features supported in URL module
@@ -702,7 +699,11 @@ function mod_lti_core_calendar_provide_event_action(calendar_event $event,
  * @param context_course $coursecontext
  */
 function mod_lti_extend_navigation_course(navigation_node $parentnode, stdClass $course, context_course $coursecontext) {
-    global $PAGE;
+    // START UCLA MOD: CCLE-6955 - LTI Apps in Course Menu Links.
+    // global $PAGE;
+    global $PAGE, $CFG;
+    require_once($CFG->dirroot.'/mod/lti/locallib.php');
+    // END UCLA MOD: CCLE-6955.
 
     if ($course->id == SITEID) {
         return;
