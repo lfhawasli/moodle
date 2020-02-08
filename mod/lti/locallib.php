@@ -1165,6 +1165,8 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
     // Get base request parameters.
     $instance = new stdClass();
     $instance->course = $course->id;
+    $instance->name = $tool->name;
+    $instance->id = 'ltimenu-'.$id;
     $requestparams = lti_build_request($instance, $typeconfig, $course, $id, $islti2);
 
     // Get LTI2-specific request parameters and merge to the request parameters if applicable.
@@ -2619,6 +2621,15 @@ function lti_get_type_type_config($id) {
 
     $type->lti_secureicon = $basicltitype->secureicon;
 
+    $type->lti_asmenulink = $basicltitype->asmenulink;
+
+    $ltimenulinks = $DB->get_records_select('lti_menu_links', 'typeid=?', [$id], null, 'id, label, url');
+
+    foreach ($ltimenulinks as $record) {
+        $type->lti_menulinklabel[] = $record->label;
+        $type->lti_menulinkurl[] = $record->url;
+    }
+
     if (isset($config['resourcekey'])) {
         $type->lti_resourcekey = $config['resourcekey'];
     }
@@ -2775,6 +2786,27 @@ function lti_prepare_type_for_save($type, $config) {
         $config->lti_toolurl_ContentItemSelectionRequest = $type->toolurl_ContentItemSelectionRequest;
     }
 
+    $type->asmenulink = false;
+    if (isset($config->lti_asmenulink)) {
+        $type->asmenulink = $config->lti_asmenulink;
+    }
+
+    $menulinkscount = isset($config->lti_menulinklabel) ? count($config->lti_menulinklabel) : 0;
+    for ($i = 0; $i < $menulinkscount; $i++) {
+
+        $menulinklabel = $config->lti_menulinklabel[$i];
+        $menulinkurl = $config->lti_menulinkurl[$i];
+
+        if (empty($menulinklabel) && empty($menulinkurl)) {
+            continue;
+        }
+
+        $type->menulinks[] = array (
+            "label" => $menulinklabel,
+            "url" => $menulinkurl
+        );
+    }
+
     $type->timemodified = time();
 
     unset ($config->lti_typename);
@@ -2798,7 +2830,32 @@ function lti_update_type($type, $config) {
     }
     unset($config->oldicon);
 
+    if (isset($type->menulinks)) {
+        $menulinks = $type->menulinks;
+        unset($type->menulinks);
+    }
+
     if ($DB->update_record('lti_types', $type)) {
+
+        try {
+            $transaction = $DB->start_delegated_transaction();
+
+            $DB->delete_records('lti_menu_links', array('typeid' => $type->id)) && isset($menulinks);
+
+            if (isset($menulinks)) {
+                foreach ($menulinks as $key => $value) {
+                    $value["typeid"] = $type->id;
+                    $DB->insert_record('lti_menu_links', $value);
+                }
+            }
+
+            $transaction->allow_commit();
+
+        } catch (Exception $e) {
+            $transaction->rollback($e);
+            throw $e;
+        }
+
         foreach ($config as $key => $value) {
             if (substr($key, 0, 4) == 'lti_' && !is_null($value)) {
                 $record = new \StdClass();
@@ -2830,6 +2887,130 @@ function lti_update_type($type, $config) {
     }
 }
 
+/**
+ * Returns LTI tools that can be placed in the course menu.
+ *
+ * @param int $courseid
+ * @param boolean $activeonly
+ * @return array
+ */
+function lti_load_course_menu_links(int $courseid, $activeonly=false) {
+    global $DB;
+
+    $join = '';
+    if (!$activeonly) {
+        $join = ' LEFT ';
+    }
+    $records = $DB->get_recordset_sql(
+        "SELECT l.id,
+                l.name,
+                l.description,
+                lc.course,
+                lc.menulinkid
+           FROM {lti_types} AS l
+     $join JOIN {lti_course_menu_placements} AS lc ON (lc.typeid=l.id AND lc.course=?)
+          WHERE l.asmenulink=1
+       ORDER BY l.name", [$courseid]
+    );
+
+    $types = [];
+    foreach ($records as $record) {
+        if (!array_key_exists($record->id, $types)) {
+            $type = new stdClass();
+            $type->id = $record->id;
+            $type->name = $record->name;
+            $type->description = trim($record->description);
+            $type->selected = $record->course != null;
+
+            $type->menulinks = [];
+            $linkrecords = $DB->get_recordset_sql(
+                "SELECT id,
+                        typeid,
+                        label
+                   FROM {lti_menu_links}
+                  WHERE typeid=?
+               ORDER BY id", [$type->id]
+            );
+            foreach ($linkrecords as $linkrecord) {
+                $menulink = new stdClass();
+                $menulink->id = $linkrecord->id;
+                $menulink->typeid = $linkrecord->typeid;
+                $menulink->label = $linkrecord->label;
+                $menulink->selected = false;
+
+                $type->menulinks[$menulink->id] = $menulink;
+            }
+
+            $types[$type->id] = $type;
+        }
+
+        if ($record->menulinkid) {
+            $types[$record->id]->menulinks[$record->menulinkid]->selected = true;
+        }
+    }
+
+    return $types;
+}
+
+/**
+ * For given course, set course menu links.
+ *
+ * @param int $courseid
+ * @param array $menulinks
+ */
+function lti_set_course_menu_links(int $courseid, array $menulinks) {
+    global $DB;
+    $transaction = $DB->start_delegated_transaction();
+    try {
+        $DB->delete_records('lti_course_menu_placements', ['course' => $courseid]);
+
+        $ltitools = lti_organize_menuplacement_form_data($menulinks);
+        foreach ($ltitools as $key => $ltitool) {
+            if ($ltitool->menulinks) {
+                foreach ($ltitool->menulinks as $menulinkid) {
+                    $DB->insert_record('lti_course_menu_placements', (object)[
+                        'typeid' => $ltitool->id,
+                        'course' => $courseid,
+                        'menulinkid' => $menulinkid
+                    ]);
+                }
+            } else {
+                $DB->insert_record('lti_course_menu_placements', (object)[
+                    'typeid' => $ltitool->id,
+                    'course' => $courseid,
+                    'menulinkid' => null
+                ]);
+            }
+        }
+
+        $transaction->allow_commit();
+    } catch (Exception $e) {
+        $transaction->rollback($e);
+    }
+}
+
+/**
+ * Organize the output data from menuplacement form.
+ *
+ * @param array $menuitems
+ */
+function lti_organize_menuplacement_form_data(array $menuitems) {
+    $ltitools = [];
+    foreach ($menuitems as $keyset => $menuitemid) {
+        $key = explode('-', $keyset);
+        if ($key[0] === 'ltitool' && $menuitemid) {
+            $ltitool = new stdClass();
+            $ltitool->id = $menuitemid;
+            $ltitool->menulinks = [];
+            $ltitools [$ltitool->id] = $ltitool;
+        } else if ($key[0] === 'menulink' && $menuitemid) {
+            $ltitools[$key[1]]->menulinks [] = $key[2];
+        }
+    }
+
+    return $ltitools;
+}
+
 function lti_add_type($type, $config) {
     global $USER, $SITE, $DB;
 
@@ -2855,6 +3036,11 @@ function lti_add_type($type, $config) {
         $type->course = $SITE->id;
     }
 
+    if (isset($type->menulinks)) {
+        $menulinks = $type->menulinks;
+        unset($type->menulinks);
+    }
+
     // Create a salt value to be used for signing passed data to extension services
     // The outcome service uses the service salt on the instance. This can be used
     // for communication with services not related to a specific LTI instance.
@@ -2863,6 +3049,13 @@ function lti_add_type($type, $config) {
     $id = $DB->insert_record('lti_types', $type);
 
     if ($id) {
+        if (isset($menulinks)) {
+            foreach ($menulinks as $key => $value) {
+                $value['typeid'] = $id;
+                $DB->insert_record('lti_menu_links', $value);
+            }
+        }
+
         foreach ($config as $key => $value) {
             if (!is_null($value)) {
                 if (substr($key, 0, 4) === 'lti_') {
