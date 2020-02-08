@@ -407,3 +407,40 @@
     border: 1px solid #ddd;
     border-radius: 4px;
 }
+
+body#page-admin-mod-lti-typessettings div[id ^= fitem_id_lti_menulinkurl] {
+    background: #eee;
+    margin-bottom: 1rem;
+    margin-top: 0;
+    padding-bottom: 10px;
+    padding-top: 5px;
+    border: 1px solid #bbb;
+    border-top: 0;
+}
+
+body#page-admin-mod-lti-typessettings div[id ^= fitem_id_lti_menulinklabel] {
+    background: #eee;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 5px;
+    padding-top: 10px;
+    border: 1px solid #bbb;
+    border-bottom: 0;
+}
+
+body#page-mod-lti-menuplacement div.row {
+    margin-bottom: 0;
+}
+
+body#page-mod-lti-menuplacement div.row[data-groupname ^= menulinkcheckboxgroup] {
+    margin-bottom: 1rem;
+}
+
+body#page-mod-lti-menuplacement div[data-groupname ^= menulinkcheckboxgroup] div[data-fieldtype = group] {
+    display: block;
+    padding-left: 2.5rem;
+}
+
+body#page-mod-lti-menuplacement div[data-groupname ^= menulinkcheckboxgroup] label {
+    justify-content: start;
+}
