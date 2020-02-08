@@ -169,5 +169,50 @@ function xmldb_lti_upgrade($oldversion) {
     // Automatically generated Moodle v3.9.0 release upgrade line.
     // Put any upgrade step following this.
 
+    if ($oldversion < 2020090100) {
+
+        // Define asmenulink bool to be added to lti_types table.
+        $table = new xmldb_table('lti_types');
+        $table->add_field('asmenulink', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'secureicon');
+
+        // Create lti_course_menu_placements table.
+        $placementstablename = 'lti_course_menu_placements';
+        $table = new xmldb_table($placementstablename);
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, 11, true, true, XMLDB_SEQUENCE, null);
+        $table->add_field('course', XMLDB_TYPE_INTEGER, 11, true, true, false, null, 'id');
+        $table->add_field('typeid', XMLDB_TYPE_INTEGER, 11, true, true, false, null, 'course');
+        $table->add_field('menulinkid', XMLDB_TYPE_INTEGER, 11, true, false, null, null, 'typeid');
+
+        // Adding keys to table lti_course_menu_placements.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('course', XMLDB_KEY_FOREIGN, array('course'), 'course', array('id'));
+        $table->add_key('typeid', XMLDB_KEY_FOREIGN, array('typeid'), 'lti_types', array('id'));
+        $table->add_key('menulinkid', XMLDB_KEY_FOREIGN, array('menulinkid'), 'lti_menu_links', array('id'));
+
+        if (!$dbman->table_exists($placementstablename)) {
+            $dbman->create_table($table);
+        }
+
+        // Create lti_menu_links table.
+        $ltimenutablename = 'lti_menu_links';
+        $table = new xmldb_table($ltimenutablename);
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, 11, true, true, XMLDB_SEQUENCE, null);
+        $table->add_field('typeid', XMLDB_TYPE_INTEGER, 11, true, true, false, null, 'id');
+        $table->add_field('label', XMLDB_TYPE_TEXT, 'small', null, false, null, null, 'typeid');
+        $table->add_field('url', XMLDB_TYPE_TEXT, 'small', null, false, null, null, 'label');
+
+        // Adding keys to table lti_menu_links.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('typeid', XMLDB_KEY_FOREIGN, array('typeid'), 'lti_types', array('id'));
+
+        if (!$dbman->table_exists($ltimenutablename)) {
+            $dbman->create_table($table);
+        }
+
+        upgrade_mod_savepoint(true, 2020090100, 'lti');
+    }
+
     return true;
 }
