@@ -94,6 +94,7 @@ $string['cannot_edit'] = 'You may not edit this tool configuration.';
 $string['capabilities'] = 'Capabilities';
 $string['capabilitiesrequired'] = 'This tool requires access to the following data in order to activate:';
 $string['capabilities_help'] = 'Select those capabilities which you wish to offer to the tool provider.  More than one capability can be selected.';
+$string['changessaved'] = 'Course apps selections have been saved.';
 $string['cleanaccesstokens'] = 'External tool removal of expired access tokens';
 $string['click_to_continue'] = '<a href="{$a->link}" target="_top">Click to continue</a>';
 $string['clientidadmin'] = 'Client ID';
@@ -114,6 +115,9 @@ $string['contentitem_multiple_description'] = 'The following items will be added
 $string['contentitem_multiple_graded'] = 'Graded activity (Maximum grade: {$a})';
 $string['course_tool_types'] = 'Course tools';
 $string['courseactivitiesorresources'] = 'Course activities or resources';
+$string['courseapps'] = 'Course apps';
+$string['courseappselectionmessage'] = 'Select app(s) to launch from side navigation bar';
+$string['courseappselectionmissingmessage'] = 'No apps are currently available. Contact your site administrator for more information.';
 $string['courseid'] = 'Course ID number';
 $string['courseinformation'] = 'Course information';
 $string['courselink'] = 'Go to course';
@@ -180,6 +184,8 @@ $string['errorinvalidmediatype'] = 'Invalid media type: {$a}';
 $string['errorinvalidresponseformat'] = 'Invalid Content-Item response format.';
 $string['errormisconfig'] = 'Misconfigured tool. Please ask your Moodle administrator to fix the configuration of the tool.';
 $string['errortooltypenotfound'] = 'LTI tool type not found.';
+$string['erroremptymenulinklabel'] = 'Menu links are required to have a label.';
+$string['erroremptymenulinkurl'] = 'Menu links are required to have a URL.';
 $string['existing_window'] = 'Existing window';
 $string['extensions'] = 'LTI extension services';
 $string['external_tool_type'] = 'Preconfigured tool';
@@ -372,6 +378,10 @@ along with the consumer key from the tool provider.
 Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
 may not require a shared secret.';
 $string['pending'] = 'Pending';
+$string['placementaddmenulinkbutton'] = 'Add menu link';
+$string['placementasmenulink'] = 'As menu link';
+$string['placementmenulinklabel'] = 'Menu link label';
+$string['placementmenulinkurl'] = 'Menu link URL';
 $string['pluginadministration'] = 'External tool administration';
 $string['pluginname'] = 'External tool';
 $string['preferheight'] = 'Preferred height';
@@ -460,6 +470,7 @@ $string['secure_launch_url_help'] = 'Similar to the tool URL, but used instead o
 
 The tool URL may also be set to an https address to force launching through SSL, and this field may be left blank.';
 $string['selectcontent'] = 'Select content';
+$string['selectcourseapptitle'] = 'Select course apps';
 $string['send'] = 'Send';
 $string['services'] = 'Services';
 $string['services_help'] = 'Select those services which you wish to offer to the tool provider.  More than one service can be selected.';
