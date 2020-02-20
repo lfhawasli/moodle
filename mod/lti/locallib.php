@@ -2451,6 +2451,9 @@ function lti_get_type_type_config($id) {
 
     $type->lti_secureicon = $basicltitype->secureicon;
 
+    $type->lti_asmenulink = $basicltitype->asmenulink;
+    $type->lti_menulinkurl = $basicltitype->menulinkurl;
+
     if (isset($config['resourcekey'])) {
         $type->lti_resourcekey = $config['resourcekey'];
     }
@@ -2590,6 +2593,13 @@ function lti_prepare_type_for_save($type, $config) {
         }
         $config->lti_toolurl_ContentItemSelectionRequest = $type->toolurl_ContentItemSelectionRequest;
     }
+
+    $type->asmenulink = false;
+    if (isset($config->lti_asmenulink)) {
+        $type->asmenulink = $config->lti_asmenulink;
+    }
+
+    $type->menulinkurl = $config->lti_menulinkurl;
 
     $type->timemodified = time();
 

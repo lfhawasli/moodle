@@ -213,6 +213,12 @@ class mod_lti_edit_types_form extends moodleform {
             $mform->disabledIf('lti_toolurl__ContentItemSelectionRequest', null);
         }
 
+        $mform->addElement('checkbox', 'lti_asmenulink', get_string('placementasmenulink', 'lti'));
+        $mform->addElement('text', 'lti_menulinkurl', get_string('placementmenulinkurl', 'lti'), [
+            'size' => '64'
+        ]);
+        $mform->setType('lti_menulinkurl', PARAM_URL);
+
         $mform->addElement('hidden', 'oldicon');
         $mform->setType('oldicon', PARAM_URL);
 

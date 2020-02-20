@@ -360,6 +360,8 @@ along with the consumer key from the tool provider.
 Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
 may not require a shared secret.';
 $string['pending'] = 'Pending';
+$string['placementasmenulink'] = 'As menu link';
+$string['placementmenulinkurl'] = 'Menu link URL';
 $string['pluginadministration'] = 'External tool administration';
 $string['pluginname'] = 'External tool';
 $string['preferheight'] = 'Preferred height';
