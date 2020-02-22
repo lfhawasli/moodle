@@ -110,6 +110,7 @@ $string['confirmtoolactivation'] = 'Are you sure you would like to activate this
 $string['contentitem'] = 'Content-Item Message';
 $string['contentitem_help'] = 'If ticked, the option \'Select content\' will be available when adding an external tool.';
 $string['course_tool_types'] = 'Course tools';
+$string['courseapps'] = 'Course apps';
 $string['courseactivitiesorresources'] = 'Course activities or resources';
 $string['courseid'] = 'Course ID number';
 $string['courseinformation'] = 'Course information';

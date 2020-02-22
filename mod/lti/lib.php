@@ -607,6 +607,7 @@ function lti_check_updates_since(cm_info $cm, $from, $filter = array()) {
 function mod_lti_get_fontawesome_icon_map() {
     return [
         'mod_lti:warning' => 'fa-exclamation text-warning',
+        'mod_lti:i/indent' => 'fa-level-up fa-rotate-90',
     ];
 }
 
@@ -651,4 +652,73 @@ function mod_lti_core_calendar_provide_event_action(calendar_event $event,
         1,
         true
     );
+}
+
+/**
+ * Adds "Course apps" link to navigation.
+ *
+ * @param navigation_node $parentnode
+ * @param stdClass $course
+ * @param context_course $coursecontext
+ */
+function mod_lti_extend_navigation_course(navigation_node $parentnode, stdClass $course, context_course $coursecontext) {
+    global $PAGE, $CFG;
+    require_once($CFG->dirroot.'/mod/lti/locallib.php');
+
+    if ($course->id == SITEID) {
+        return;
+    }
+
+    // Do not display Course apps to non-enrolled users.
+    if (!isloggedin() || (!is_enrolled($coursecontext, null, '', true) &&
+            !has_capability('moodle/course:view', $coursecontext))) {
+        return;
+    }
+
+    // Only show the "Course apps" node if the user is editing or if there are
+    // actual course menu apps to show.
+    $coursemenulinks = lti_load_course_menu_links($course->id, true);
+    if (empty($coursemenulinks) && !$PAGE->user_is_editing()) {
+        return;
+    }
+
+    $coursenode = $PAGE->navigation->find($course->id, navigation_node::TYPE_COURSE);
+
+    $courseappsurl = null;
+    if (has_capability('mod/lti:addcoursetool', $coursecontext)) {
+        $courseappsurl = new \moodle_url('/mod/lti/menuplacement.php',
+                array('course' => $course->id));
+    } else {
+        $courseappsurl = new \moodle_url('/course/view.php', array('id' => $course->id));
+    }
+
+    $appsnode = navigation_node::create(
+        get_string('courseapps', 'mod_lti'),
+        $courseappsurl, // We have to add a URL for node to appear.
+        navigation_node::TYPE_CATEGORY,
+        null,
+        'courseapps',
+        new pix_icon('icon', get_string('courseapps', 'mod_lti'), 'mod_lti')
+    );
+
+    $appsnode->make_inactive();
+    $appsnode = new flat_navigation_node($appsnode, 0);
+    $appsnode->set_showdivider(true);
+    $appsnode = $coursenode->add_node($appsnode);
+
+    foreach ($coursemenulinks as $type) {
+        $node = navigation_node::create(
+            $type->name,
+            new moodle_url('/mod/lti/view.php', [
+                'course' => $course->id,
+                'ltitypeid' => $type->id,
+            ]),
+            navigation_node::TYPE_RESOURCE,
+            null,
+            $type->id,
+            new pix_icon('i/indent', '', 'mod_lti')
+        );
+        $node->set_parent($appsnode);
+        $coursenode->add_node($node);
+    }
 }
