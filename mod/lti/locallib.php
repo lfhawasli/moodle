@@ -2656,6 +2656,43 @@ function lti_update_type($type, $config) {
     }
 }
 
+/**
+ * Returns LTI tools that can be placed in the course menu.
+ *
+ * @param int $courseid
+ * @param boolean $activeonly
+ * @return array
+ */
+function lti_load_course_menu_links(int $courseid, $activeonly=false) {
+    global $DB;
+
+    $join = '';
+    if (!$activeonly) {
+        $join = ' LEFT ';
+    }
+    $records = $DB->get_recordset_sql(
+        "SELECT l.id,
+                l.name,
+                l.description,
+                lc.course
+           FROM {lti_types} AS l
+     $join JOIN {lti_course_menu_placements} AS lc ON (lc.typeid=l.id AND lc.course=?)
+          WHERE l.asmenulink=1
+       ORDER BY l.name", [$courseid]
+    );
+
+    $types = [];
+    foreach ($records as $record) {
+        $type = new stdClass();
+        $type->id = $record->id;
+        $type->name = $record->name;
+        $type->description = trim($record->description);
+        $type->selected = $record->course != null;
+        $types[] = $type;
+    }
+    return $types;
+}
+
 function lti_add_type($type, $config) {
     global $USER, $SITE, $DB;
 
