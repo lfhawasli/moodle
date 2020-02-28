@@ -20,6 +20,7 @@
  * @package    mod_lti
  * @copyright  2020 The Regents of the University of California
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author     David Shepard, Lillian Hawasli
  */
 
 defined('MOODLE_INTERNAL') || die;
@@ -32,6 +33,7 @@ require_once($CFG->libdir.'/formslib.php');
  * @package    mod_lti
  * @copyright  2020 The Regents of the University of California
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author     David Shepard
  */
 class mod_lti_menuplacement_form extends moodleform {
 
