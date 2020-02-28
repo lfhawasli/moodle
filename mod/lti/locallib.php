@@ -2693,6 +2693,31 @@ function lti_load_course_menu_links(int $courseid, $activeonly=false) {
     return $types;
 }
 
+/**
+ * For given course, set course menu links.
+ *
+ * @param int $courseid
+ * @param array $menulinks
+ */
+function lti_set_course_menu_links(int $courseid, array $menulinks) {
+    global $DB;
+    $transaction = $DB->start_delegated_transaction();
+    try {
+        $DB->delete_records('lti_course_menu_placements', ['course' => $courseid]);
+        foreach ($menulinks as $key => $typeid) {
+            if (explode('-', $key)[0] === 'ltitool' && $typeid) {
+                $DB->insert_record('lti_course_menu_placements', (object)[
+                    'typeid' => $typeid,
+                    'course' => $courseid,
+                ]);
+            }
+        }
+        $transaction->allow_commit();
+    } catch (Exception $e) {
+        $transaction->rollback($e);
+    }
+}
+
 function lti_add_type($type, $config) {
     global $USER, $SITE, $DB;
 
