@@ -50,18 +50,37 @@ require_once("../../config.php");
 require_once($CFG->dirroot.'/mod/lti/lib.php');
 require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
-$id = required_param('id', PARAM_INT); // Course Module ID.
+$id = optional_param('id', 0, PARAM_INT); // Course Module ID.
 $triggerview = optional_param('triggerview', 1, PARAM_BOOL);
+$courseid = optional_param('courseid', 0, PARAM_INT);
+$ltitypeid = optional_param('ltitypeid', 0, PARAM_INT);
+$cm = null;
 
-$cm = get_coursemodule_from_id('lti', $id, 0, false, MUST_EXIST);
-$lti = $DB->get_record('lti', array('id' => $cm->instance), '*', MUST_EXIST);
+if ($id) {
+    $cm = get_coursemodule_from_id('lti', $id, 0, false, MUST_EXIST);
+    $lti = $DB->get_record('lti', array('id' => $cm->instance), '*', MUST_EXIST);
+    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $context = context_module::instance($cm->id);
+    $pageparams = array('id' => $id);
+} else {
+    //menulink
+    $lti = $DB->get_record('lti_types', ['id' => $ltitypeid]);
+    $lti->typeid = $ltitypeid;
+    $lti->instructorcustomparameters = null;
+    $lti->debuglaunch = false;
+    $lti->course = $courseid;
+    $course = get_course($courseid);
+    $context = context_course::instance($courseid);
+    $pageparams = array('ltitypeid' => $ltitypeid, 'courseid' => $courseid,);
+}
 
 $typeid = $lti->typeid;
 if ($typeid) {
     $config = lti_get_type_type_config($typeid);
     if ($config->lti_ltiversion === LTI_VERSION_1P3) {
         if (!isset($SESSION->lti_initiatelogin_status)) {
-            echo lti_initiate_login($cm->course, $id, $lti, $config);
+            $courseid = $cm->course ? $cm->course : $courseid;
+            echo lti_initiate_login($courseid, $id, $lti, $config);
             exit;
         } else {
             unset($SESSION->lti_initiatelogin_status);
@@ -69,18 +88,15 @@ if ($typeid) {
     }
 }
 
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-
-$context = context_module::instance($cm->id);
-
 require_login($course, true, $cm);
 require_capability('mod/lti:view', $context);
 
 // Completion and trigger events.
-if ($triggerview) {
-    lti_view($lti, $course, $cm, $context);
+if ($cm) {
+    if ($triggerview) {
+        lti_view($lti, $course, $cm, $context);
+    }
+    $lti->cmid = $cm->id;
 }
 
-$lti->cmid = $cm->id;
 lti_launch_tool($lti);
-
