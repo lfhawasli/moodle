@@ -50,11 +50,32 @@ require_once("../../config.php");
 require_once($CFG->dirroot.'/mod/lti/lib.php');
 require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
-$id = required_param('id', PARAM_INT); // Course Module ID.
+$id = optional_param('id', 0, PARAM_INT); // Course Module ID.
 $triggerview = optional_param('triggerview', 1, PARAM_BOOL);
+$courseid = optional_param('courseid', 0, PARAM_INT);
+$ltitypeid = optional_param('ltitypeid', 0, PARAM_INT);
 
-$cm = get_coursemodule_from_id('lti', $id, 0, false, MUST_EXIST);
-$lti = $DB->get_record('lti', array('id' => $cm->instance), '*', MUST_EXIST);
+$cm = null;
+$placement = null;
+if ($id) {
+    $cm = get_coursemodule_from_id('lti', $id, 0, false, MUST_EXIST);
+    $lti = $DB->get_record('lti', array('id' => $cm->instance), '*', MUST_EXIST);
+
+    $launchparam = 'id=' . $ltitypeid;
+    $pageparams = array('id' => $id);
+} else {
+    $lti = $DB->get_record('lti_types', ['id' => $ltitypeid]);
+    $lti->typeid = $ltitypeid;
+    $lti->instructorcustomparameters = null;
+    $lti->debuglaunch = false;
+    $lti->course = $courseid;
+    $course = get_course($courseid);
+    $context = context_course::instance($courseid);
+    $pageparams = array('ltitypeid' => $ltitypeid, 'courseid' => $courseid,);
+
+    $launchparam = 'ltitypeid=' . $ltitypeid . '&courseid=' . $courseid;
+    $placement = 'menulink';
+}
 
 $typeid = $lti->typeid;
 if ($typeid) {
@@ -69,18 +90,20 @@ if ($typeid) {
     }
 }
 
-$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-
-$context = context_module::instance($cm->id);
+if ($id) {
+    $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
+    $context = context_module::instance($cm->id);
+}
 
 require_login($course, true, $cm);
 require_capability('mod/lti:view', $context);
 
 // Completion and trigger events.
-if ($triggerview) {
-    lti_view($lti, $course, $cm, $context);
+if ($cm) {
+    if ($triggerview) {
+        lti_view($lti, $course, $cm, $context);
+    }
+
+    $lti->cmid = $cm->id;
 }
-
-$lti->cmid = $cm->id;
 lti_launch_tool($lti);
-
