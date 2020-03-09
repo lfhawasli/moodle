@@ -63,7 +63,7 @@ if ($id) {
     $context = context_module::instance($cm->id);
     $pageparams = array('id' => $id);
 } else {
-    //menulink
+    //$id is 0 when LTI is launched via menu link.
     $lti = $DB->get_record('lti_types', ['id' => $ltitypeid]);
     $lti->typeid = $ltitypeid;
     $lti->instructorcustomparameters = null;
