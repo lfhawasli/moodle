@@ -56,7 +56,6 @@ $l  = optional_param('l', 0, PARAM_INT);  // lti ID.
 $forceview = optional_param('forceview', 0, PARAM_BOOL);
 $ltitypeid = optional_param('ltitypeid', 0, PARAM_INT);
 $courseid = optional_param('course', 0, PARAM_INT);
-$modcontext = context_module::instance($cm->id);
 
 $cm = null;
 $pageparams = array();
@@ -97,13 +96,12 @@ if ($cm) {
     $PAGE->set_context($context);
 }
 
-require_login($course, true, $cm);
-require_capability('mod/lti:view', $context);
+//require_login($course, true, $cm);
+//require_capability('mod/lti:view', $context);
 
-/*
-if (is_guest($modulecontext, $USER) || !isloggedin() || !has_capability('mod/lti:view', $context)) {
+if (is_guest($context, $USER) || !isloggedin() || !has_capability('mod/lti:view', $context)) {
     throw new moodle_exception('nopermissions', '');
-}*/
+}
 
 $url = new moodle_url('/mod/lti/view.php', $pageparams);
 $PAGE->set_url($url);
