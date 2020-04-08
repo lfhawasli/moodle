@@ -99,6 +99,10 @@ if ($cm) {
 require_login($course, true, $cm);
 require_capability('mod/lti:view', $context);
 
+if (is_guest($context, $USER) || !isloggedin()) {
+    throw new moodle_exception('nopermissions', 'error');
+}
+
 $url = new moodle_url('/mod/lti/view.php', $pageparams);
 $PAGE->set_url($url);
 

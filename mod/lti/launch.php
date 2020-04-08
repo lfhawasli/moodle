@@ -90,6 +90,10 @@ if ($typeid) {
 require_login($course, true, $cm);
 require_capability('mod/lti:view', $context);
 
+if (is_guest($context, $USER) || !isloggedin()) {
+    throw new moodle_exception('nopermissions', 'error');
+}
+
 // Completion and trigger events.
 if ($cm) {
     if ($triggerview) {
