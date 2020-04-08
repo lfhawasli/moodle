@@ -68,6 +68,11 @@ if ($ltitypeid && $courseid) {
     $context = context_course::instance($courseid);
     $pageparams = array('ltitypeid' => $ltitypeid, 'courseid' => $courseid);
     $launchparam = 'ltitypeid=' . $ltitypeid . '&courseid=' . $courseid;
+    
+    if (is_guest($context, $USER) || !isloggedin()) {
+        throw new moodle_exception('guestsarenotallowed', 'error');
+    }
+    
 } else {
     if ($l) {  // Two ways to specify the module.
         $lti = $DB->get_record('lti', array('id' => $l), '*', MUST_EXIST);
