@@ -213,12 +213,21 @@ class mod_lti_edit_types_form extends moodleform {
             $mform->disabledIf('lti_toolurl__ContentItemSelectionRequest', null);
         }
 
+        $mform->addElement('html', html_writer::link('', '', array('id' => 'menulinkanchor')));
         $mform->addElement('checkbox', 'lti_asmenulink', get_string('placementasmenulink', 'lti'));
-        $mform->addElement('text', 'lti_menulinkurl', get_string('placementmenulinkurl', 'lti'), [
+        $repeatarray = array();
+        $repeateloptions = array();
+        $repeatarray[] = $mform->createElement('text', 'lti_menulinklabel', get_string('placementmenulinklabel', 'lti'));
+        $repeateloptions['lti_menulinklabel']['type'] = PARAM_TEXT;
+        $repeateloptions['lti_menulinklabel']['disabledif'] = array('lti_asmenulink', 'notchecked');
+        $repeatarray[] = $mform->createElement('text', 'lti_menulinkurl', get_string('placementmenulinkurl', 'lti'), [
             'size' => '64'
         ]);
-        $mform->setType('lti_menulinkurl', PARAM_URL);
+        $repeateloptions['lti_menulinkurl']['type'] = PARAM_URL;
+        $repeateloptions['lti_menulinkurl']['disabledif'] = array('lti_asmenulink', 'notchecked');
 
+        $this->repeat_elements($repeatarray, 1,
+            $repeateloptions, 'option_repeats', 'option_add_fields', 1, get_string('placementaddmenulinkbutton', 'lti'), true);
         $mform->addElement('hidden', 'oldicon');
         $mform->setType('oldicon', PARAM_URL);
 
