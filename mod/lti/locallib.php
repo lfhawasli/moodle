@@ -2452,8 +2452,14 @@ function lti_get_type_type_config($id) {
     $type->lti_secureicon = $basicltitype->secureicon;
 
     $type->lti_asmenulink = $basicltitype->asmenulink;
-    $type->lti_menulinkurl = $basicltitype->menulinkurl;
 
+    $ltimenulinks = $DB->get_records_select('lti_menu_links', 'typeid=?', [$id], null, 'id, label, url');
+    
+    foreach ($ltimenulinks as $record) {
+        $type->lti_menulinklabel[] = $record->label;
+        $type->lti_menulinkurl[] = $record->url;
+    }
+    
     if (isset($config['resourcekey'])) {
         $type->lti_resourcekey = $config['resourcekey'];
     }
@@ -2599,7 +2605,21 @@ function lti_prepare_type_for_save($type, $config) {
         $type->asmenulink = $config->lti_asmenulink;
     }
 
-    $type->menulinkurl = $config->lti_menulinkurl;
+    $menulinkscount = count($config->lti_menulinklabel);
+    for ($i = 0 ; $i < $menulinkscount; $i++) {
+
+        $menulinklabel = $config->lti_menulinklabel[$i];
+        $menulinkurl = $config->lti_menulinkurl[$i];
+
+        if (empty($menulinklabel) && empty($menulinkurl)) {
+            continue;
+        }
+
+        $type->menulinks[] = array (
+            "label" => $menulinklabel,
+            "url" => $menulinkurl
+        );
+    }
 
     $type->timemodified = time();
 
@@ -2624,7 +2644,32 @@ function lti_update_type($type, $config) {
     }
     unset($config->oldicon);
 
+    if (isset($type->menulinks)) {
+        $menulinks = $type->menulinks;
+        unset($type->menulinks);
+    }
+
     if ($DB->update_record('lti_types', $type)) {
+    
+        try {
+            $transaction = $DB->start_delegated_transaction();
+
+            $DB->delete_records('lti_menu_links', array('typeid'=> $type->id)) && isset($menulinks);
+
+            if (isset($menulinks)) {
+                foreach ($menulinks as $key => $value) {
+                    $value["typeid"] = $type->id;
+                    $DB->insert_record('lti_menu_links', $value);
+                }
+            }
+
+            $transaction->allow_commit();
+
+        } catch (Exception $e) {
+            $transaction->rollback($e);
+            throw $e;
+        }
+
         foreach ($config as $key => $value) {
             if (substr($key, 0, 4) == 'lti_' && !is_null($value)) {
                 $record = new \StdClass();
@@ -2743,6 +2788,11 @@ function lti_add_type($type, $config) {
         $type->course = $SITE->id;
     }
 
+    if (isset($type->menulinks)) {
+        $menulinks = $type->menulinks;
+        unset($type->menulinks);
+    }
+
     // Create a salt value to be used for signing passed data to extension services
     // The outcome service uses the service salt on the instance. This can be used
     // for communication with services not related to a specific LTI instance.
@@ -2751,6 +2801,13 @@ function lti_add_type($type, $config) {
     $id = $DB->insert_record('lti_types', $type);
 
     if ($id) {
+        if (isset($menulinks)) {
+            foreach ($menulinks as $key => $value) {
+                $value['typeid'] = $id;
+                $DB->insert_record('lti_menu_links', $value);
+            }
+        }
+
         foreach ($config as $key => $value) {
             if (!is_null($value)) {
                 if (substr($key, 0, 4) === 'lti_') {
