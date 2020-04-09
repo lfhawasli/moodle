@@ -364,9 +364,7 @@ Tools which do not require secure communication from Moodle and do not provide a
 may not require a shared secret.';
 $string['pending'] = 'Pending';
 $string['placementasmenulink'] = 'As menu link';
-$string['placementmenulinklabel'] = 'Menu link label';
 $string['placementmenulinkurl'] = 'Menu link URL';
-$string['placementaddmenulinkbutton'] = 'Add menu link';
 $string['pluginadministration'] = 'External tool administration';
 $string['pluginname'] = 'External tool';
 $string['preferheight'] = 'Preferred height';
