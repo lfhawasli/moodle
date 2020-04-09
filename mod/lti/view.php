@@ -100,9 +100,7 @@ require_login($course, true, $cm);
 require_capability('mod/lti:view', $context);
 
 if (is_guest($context, $USER) || !isloggedin()) {
-    //throw new require_login_exception('You are not logged in');
-    //throw new required_capability_exception($context, 'mod/lti:view', 'nopermissions', '');
-    throw new moodle_exception('nopermissions');
+    throw new moodle_exception('nopermissions', 'error');
 }
 
 $url = new moodle_url('/mod/lti/view.php', $pageparams);
