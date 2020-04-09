@@ -95,7 +95,6 @@ if (!empty($id)) {
 if (!empty($returnto)) {
     $pageurl->param('returnto', $returnto);
 }
-$pageurl->set_anchor('menulinkanchor');
 $PAGE->set_url($pageurl);
 
 admin_externalpage_setup('managemodules'); // Hacky solution for printing the admin page.
@@ -122,7 +121,7 @@ if (lti_request_is_using_ssl() && !empty($type->lti_secureicon)) {
     $type->oldicon = $type->lti_icon;
 }
 
-$form = new mod_lti_edit_types_form($pageurl->__toString(),
+$form = new mod_lti_edit_types_form($pageurl,
     (object)array('isadmin' => true, 'istool' => false, 'id' => $id, 'clientid' => $type->lti_clientid));
 
 if ($data = $form->get_data()) {
