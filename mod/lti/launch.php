@@ -62,6 +62,11 @@ if ($id) {
     $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
     $context = context_module::instance($cm->id);
     $pageparams = array('id' => $id);
+    
+    if (is_guest($context, $USER) || !isloggedin()) {
+        throw new moodle_exception('guestsarenotallowed', 'error');
+    }
+    
 } else {
     //$id is 0 when LTI is launched via menu link.
     $lti = $DB->get_record('lti_types', ['id' => $ltitypeid]);
