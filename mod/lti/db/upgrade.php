@@ -189,7 +189,7 @@ function xmldb_lti_upgrade($oldversion) {
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->add_key('course', XMLDB_KEY_FOREIGN, array('course'), 'course', array('id'));
         $table->add_key('typeid',XMLDB_KEY_FOREIGN, array('typeid'), 'lti_types', array('id'));
-        
+
         if (!$dbman->table_exists($placementstablename)) {
             $dbman->create_table($table);
         }
@@ -244,6 +244,19 @@ function xmldb_lti_upgrade($oldversion) {
         }
 
         upgrade_mod_savepoint(true, 2020021001, 'lti');
+    }
+
+    if ($oldversion < 2020021002) {
+
+        $placementstablename = 'lti_course_menu_placements';
+        $table = new xmldb_table($placementstablename);
+
+        $field = new xmldb_field('menulinkid', XMLDB_TYPE_INTEGER, 11, true, false, null, null, 'typeid');
+        $key = new xmldb_key('menulinkid', XMLDB_KEY_FOREIGN, array('menulinkid'), 'lti_menu_links', array('id'));
+        $dbman->add_field($table, $field);
+        $dbman->add_key($table, $key);
+
+        upgrade_mod_savepoint(true, 2020021002, 'lti');
     }
 
     return true;

@@ -2454,12 +2454,12 @@ function lti_get_type_type_config($id) {
     $type->lti_asmenulink = $basicltitype->asmenulink;
 
     $ltimenulinks = $DB->get_records_select('lti_menu_links', 'typeid=?', [$id], null, 'id, label, url');
-    
+
     foreach ($ltimenulinks as $record) {
         $type->lti_menulinklabel[] = $record->label;
         $type->lti_menulinkurl[] = $record->url;
     }
-    
+
     if (isset($config['resourcekey'])) {
         $type->lti_resourcekey = $config['resourcekey'];
     }
@@ -2650,7 +2650,7 @@ function lti_update_type($type, $config) {
     }
 
     if ($DB->update_record('lti_types', $type)) {
-    
+
         try {
             $transaction = $DB->start_delegated_transaction();
 
@@ -2719,7 +2719,8 @@ function lti_load_course_menu_links(int $courseid, $activeonly=false) {
         "SELECT l.id,
                 l.name,
                 l.description,
-                lc.course
+                lc.course,
+                lc.menulinkid
            FROM {lti_types} AS l
      $join JOIN {lti_course_menu_placements} AS lc ON (lc.typeid=l.id AND lc.course=?)
           WHERE l.asmenulink=1
@@ -2728,13 +2729,40 @@ function lti_load_course_menu_links(int $courseid, $activeonly=false) {
 
     $types = [];
     foreach ($records as $record) {
-        $type = new stdClass();
-        $type->id = $record->id;
-        $type->name = $record->name;
-        $type->description = trim($record->description);
-        $type->selected = $record->course != null;
-        $types[] = $type;
+        if (!array_key_exists($record->id, $types)) {
+            $type = new stdClass();
+            $type->id = $record->id;
+            $type->name = $record->name;
+            $type->description = trim($record->description);
+            $type->selected = $record->course != null;
+
+            $type->menulinks = [];
+            $linkrecords = $DB->get_recordset_sql(
+                "SELECT l.id,
+                        l.typeid,
+                        l.label
+                   FROM {lti_menu_links} AS l
+                  WHERE l.typeid=?
+               ORDER BY l.id", [$type->id]
+            );
+            foreach ($linkrecords as $linkrecord) {
+                $menulink = new stdClass();
+                $menulink->id = $linkrecord->id;
+                $menulink->typeid = $linkrecord->typeid;
+                $menulink->label = $linkrecord->label;
+                $menulink->selected = false;
+
+                $type->menulinks[$menulink->id] = $menulink;
+            }
+
+            $types[$type->id] = $type;
+        }
+
+        if ($record->menulinkid) {
+            $types[$record->id]->menulinks[$record->menulinkid]->selected = true;
+        }
     }
+
     return $types;
 }
 
@@ -2749,18 +2777,52 @@ function lti_set_course_menu_links(int $courseid, array $menulinks) {
     $transaction = $DB->start_delegated_transaction();
     try {
         $DB->delete_records('lti_course_menu_placements', ['course' => $courseid]);
-        foreach ($menulinks as $key => $typeid) {
-            if (explode('-', $key)[0] === 'ltitool' && $typeid) {
+
+        $ltitools = lti_organize_menuplacement_form_data($menulinks);
+        foreach ($ltitools as $key => $ltitool) {
+            if ($ltitool->menulinks) {
+                foreach ($ltitool->menulinks as $menulinkid) {
+                    $DB->insert_record('lti_course_menu_placements', (object)[
+                        'typeid' => $ltitool->id,
+                        'course' => $courseid,
+                        'menulinkid' => $menulinkid
+                    ]);
+                }
+            } else {
                 $DB->insert_record('lti_course_menu_placements', (object)[
-                    'typeid' => $typeid,
+                    'typeid' => $ltitool->id,
                     'course' => $courseid,
+                    'menulinkid' => NULL
                 ]);
             }
         }
+
         $transaction->allow_commit();
     } catch (Exception $e) {
         $transaction->rollback($e);
     }
+}
+
+/**
+ * Organize the output data from menuplacement form.
+ *
+ * @param array $menuitems
+ */
+function lti_organize_menuplacement_form_data(array $menuitems) {
+    $ltitools = [];
+    foreach ($menuitems as $keyset => $menuitemid) {
+        $key = explode('-', $keyset);
+        if ($key[0] === 'ltitool' && $menuitemid) {
+            $ltitool = new stdClass();
+            $ltitool->id = $menuitemid;
+            $ltitool->menulinks = [];
+            $ltitools [$ltitool->id]= $ltitool;
+        } else if ($key[0] === 'menulink' && $menuitemid) {
+            $ltitools[$key[1]]->menulinks []= $key[2];
+        }
+    }
+
+    return $ltitools;
 }
 
 function lti_add_type($type, $config) {
