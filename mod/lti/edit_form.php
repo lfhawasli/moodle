@@ -229,7 +229,8 @@ class mod_lti_edit_types_form extends moodleform {
         $repeateloptions['lti_menulinkurl']['disabledif'] = array('lti_asmenulink', 'notchecked');
 
         if (isset($typeid) && !empty($typeid)) {
-            if ($numberofmenulinks = $DB->count_records('lti_menu_links', array('typeid'=> $typeid)) == 0) {
+            $numberofmenulinks = $DB->count_records('lti_menu_links', array('typeid'=> $typeid));
+            if ($numberofmenulinks == 0) {
                 $numberofmenulinks = 1;
             }
         } else {
