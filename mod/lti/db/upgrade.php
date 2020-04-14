@@ -197,5 +197,54 @@ function xmldb_lti_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020021000, 'lti');
     }
 
+    if ($oldversion < 2020021001) {
+
+        // Create lti_menu_links table.
+        $ltimenutablename = 'lti_menu_links';
+        $table = new xmldb_table($ltimenutablename);
+
+        $table->add_field('id', XMLDB_TYPE_INTEGER, 11, true, true, XMLDB_SEQUENCE, null);
+        $table->add_field('typeid', XMLDB_TYPE_INTEGER, 11, true, true, false, null, 'id');
+        $table->add_field('label', XMLDB_TYPE_TEXT, 255, null, false, null, null, 'typeid');
+        $table->add_field('url', XMLDB_TYPE_TEXT, 255, null, false, null, null, 'label');
+
+        // Adding keys to table lti_menu_links.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
+        $table->add_key('typeid',XMLDB_KEY_FOREIGN, array('typeid'), 'lti_types', array('id'));
+
+        if (!$dbman->table_exists($ltimenutablename)) {
+            $dbman->create_table($table);
+        }
+
+        // Check if menulinkurl column exists.
+        if ($dbman->field_exists('lti_types', 'menulinkurl')) {
+
+            // Migrate menulinkurl from lti_course_menu_placements to lti_menu_links.
+            $rs = $DB->get_recordset_select('lti_types', null, null, null, 'id, name, menulinkurl');
+            if ($rs->valid()) {
+                foreach ($rs as $menuurldata) {
+
+                    if (empty($menuurldata->menulinkurl) || is_null($menuurldata->menulinkurl)) {
+                        continue;
+                    }
+
+                    $record                 = new stdclass();
+                    $record->typeid         = $menuurldata->id;
+                    $record->menulinklabel  = $menuurldata->name;
+                    $record->menulinkurl    = $menuurldata->menulinkurl;
+                    $DB->insert_record('lti_menu_links', $record);
+                }
+            }
+            $rs->close();
+
+            // Delete menulinkurl from lti_course_menu_placements.
+            $table = new xmldb_table('lti_types');
+            $field = new xmldb_field('menulinkurl');
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2020021001, 'lti');
+    }
+
     return true;
 }
