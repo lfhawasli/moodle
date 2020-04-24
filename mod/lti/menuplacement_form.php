@@ -52,6 +52,19 @@ class mod_lti_menuplacement_form extends moodleform {
             }
             $mform->addElement('advcheckbox', $checkboxid, $labeltext, NULL, NULL, [NULL, $type->id]);
             $mform->setDefault($checkboxid, $type->selected);
+
+            $checkboxarray = array();
+            $menulinks = $type->menulinks;
+
+            foreach ($menulinks as $menulink) {
+                $menulinkname = 'menulink-' . $type->id . '-' . $menulink->id;
+                $checkboxarray[] = $mform->createElement('checkbox', $menulinkname, '', $menulink->label, $menulink->id);
+                $mform->disabledIf($menulinkname, $checkboxid);
+                if ($menulink->selected) {
+                    $mform->setDefault($menulinkname, $menulink->id);
+                }
+            }
+            $mform->addGroup($checkboxarray, 'menulinkcheckboxgroup' . $type->id, '', array(''), false);
         }
 
         $mform->addElement('hidden', 'courseid');
