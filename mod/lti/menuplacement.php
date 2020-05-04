@@ -42,8 +42,6 @@ $PAGE->set_title(format_string($course->shortname) . ': ' . get_string('selectco
 
 require_capability('mod/lti:addcoursetool', context_course::instance($courseid));
 
-$alltypes = lti_load_course_menu_links($courseid);
-
 $customdata['courseid'] = $courseid;
 $customdata['menulinks'] = lti_load_course_menu_links($courseid);
 $form = new mod_lti_menuplacement_form($url, $customdata);

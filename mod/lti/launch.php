@@ -54,6 +54,7 @@ $id = optional_param('id', 0, PARAM_INT); // Course Module ID.
 $triggerview = optional_param('triggerview', 1, PARAM_BOOL);
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $ltitypeid = optional_param('ltitypeid', 0, PARAM_INT);
+$menulinkid = optional_param('menulinkid', 0, PARAM_INT);
 $cm = null;
 
 if ($id) {
@@ -61,8 +62,7 @@ if ($id) {
     $lti = $DB->get_record('lti', array('id' => $cm->instance), '*', MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
     $context = context_module::instance($cm->id);
-    $pageparams = array('id' => $id);
-    
+
     if (is_guest($context, $USER) || !isloggedin()) {
         throw new moodle_exception('guestsarenotallowed', 'error');
     }
@@ -74,9 +74,11 @@ if ($id) {
     $lti->instructorcustomparameters = null;
     $lti->debuglaunch = false;
     $lti->course = $courseid;
+    if ($menulinkid != 0) {
+        $lti->toolurl = $DB->get_field('lti_menu_links', 'url', ['id' => $menulinkid]);
+    }
     $course = get_course($courseid);
     $context = context_course::instance($courseid);
-    $pageparams = array('ltitypeid' => $ltitypeid, 'courseid' => $courseid,);
 }
 
 $typeid = $lti->typeid;
