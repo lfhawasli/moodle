@@ -259,5 +259,20 @@ function xmldb_lti_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020021002, 'lti');
     }
 
+    if ($oldversion < 2020021003) {
+        $table = new xmldb_table('lti_types');
+
+        $fields = [];
+        $fields[] = new xmldb_field('asrichtexteditorplugin', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'asmenulink');
+        $fields[] = new xmldb_field('richtexteditorurl', XMLDB_TYPE_TEXT, 255, null, false, null, null, 'asrichtexteditorplugin');
+        foreach ($fields as $field) {
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_mod_savepoint(true, 2020021003, 'lti');
+    }
+
     return true;
 }
