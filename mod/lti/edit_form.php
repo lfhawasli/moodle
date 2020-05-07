@@ -239,6 +239,13 @@ class mod_lti_edit_types_form extends moodleform {
 
         $this->repeat_elements($repeatarray, $numberofmenulinks,
             $repeateloptions, 'option_repeats', 'option_add_fields', 1, get_string('placementaddmenulinkbutton', 'lti'), true);
+
+        $mform->addElement('checkbox', 'lti_asrichtexteditorplugin', get_string('placementasrichtexteditorplugin', 'lti'));
+        $mform->addElement('text', 'lti_richtexteditorurl', get_string('placementrichtexteditorurl', 'lti'), [
+            'size' => '64'
+        ]);
+        $mform->setType('lti_richtexteditorurl', PARAM_URL);
+        
         $mform->addElement('hidden', 'oldicon');
         $mform->setType('oldicon', PARAM_URL);
 
@@ -388,7 +395,7 @@ class mod_lti_edit_types_form extends moodleform {
                 return $errors;
             }
         }
-        
+
         $menulinkscount = count($data['lti_menulinklabel']);
         for ($i = 0 ; $i < $menulinkscount; $i++) {
             // If menu link label or url are empty, but not both, give an error.
