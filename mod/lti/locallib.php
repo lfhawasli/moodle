@@ -2539,6 +2539,10 @@ function lti_get_type_type_config($id) {
 
     $ltimenulinks = $DB->get_records_select('lti_menu_links', 'typeid=?', [$id], null, 'id, label, url');
 
+    $type->lti_asrichtexteditorplugin = $basicltitype->asrichtexteditorplugin;
+
+    $type->lti_richtexteditorurl = $basicltitype->richtexteditorurl;
+
     foreach ($ltimenulinks as $record) {
         $type->lti_menulinklabel[] = $record->label;
         $type->lti_menulinkurl[] = $record->url;
@@ -2697,8 +2701,14 @@ function lti_prepare_type_for_save($type, $config) {
     }
 
     $type->asmenulink = false;
+    $type->asrichtexteditorplugin = false;
+
     if (isset($config->lti_asmenulink)) {
         $type->asmenulink = $config->lti_asmenulink;
+    }
+
+    if (isset($config->lti_asrichtexteditorplugin)) {
+        $type->asrichtexteditorplugin = $config->lti_asrichtexteditorplugin;
     }
 
     $menulinkscount = count($config->lti_menulinklabel);
@@ -2716,6 +2726,8 @@ function lti_prepare_type_for_save($type, $config) {
             "url" => $menulinkurl
         );
     }
+
+    $type->richtexteditorurl = $config->lti_richtexteditorurl;
 
     $type->timemodified = time();
 
