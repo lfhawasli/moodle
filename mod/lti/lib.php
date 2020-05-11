@@ -727,7 +727,7 @@ function mod_lti_extend_navigation_course(navigation_node $parentnode, stdClass 
                 ]),
                 navigation_node::TYPE_RESOURCE,
                 null,
-                'ltimenu-'.$menulink->id
+                'ltimenu-'.$type->id.'-'.$menulink->id
             );
 
             $node->set_parent($appsnode);
@@ -744,7 +744,7 @@ function mod_lti_extend_navigation_course(navigation_node $parentnode, stdClass 
                 ]),
                 navigation_node::TYPE_RESOURCE,
                 null,
-                $type->id
+                'ltimenu-'.$type->id
             );
 
             $node->set_parent($appsnode);
