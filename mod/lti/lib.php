@@ -707,18 +707,48 @@ function mod_lti_extend_navigation_course(navigation_node $parentnode, stdClass 
     $appsnode = $coursenode->add_node($appsnode);
 
     foreach ($coursemenulinks as $type) {
-        $node = navigation_node::create(
-            $type->name,
-            new moodle_url('/mod/lti/view.php', [
-                'course' => $course->id,
-                'ltitypeid' => $type->id,
-            ]),
-            navigation_node::TYPE_RESOURCE,
-            null,
-            $type->id,
-            new pix_icon('i/indent', '', 'mod_lti')
-        );
-        $node->set_parent($appsnode);
-        $coursenode->add_node($node);
+
+        // Display selected menu labels.
+        $selectedmenuitem = false;
+        foreach ($type->menulinks as $menulink) {
+
+            if (!$menulink->selected) {
+                continue;
+            }
+
+            $selectedmenuitem = true;
+
+            $node = navigation_node::create(
+                $type->name . ' - ' . $menulink->label,
+                new moodle_url('/mod/lti/view.php', [
+                    'course' => $course->id,
+                    'ltitypeid' => $type->id,
+                    'menulinkid' => $menulink->id
+                ]),
+                navigation_node::TYPE_RESOURCE,
+                null,
+                'ltimenu-'.$menulink->id
+            );
+
+            $node->set_parent($appsnode);
+            $coursenode->add_node($node);
+        }
+        
+        // If no menu labels selected, display selected LTI tool.
+        if (!$selectedmenuitem) {
+            $node = navigation_node::create(
+                $type->name,
+                new moodle_url('/mod/lti/view.php', [
+                    'course' => $course->id,
+                    'ltitypeid' => $type->id,
+                ]),
+                navigation_node::TYPE_RESOURCE,
+                null,
+                $type->id
+            );
+
+            $node->set_parent($appsnode);
+            $coursenode->add_node($node);
+        }
     }
 }
