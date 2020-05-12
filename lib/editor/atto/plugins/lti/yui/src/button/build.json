@@ -1,0 +1,11 @@
+{
+  "name": "moodle-atto_lti-button",
+  "builds" : {
+      "moodle-atto_lti-button" : {
+          "jsfiles" : [
+              "button.js",
+              "deeplinkplacement.js"
+          ]
+      }
+  }
+}
