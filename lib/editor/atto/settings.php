@@ -42,7 +42,7 @@ align = align
 insert = equation, charmap, table, clear
 undo = undo
 accessibility = accessibilitychecker, accessibilityhelper
-other = html';
+other = html, lti';
     $setting = new editor_atto_toolbar_setting('editor_atto/toolbar', $name, $desc, $default);
 
     $settings->add($setting);
