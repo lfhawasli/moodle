@@ -2714,6 +2714,25 @@ function lti_update_type($type, $config) {
 }
 
 /**
+ * Get all types that can be placed in a specific placement.
+ *
+ * @param string $placementname Either'assignment', 'activity', 'menulink', or
+ * 'richtexteditorplugin'
+ *
+ * @return array array of tools
+ */
+function lti_load_type_by_placement (string $placementname) {
+    global $DB;
+
+    $queryfield = [
+        'menulink' => 'asmenulink',
+        'richtexteditorplugin' => 'asrichtexteditorplugin',
+    ][$placementname];
+
+    return $DB->get_records('lti_types', [$queryfield => 1], 'name');
+}
+
+/**
  * Returns LTI tools that can be placed in the course menu.
  *
  * @param int $courseid
