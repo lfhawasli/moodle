@@ -51,7 +51,7 @@ $returnurl = new \moodle_url('/lib/editor/atto/plugins/lti/contentitem_return.ph
 // Prepare the request.
 $request = lti_build_content_item_selection_request(
     $id, $course, $returnurl, '', '', [], [],
-    false, false, false, false, false, 'richtexteditor'
+    false, false, false, false, false, '', 'richtexteditor'
 );
 
 // Get the launch HTML.
