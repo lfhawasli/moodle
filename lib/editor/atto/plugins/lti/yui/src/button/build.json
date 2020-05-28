@@ -3,7 +3,8 @@
   "builds" : {
       "moodle-atto_lti-button" : {
           "jsfiles" : [
-              "button.js"
+              "button.js",
+              "deeplinkplacement.js"
           ]
       }
   }
