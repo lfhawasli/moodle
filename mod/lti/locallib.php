@@ -1092,7 +1092,7 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
     if (!is_array($presentationtargets)) {
         throw new coding_exception('The list of accepted presentation targets should be in an array');
     }
-    if (!in_array($placement, ['menulink', 'richtexteditor'])) {
+    if (!in_array($placement, ['', 'menulink', 'richtexteditor'])) {
         throw new Moodle_Exception("Invalid placement type: $placement");
     }
     // Check title. If empty, use the tool's name.
