@@ -499,7 +499,7 @@ function lti_get_jwt_claim_mapping() {
  * @return array the endpoint URL and parameters (including the signature)
  * @since  Moodle 3.0
  */
-function lti_get_launch_data($instance, $nonce = '', $placement = 'menulink') {
+function lti_get_launch_data($instance, $nonce = '', $placement = '') {
     global $PAGE, $CFG, $USER;
 
     if (empty($instance->typeid)) {
@@ -1078,7 +1078,7 @@ function lti_build_custom_parameters($toolproxy, $tool, $instance, $params, $cus
  */
 function lti_build_content_item_selection_request($id, $course, moodle_url $returnurl, $title = '', $text = '', $mediatypes = [],
                                                   $presentationtargets = [], $autocreate = false, $multiple = false,
-                                                  $unsigned = false, $canconfirm = false, $copyadvice = false, $nonce = '', $placement = 'menulink') {
+                                                  $unsigned = false, $canconfirm = false, $copyadvice = false, $nonce = '', $placement = '') {
     global $USER;
 
     $tool = lti_get_type($id);
@@ -2749,7 +2749,7 @@ function lti_update_type($type, $config) {
 /**
  * Get all types that can be placed in a specific placement.
  *
- * @param string $placementname Either'assignment', 'activity', 'menulink', or
+ * @param string $placementname Either 'menulink' or
  * 'richtexteditorplugin'
  *
  * @return array array of tools

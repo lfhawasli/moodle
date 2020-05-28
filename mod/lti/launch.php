@@ -52,7 +52,7 @@ require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID.
 $triggerview = optional_param('triggerview', 1, PARAM_BOOL);
-$placement = optional_param('placement', 'menulink', PARAM_RAW);
+$placement = optional_param('placement', '', PARAM_RAW);
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $ltitypeid = optional_param('ltitypeid', 0, PARAM_INT);
 $cm = null;
