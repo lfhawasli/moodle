@@ -709,7 +709,7 @@ function lti_get_launch_data($instance, $nonce = '', $placement = '') {
  * @param string $placement is either 'menulink', or 'richtexteditor'.
  * @return string The HTML code containing the javascript code for the launch
  */
-function lti_launch_tool($instance, $placement) {
+function lti_launch_tool($instance, $placement = '') {
 
     list($endpoint, $parms) = lti_get_launch_data($instance, '', $placement);
     $debuglaunch = ( $instance->debuglaunch == 1 );
@@ -1178,7 +1178,7 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
     if (!$typeconfig['contentitem']) {
         $requesttype = 'basic-lti-launch-request';
     }
-    $standardparams = lti_build_standard_message(null, $orgid, $islti2, $requesttype);
+    $standardparams = lti_build_standard_request(null, $orgid, $islti2, $requesttype);
     $requestparams = array_merge($requestparams, $standardparams);
 
     // Get custom request parameters and merge to the request parameters.
