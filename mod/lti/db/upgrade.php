@@ -237,7 +237,7 @@ function xmldb_lti_upgrade($oldversion) {
             }
             $rs->close();
 
-            // Delete menulinkurl from lti_course_menu_placements.
+            // Delete menulinkurl from lti_types.
             $table = new xmldb_table('lti_types');
             $field = new xmldb_field('menulinkurl');
             $dbman->drop_field($table, $field);
