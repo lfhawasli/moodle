@@ -94,6 +94,7 @@ $string['cannot_edit'] = 'You may not edit this tool configuration.';
 $string['capabilities'] = 'Capabilities';
 $string['capabilitiesrequired'] = 'This tool requires access to the following data in order to activate:';
 $string['capabilities_help'] = 'Select those capabilities which you wish to offer to the tool provider.  More than one capability can be selected.';
+$string['changessaved'] = 'Course apps selections have been saved.';
 $string['cleanaccesstokens'] = 'External tool removal of expired access tokens';
 $string['click_to_continue'] = '<a href="{$a->link}" target="_top">Click to continue</a>';
 $string['clientidadmin'] = 'Client ID';
@@ -455,7 +456,6 @@ tool providers. It may be an automated process, or it may require a dialogue wit
 
 Tools which do not require secure communication from Moodle and do not provide additional services (such as grade reporting)
 may not require a resource key.';
-$string['changessaved'] = 'Course apps selections have been saved.';
 $string['resourceurl'] = 'Resource URL';
 $string['return_to_course'] = 'Click <a href="{$a->link}" target="_top">here</a> to return to the course.';
 $string['saveallfeedback'] = 'Save all my feedback';
