@@ -78,7 +78,6 @@ if ($ltitypeid && $courseid) {
     if ($l) {  // Two ways to specify the module.
         $lti = $DB->get_record('lti', array('id' => $l), '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('lti', $lti->id, $lti->course, false, MUST_EXIST);
-
     } else {
         $cm = get_coursemodule_from_id('lti', $id, 0, false, MUST_EXIST);
         $lti = $DB->get_record('lti', array('id' => $cm->instance), '*', MUST_EXIST);

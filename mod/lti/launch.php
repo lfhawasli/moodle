@@ -66,7 +66,6 @@ if ($id) {
     if (is_guest($context, $USER) || !isloggedin()) {
         throw new moodle_exception('guestsarenotallowed', 'error');
     }
-    
 } else {
     //$id is 0 when LTI is launched via menu link.
     $lti = $DB->get_record('lti_types', ['id' => $ltitypeid]);
