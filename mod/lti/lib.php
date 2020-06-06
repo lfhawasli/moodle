@@ -801,6 +801,7 @@ function mod_lti_core_calendar_provide_event_action(calendar_event $event,
  * @param stdClass $course
  * @param context_course $coursecontext
  */
+
 function mod_lti_extend_navigation_course(navigation_node $parentnode, stdClass $course, context_course $coursecontext) {
     global $PAGE, $CFG;
     require_once($CFG->dirroot.'/mod/lti/locallib.php');
@@ -843,7 +844,7 @@ function mod_lti_extend_navigation_course(navigation_node $parentnode, stdClass 
 
     $appsnode->make_inactive();
     $appsnode = new flat_navigation_node($appsnode, 0);
-    $appsnode->set_showdivider(true);
+    $appsnode->set_showdivider(true, get_string('courseapps', 'mod_lti'));
     $appsnode = $coursenode->add_node($appsnode);
 
     foreach ($coursemenulinks as $type) {
