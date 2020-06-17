@@ -182,8 +182,8 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="typeid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Primary key of LTI type(tool)"/>
-        <FIELD NAME="label" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Label of menu link url"/>
-        <FIELD NAME="url" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Menu link url"/>
+        <FIELD NAME="label" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Label of menu link url"/>
+        <FIELD NAME="url" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Menu link url"/>
         </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
