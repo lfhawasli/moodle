@@ -411,7 +411,7 @@ class mod_lti_edit_types_form extends moodleform {
                 return $errors;
             }
         }
-        
+
         $menulinkscount = count($data['lti_menulinklabel']);
         for ($i = 0 ; $i < $menulinkscount; $i++) {
             // If menu link label or url are empty, but not both, give an error.

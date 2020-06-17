@@ -843,7 +843,7 @@ function mod_lti_extend_navigation_course(navigation_node $parentnode, stdClass 
 
     $appsnode->make_inactive();
     $appsnode = new flat_navigation_node($appsnode, 0);
-    $appsnode->set_showdivider(true);
+    $appsnode->set_showdivider(true, get_string('courseapps', 'mod_lti'));
     $appsnode = $coursenode->add_node($appsnode);
 
     foreach ($coursemenulinks as $type) {

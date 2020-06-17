@@ -78,7 +78,6 @@ if ($ltitypeid && $courseid) {
     if ($l) {  // Two ways to specify the module.
         $lti = $DB->get_record('lti', array('id' => $l), '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('lti', $lti->id, $lti->course, false, MUST_EXIST);
-
     } else {
         $cm = get_coursemodule_from_id('lti', $id, 0, false, MUST_EXIST);
         $lti = $DB->get_record('lti', array('id' => $cm->instance), '*', MUST_EXIST);
@@ -175,7 +174,12 @@ if (($launchcontainer == LTI_LAUNCH_CONTAINER_WINDOW) &&
 } else {
     $content = '';
     if ($config->lti_ltiversion === LTI_VERSION_1P3) {
-        $content = lti_initiate_login($cm->course, $id, $lti, $config);
+        if (isset($cm->course) && !empty($cm->course)) {
+            $content = lti_initiate_login($cm->course, $id, $lti, $config);
+        } else {
+            $content = lti_initiate_login($courseid, $id, $lti, $config);
+        }
+
     }
 
     // Request the launch content with an iframe tag.
