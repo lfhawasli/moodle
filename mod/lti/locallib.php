@@ -2701,7 +2701,7 @@ function lti_prepare_type_for_save($type, $config) {
         $type->asmenulink = $config->lti_asmenulink;
     }
 
-    $menulinkscount = count($config->lti_menulinklabel);
+    $menulinkscount = isset($config->lti_menulinklabel) ? count($config->lti_menulinklabel) : 0;
     for ($i = 0 ; $i < $menulinkscount; $i++) {
 
         $menulinklabel = $config->lti_menulinklabel[$i];
