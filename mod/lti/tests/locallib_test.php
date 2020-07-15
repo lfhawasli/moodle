@@ -374,7 +374,7 @@ class mod_lti_locallib_testcase extends advanced_testcase {
         $this->assertEquals('ContentItemSelectionRequest', $params['lti_message_type']);
         $this->assertEquals(LTI_VERSION_1, $params['lti_version']);
         $this->assertEquals('application/vnd.ims.lti.v1.ltilink', $params['accept_media_types']);
-        $this->assertEquals('frame,iframe,window', $params['accept_presentation_document_targets']);
+        $this->assertEquals('frame,iframe,window,embed', $params['accept_presentation_document_targets']);
         $this->assertEquals($returnurl->out(false), $params['content_item_return_url']);
         $this->assertEquals('false', $params['accept_unsigned']);
         $this->assertEquals('false', $params['accept_multiple']);

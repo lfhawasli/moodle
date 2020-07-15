@@ -1201,7 +1201,7 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
     if (!$typeconfig['contentitem']) {
         $requesttype = 'basic-lti-launch-request';
     }
-    $standardparams = lti_build_standard_request(null, $orgid, $islti2, $requesttype);
+    $standardparams = lti_build_standard_message(null, $orgid, $tool->ltiversion, $requesttype);
     $requestparams = array_merge($requestparams, $standardparams);
 
     // Get custom request parameters and merge to the request parameters.
@@ -2760,7 +2760,7 @@ function lti_prepare_type_for_save($type, $config) {
         );
     }
 
-    $type->richtexteditorurl = $config->lti_richtexteditorurl;
+    $type->richtexteditorurl = isset($config->lti_richtexteditorurl) ? $config->lti_richtexteditorurl : '';
 
     $type->timemodified = time();
 
