@@ -85,7 +85,7 @@
         <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="A description of what this LTI module is."/>
         <FIELD NAME="asmenulink" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Can the type be used as an menu link?"/>
         <FIELD NAME="asrichtexteditorplugin" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="Can the type be used as a rich text editor plugin?"/>
-        <FIELD NAME="richtexteditorurl" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="richtexteditorurl" TYPE="text" LENGTH="small" NOTNULL="false" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
