@@ -171,7 +171,7 @@ function xmldb_lti_upgrade($oldversion) {
 
         $fields = [];
         $fields[] = new xmldb_field('asmenulink', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'secureicon');
-        $fields[] = new xmldb_field('menulinkurl', XMLDB_TYPE_TEXT, 255, null, false, null, null, 'asmenulink');
+        $fields[] = new xmldb_field('menulinkurl', XMLDB_TYPE_TEXT, 'small', null, false, null, null, 'asmenulink');
         foreach ($fields as $field) {
             if (!$dbman->field_exists($table, $field)) {
                 $dbman->add_field($table, $field);
@@ -205,8 +205,8 @@ function xmldb_lti_upgrade($oldversion) {
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, 11, true, true, XMLDB_SEQUENCE, null);
         $table->add_field('typeid', XMLDB_TYPE_INTEGER, 11, true, true, false, null, 'id');
-        $table->add_field('label', XMLDB_TYPE_TEXT, 255, null, false, null, null, 'typeid');
-        $table->add_field('url', XMLDB_TYPE_TEXT, 255, null, false, null, null, 'label');
+        $table->add_field('label', XMLDB_TYPE_TEXT, 'small', null, false, null, null, 'typeid');
+        $table->add_field('url', XMLDB_TYPE_TEXT, 'small', null, false, null, null, 'label');
 
         // Adding keys to table lti_menu_links.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
