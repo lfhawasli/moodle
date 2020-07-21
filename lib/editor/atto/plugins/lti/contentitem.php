@@ -19,7 +19,7 @@
  *
  * @package    atto_lti
  * @copyright  2020 The Regents of the University of California
- * @author     David Shepard
+ * @author     David Shepard, Lillian Hawasli
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,6 +30,16 @@ require_once($CFG->dirroot . '/mod/lti/locallib.php');
 $id = required_param('id', PARAM_INT);
 $courseid = required_param('course', PARAM_INT);
 $callback = required_param('callback', PARAM_ALPHANUMEXT);
+
+$config = lti_get_type_type_config($id);
+if ($config->lti_ltiversion === LTI_VERSION_1P3) {
+    if (!isset($SESSION->lti_initiatelogin_status)) {
+        echo lti_initiate_login($courseid, 0, null, $config, 'ContentItemSelectionRequest', '', '');
+        exit;
+    } else {
+        unset($SESSION->lti_initiatelogin_status);
+    }
+}
 
 // Check access and capabilities.
 $course = get_course($courseid);
