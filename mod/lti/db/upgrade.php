@@ -254,10 +254,12 @@ function xmldb_lti_upgrade($oldversion) {
         $placementstablename = 'lti_course_menu_placements';
         $table = new xmldb_table($placementstablename);
 
-        $field = new xmldb_field('menulinkid', XMLDB_TYPE_INTEGER, 11, true, false, null, null, 'typeid');
-        $key = new xmldb_key('menulinkid', XMLDB_KEY_FOREIGN, array('menulinkid'), 'lti_menu_links', array('id'));
-        $dbman->add_field($table, $field);
-        $dbman->add_key($table, $key);
+        if (!$dbman->field_exists($placementstablename, 'menulinkid')) {
+            $field = new xmldb_field('menulinkid', XMLDB_TYPE_INTEGER, 11, true, false, null, null, 'typeid');
+            $key = new xmldb_key('menulinkid', XMLDB_KEY_FOREIGN, array('menulinkid'), 'lti_menu_links', array('id'));
+            $dbman->add_field($table, $field);
+            $dbman->add_key($table, $key);
+        }
 
         upgrade_mod_savepoint(true, 2020061503, 'lti');
     }
