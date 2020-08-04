@@ -1187,6 +1187,8 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
     // Get base request parameters.
     $instance = new stdClass();
     $instance->course = $course->id;
+    $instance->name = $tool->name;
+    $instance->id = 'ltimenu-'.$id;
     $requestparams = lti_build_request($instance, $typeconfig, $course, $id, $islti2);
 
     // Get LTI2-specific request parameters and merge to the request parameters if applicable.
