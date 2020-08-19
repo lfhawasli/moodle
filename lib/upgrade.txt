@@ -36,6 +36,7 @@ information provided here is intended especially for developers.
   a callback function instead of an array of options.
 * Admin setting admin_setting_configselect now supports validating the selection by supplying a
   callback function.
+* New library function rename_to_unused_name() to rename a file within its current location.
 * The task system has new functions adhoc_task_starting() and scheduled_task_starting() which must
   be called before executing a task, and a new function \core\task\manager::get_running_tasks()
   returns information about currently-running tasks.
