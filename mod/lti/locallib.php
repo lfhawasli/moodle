@@ -1187,12 +1187,9 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
     // Get base request parameters.
     $instance = new stdClass();
     $instance->course = $course->id;
-    echo "<pre>";
-    var_dump($tool);
-    echo "</pre>";
-    exit();
-    //$instance->name = $tool->name;
-    //$instance->id = 'ltimenu-'.$id;
+    
+    $instance->name = $tool->name;
+    $instance->id = 'ltimenu-'.$id;
     $requestparams = lti_build_request($instance, $typeconfig, $course, $id, $islti2);
 
     // Get LTI2-specific request parameters and merge to the request parameters if applicable.
@@ -1274,6 +1271,11 @@ function lti_build_content_item_selection_request($id, $course, moodle_url $retu
     $requestparams['content_item_return_url'] = $returnurl->out(false);
     $requestparams['title'] = $title;
     $requestparams['text'] = $text;
+    
+    echo "<pre>";
+    var_dump($requestparams);
+    echo "</pre>";
+    exit();
     if (!$islti13) {
         $signedparams = lti_sign_parameters($requestparams, $toolurlout, 'POST', $key, $secret);
     } else {
