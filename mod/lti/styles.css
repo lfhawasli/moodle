@@ -432,15 +432,15 @@ body#page-mod-lti-menuplacement div.row {
     margin-bottom: 0;
 }
 
-body#page-mod-lti-menuplacement div.row[data-groupname ^= menulinkcheckboxgroup] {
+body#page-mod-lti-menuplacement div.row[id ^= fgroup_id_menulinkcheckboxgroup] {
     margin-bottom: 1rem;
 }
 
-body#page-mod-lti-menuplacement div[data-groupname ^= menulinkcheckboxgroup] div[data-fieldtype = group] {
-    display: block;
+body#page-mod-lti-menuplacement div[id ^= fgroup_id_menulinkcheckboxgroup] div.felement {
     padding-left: 2.5rem;
 }
 
-body#page-mod-lti-menuplacement div[data-groupname ^= menulinkcheckboxgroup] label {
+body#page-mod-lti-menuplacement div[id ^= fgroup_id_menulinkcheckboxgroup] label {
     justify-content: start;
+    width: 100%;
 }
