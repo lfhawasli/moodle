@@ -52,6 +52,7 @@ require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
 $id = optional_param('id', 0, PARAM_INT); // Course Module ID.
 $triggerview = optional_param('triggerview', 1, PARAM_BOOL);
+$placement = optional_param('placement', '', PARAM_RAW);
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $ltitypeid = optional_param('ltitypeid', 0, PARAM_INT);
 $menulinkid = optional_param('menulinkid', 0, PARAM_INT);
@@ -62,6 +63,7 @@ if ($id) {
     $lti = $DB->get_record('lti', array('id' => $cm->instance), '*', MUST_EXIST);
     $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
     $context = context_module::instance($cm->id);
+    $pageparams = array('id' => $id);
 
     if (is_guest($context, $USER) || !isloggedin()) {
         throw new moodle_exception('guestsarenotallowed', 'error');
@@ -108,4 +110,4 @@ if ($cm) {
     $lti->cmid = $cm->id;
 }
 
-lti_launch_tool($lti);
+lti_launch_tool($lti, $placement);
