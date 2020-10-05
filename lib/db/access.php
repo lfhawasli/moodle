@@ -119,6 +119,15 @@ $capabilities = array(
         )
     ),
 
+    'moodle/site:senderrormessage' => [
+        'riskbitmask' => RISK_SPAM,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'user' => CAP_ALLOW
+        )
+    ],
+
     'moodle/site:deleteownmessage' => array(
 
         'captype' => 'write',
@@ -2555,5 +2564,16 @@ $capabilities = array(
             'coursecreator' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
         )
+    ],
+
+    // Allow users to download content.
+    'moodle/contentbank:downloadcontent' => [
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'manager' => CAP_ALLOW,
+            'coursecreator' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+        ]
     ],
 );

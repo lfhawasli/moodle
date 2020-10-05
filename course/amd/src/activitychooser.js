@@ -133,7 +133,18 @@ const registerListenerEvents = (courseId, chooserConfig) => {
                 const sectionModal = buildModal(bodyPromise, footerData);
 
                 // Now we have a modal we should start fetching data.
-                const data = await fetchModuleData();
+                // If an error occurs while fetching the data, display the error within the modal.
+                const data = await fetchModuleData().catch(async(e) => {
+                    const errorTemplateData = {
+                        'errormessage': e.message
+                    };
+                    bodyPromiseResolver(await Templates.render('core_course/local/activitychooser/error', errorTemplateData));
+                });
+
+                // Early return if there is no module data.
+                if (!data) {
+                    return;
+                }
 
                 // Apply the section id to all the module instance links.
                 const builtModuleData = sectionIdMapper(data, caller.dataset.sectionid, caller.dataset.sectionreturnid);
@@ -248,6 +259,7 @@ const buildModal = (bodyPromise, footer) => {
         body: bodyPromise,
         footer: footer.customfootertemplate,
         large: true,
+        scrollable: false,
         templateContext: {
             classes: 'modchooser'
         }

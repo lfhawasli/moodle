@@ -50,7 +50,7 @@ class mod_lti_menuplacement_form extends moodleform {
             if (!empty($type->description)) {
                 $labeltext .= '<br />' . $type->description;
             }
-            $mform->addElement('advcheckbox', $checkboxid, $labeltext, NULL, NULL, [NULL, $type->id]);
+            $mform->addElement('advcheckbox', $checkboxid, $labeltext, null, null, [null, $type->id]);
             $mform->setDefault($checkboxid, $type->selected);
 
             $checkboxarray = array();

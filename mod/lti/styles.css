@@ -408,7 +408,7 @@
     border-radius: 4px;
 }
 
-body#page-admin-mod-lti-typessettings div[id ^= fitem_id_lti_menulinkurl] {
+body#page-admin-mod-lti-typessettings div[id^=fitem_id_lti_menulinkurl] {
     background: #eee;
     margin-bottom: 1rem;
     margin-top: 0;
@@ -418,7 +418,7 @@ body#page-admin-mod-lti-typessettings div[id ^= fitem_id_lti_menulinkurl] {
     border-top: 0;
 }
 
-body#page-admin-mod-lti-typessettings div[id ^= fitem_id_lti_menulinklabel] {
+body#page-admin-mod-lti-typessettings div[id^=fitem_id_lti_menulinklabel] {
     background: #eee;
     margin-top: 0;
     margin-bottom: 0;
@@ -432,15 +432,15 @@ body#page-mod-lti-menuplacement div.row {
     margin-bottom: 0;
 }
 
-body#page-mod-lti-menuplacement div.row[id ^= fgroup_id_menulinkcheckboxgroup] {
+body#page-mod-lti-menuplacement div.row[id^=fgroup_id_menulinkcheckboxgroup] {
     margin-bottom: 1rem;
 }
 
-body#page-mod-lti-menuplacement div[id ^= fgroup_id_menulinkcheckboxgroup] div.felement {
+body#page-mod-lti-menuplacement div[id^=fgroup_id_menulinkcheckboxgroup] div.felement {
     padding-left: 2.5rem;
 }
 
-body#page-mod-lti-menuplacement div[id ^= fgroup_id_menulinkcheckboxgroup] label {
+body#page-mod-lti-menuplacement div[id^=fgroup_id_menulinkcheckboxgroup] label {
     justify-content: start;
     width: 100%;
 }

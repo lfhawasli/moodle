@@ -169,38 +169,30 @@ function xmldb_lti_upgrade($oldversion) {
     // Automatically generated Moodle v3.9.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2020061501) {
+    if ($oldversion < 2020090100) {
+
+        // Define asmenulink bool to be added to lti_types table.
         $table = new xmldb_table('lti_types');
+        $table->add_field('asmenulink', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'secureicon');
 
-        $fields = [];
-        $fields[] = new xmldb_field('asmenulink', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'secureicon');
-        $fields[] = new xmldb_field('menulinkurl', XMLDB_TYPE_TEXT, 'small', null, false, null, null, 'asmenulink');
-        foreach ($fields as $field) {
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
-        }
-
+        // Create lti_course_menu_placements table.
         $placementstablename = 'lti_course_menu_placements';
         $table = new xmldb_table($placementstablename);
 
         $table->add_field('id', XMLDB_TYPE_INTEGER, 11, true, true, XMLDB_SEQUENCE, null);
         $table->add_field('course', XMLDB_TYPE_INTEGER, 11, true, true, false, null, 'id');
         $table->add_field('typeid', XMLDB_TYPE_INTEGER, 11, true, true, false, null, 'course');
+        $table->add_field('menulinkid', XMLDB_TYPE_INTEGER, 11, true, false, null, null, 'typeid');
 
         // Adding keys to table lti_course_menu_placements.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->add_key('course', XMLDB_KEY_FOREIGN, array('course'), 'course', array('id'));
-        $table->add_key('typeid',XMLDB_KEY_FOREIGN, array('typeid'), 'lti_types', array('id'));
+        $table->add_key('typeid', XMLDB_KEY_FOREIGN, array('typeid'), 'lti_types', array('id'));
+        $table->add_key('menulinkid', XMLDB_KEY_FOREIGN, array('menulinkid'), 'lti_menu_links', array('id'));
 
         if (!$dbman->table_exists($placementstablename)) {
             $dbman->create_table($table);
         }
-
-        upgrade_mod_savepoint(true, 2020061501, 'lti');
-    }
-
-    if ($oldversion < 2020061502) {
 
         // Create lti_menu_links table.
         $ltimenutablename = 'lti_menu_links';
@@ -213,70 +205,13 @@ function xmldb_lti_upgrade($oldversion) {
 
         // Adding keys to table lti_menu_links.
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('typeid',XMLDB_KEY_FOREIGN, array('typeid'), 'lti_types', array('id'));
+        $table->add_key('typeid', XMLDB_KEY_FOREIGN, array('typeid'), 'lti_types', array('id'));
 
         if (!$dbman->table_exists($ltimenutablename)) {
             $dbman->create_table($table);
         }
 
-        // Check if menulinkurl column exists.
-        if ($dbman->field_exists('lti_types', 'menulinkurl')) {
-
-            // Migrate menulinkurl from lti_course_menu_placements to lti_menu_links.
-            $rs = $DB->get_recordset_select('lti_types', null, null, null, 'id, name, menulinkurl');
-            if ($rs->valid()) {
-                foreach ($rs as $menuurldata) {
-
-                    if (empty($menuurldata->menulinkurl) || is_null($menuurldata->menulinkurl)) {
-                        continue;
-                    }
-
-                    $record                 = new stdclass();
-                    $record->typeid         = $menuurldata->id;
-                    $record->menulinklabel  = $menuurldata->name;
-                    $record->menulinkurl    = $menuurldata->menulinkurl;
-                    $DB->insert_record('lti_menu_links', $record);
-                }
-            }
-            $rs->close();
-
-            // Delete menulinkurl from lti_types.
-            $table = new xmldb_table('lti_types');
-            $field = new xmldb_field('menulinkurl');
-            $dbman->drop_field($table, $field);
-        }
-
-        upgrade_mod_savepoint(true, 2020061502, 'lti');
-    }
-
-    if ($oldversion < 2020061503) {
-
-        $placementstablename = 'lti_course_menu_placements';
-        $table = new xmldb_table($placementstablename);
-
-        if (!$dbman->field_exists($placementstablename, 'menulinkid')) {
-            $field = new xmldb_field('menulinkid', XMLDB_TYPE_INTEGER, 11, true, false, null, null, 'typeid');
-            $key = new xmldb_key('menulinkid', XMLDB_KEY_FOREIGN, array('menulinkid'), 'lti_menu_links', array('id'));
-            $dbman->add_field($table, $field);
-            $dbman->add_key($table, $key);
-        }
-
-        upgrade_mod_savepoint(true, 2020061503, 'lti');
-    }
-
-    if ($oldversion < 2020061504) {
-        $table = new xmldb_table('lti_types');
-
-        $fields = [];
-        $fields[] = new xmldb_field('asrichtexteditorplugin', XMLDB_TYPE_INTEGER, 1, null, null, null, 0, 'asmenulink');
-        $fields[] = new xmldb_field('richtexteditorurl', XMLDB_TYPE_TEXT, 'small', null, false, null, null, 'asrichtexteditorplugin');
-        foreach ($fields as $field) {
-            if (!$dbman->field_exists($table, $field)) {
-                $dbman->add_field($table, $field);
-            }
-        }
-
-        upgrade_mod_savepoint(true, 2020061504, 'lti');
+        upgrade_mod_savepoint(true, 2020090100, 'lti');
     }
 
     return true;
