@@ -68,7 +68,7 @@ class mod_lti_edit_types_form extends moodleform {
      * Define this form.
      */
     public function definition() {
-        global $CFG, $DB, $PAGE;
+        global $CFG, $PAGE;
 
         $mform    =& $this->_form;
 
@@ -229,39 +229,6 @@ class mod_lti_edit_types_form extends moodleform {
             $mform->disabledIf('lti_toolurl__ContentItemSelectionRequest', null);
         }
 
-        $mform->addElement('html', html_writer::tag('span', '', array('id' => 'menulinkanchor')));
-        $mform->addElement('checkbox', 'lti_asmenulink', get_string('placementasmenulink', 'lti'));
-        $repeatarray = array();
-        $repeateloptions = array();
-
-        $repeatarray[] = $mform->createElement('text', 'lti_menulinklabel', get_string('placementmenulinklabel', 'lti'));
-        $repeateloptions['lti_menulinklabel']['type'] = PARAM_TEXT;
-        $repeateloptions['lti_menulinklabel']['disabledif'] = array('lti_asmenulink', 'notchecked');
-
-        $repeatarray[] = $mform->createElement('text', 'lti_menulinkurl', get_string('placementmenulinkurl', 'lti'), [
-            'size' => '64'
-        ]);
-        $repeateloptions['lti_menulinkurl']['type'] = PARAM_URL;
-        $repeateloptions['lti_menulinkurl']['disabledif'] = array('lti_asmenulink', 'notchecked');
-
-        if (isset($typeid) && !empty($typeid)) {
-            $numberofmenulinks = $DB->count_records('lti_menu_links', array('typeid' => $typeid));
-            if ($numberofmenulinks == 0) {
-                $numberofmenulinks = 1;
-            }
-        } else {
-            $numberofmenulinks = 1;
-        }
-
-        $this->repeat_elements($repeatarray, $numberofmenulinks,
-            $repeateloptions, 'option_repeats', 'option_add_fields', 1, get_string('placementaddmenulinkbutton', 'lti'), true);
-
-        $mform->addElement('checkbox', 'lti_asrichtexteditorplugin', get_string('placementasrichtexteditorplugin', 'lti'));
-        $mform->addElement('text', 'lti_richtexteditorurl', get_string('placementrichtexteditorurl', 'lti'), [
-            'size' => '64'
-        ]);
-        $mform->setType('lti_richtexteditorurl', PARAM_URL);
-        
         $mform->addElement('hidden', 'oldicon');
         $mform->setType('oldicon', PARAM_URL);
 
@@ -419,21 +386,6 @@ class mod_lti_edit_types_form extends moodleform {
             if (!empty($warning)) {
                 $errors['lti_ltiversion'] = $warning;
                 return $errors;
-            }
-        }
-
-        $menulinkscount = isset($data['lti_menulinklabel']) ? count($data['lti_menulinklabel']) : 0;
-        for ($i = 0; $i < $menulinkscount; $i++) {
-            // If menu link label or url are empty, but not both, give an error.
-            if (empty($data['lti_menulinklabel'][$i]) XOR empty($data['lti_menulinkurl'][$i])) {
-
-                if (empty($data['lti_menulinklabel'][$i])) {
-                    $errors['lti_menulinklabel['.$i.']'] = get_string('erroremptymenulinklabel', 'mod_lti');
-                }
-
-                if (empty($data['lti_menulinkurl'][$i])) {
-                    $errors['lti_menulinkurl['.$i.']'] = get_string('erroremptymenulinkurl', 'mod_lti');
-                }
             }
         }
         return $errors;
