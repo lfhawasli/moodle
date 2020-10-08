@@ -169,7 +169,7 @@ function xmldb_lti_upgrade($oldversion) {
     // Automatically generated Moodle v3.9.0 release upgrade line.
     // Put any upgrade step following this.
 
-    if ($oldversion < 2020090100) {
+    if ($oldversion < 2021052501) {
 
         // Define asmenulink bool to be added to lti_types table.
         $table = new xmldb_table('lti_types');
@@ -211,7 +211,7 @@ function xmldb_lti_upgrade($oldversion) {
             $dbman->create_table($table);
         }
 
-        upgrade_mod_savepoint(true, 2020090100, 'lti');
+        upgrade_mod_savepoint(true, 2021052501, 'lti');
     }
 
     return true;
