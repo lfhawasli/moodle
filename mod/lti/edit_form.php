@@ -234,10 +234,16 @@ class mod_lti_edit_types_form extends moodleform {
         $repeatarray = array();
         $repeateloptions = array();
 
+        // Create Hidden element with menu link id
+        $repeatarray[] = $mform->createElement('hidden', 'lti_menulinkid');
+        $repeateloptions['lti_menulinkid']['type'] = PARAM_INT;
+
+        // Create Menu link label.
         $repeatarray[] = $mform->createElement('text', 'lti_menulinklabel', get_string('placementmenulinklabel', 'lti'));
         $repeateloptions['lti_menulinklabel']['type'] = PARAM_TEXT;
         $repeateloptions['lti_menulinklabel']['disabledif'] = array('lti_asmenulink', 'notchecked');
 
+        // Create Menu link URL.
         $repeatarray[] = $mform->createElement('text', 'lti_menulinkurl', get_string('placementmenulinkurl', 'lti'), [
             'size' => '64'
         ]);

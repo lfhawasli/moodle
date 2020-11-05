@@ -2626,6 +2626,7 @@ function lti_get_type_type_config($id) {
     $ltimenulinks = $DB->get_records_select('lti_menu_links', 'typeid=?', [$id], null, 'id, label, url');
 
     foreach ($ltimenulinks as $record) {
+        $type->lti_menulinkid[] = $record->id;
         $type->lti_menulinklabel[] = $record->label;
         $type->lti_menulinkurl[] = $record->url;
     }
@@ -2794,14 +2795,12 @@ function lti_prepare_type_for_save($type, $config) {
     $menulinkscount = isset($config->lti_menulinklabel) ? count($config->lti_menulinklabel) : 0;
     for ($i = 0; $i < $menulinkscount; $i++) {
 
+        $menulinkid = $config->lti_menulinkid[$i];
         $menulinklabel = $config->lti_menulinklabel[$i];
         $menulinkurl = $config->lti_menulinkurl[$i];
 
-        if (empty($menulinklabel) && empty($menulinkurl)) {
-            continue;
-        }
-
         $type->menulinks[] = array (
+            "id" => $menulinkid,
             "label" => $menulinklabel,
             "url" => $menulinkurl
         );
@@ -2840,12 +2839,22 @@ function lti_update_type($type, $config) {
         try {
             $transaction = $DB->start_delegated_transaction();
 
-            $DB->delete_records('lti_menu_links', array('typeid' => $type->id)) && isset($menulinks);
-
             if (isset($menulinks)) {
-                foreach ($menulinks as $key => $value) {
-                    $value["typeid"] = $type->id;
-                    $DB->insert_record('lti_menu_links', $value);
+                
+                foreach ($menulinks as $menulink) {
+                    // Add record if id is 0.
+                    if (is_null($menulink['id']) || empty($menulink['id'])) {
+                        $menulink["typeid"] = $type->id;
+                        $DB->insert_record('lti_menu_links', $menulink);
+                    } else {
+                        // Delete record if label and url are empty.
+                        if (empty($menulink['label']) && empty($menulink['url'])) {
+                            $DB->delete_records('lti_menu_links', array('id' => $menulink['id']));
+                            $DB->delete_records('lti_course_menu_placements', array('menulinkid' => $menulink['id']));
+                        } else {
+                            $DB->update_record('lti_menu_links', $menulink);
+                        }
+                    }
                 }
             }
 
